@@ -15,13 +15,6 @@ class AccountTest {
             "QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo",
             Account(secretKey).publicKey.toString()
         )
-        assertEquals(64, Account(secretKey).publicKey.toString().length)
-    }
-
-    @Test
-    fun generateNewAccount() {
-        val account = Account()
-        assertEquals(64, account.publicKey.toString().length)
     }
 
     @Test
