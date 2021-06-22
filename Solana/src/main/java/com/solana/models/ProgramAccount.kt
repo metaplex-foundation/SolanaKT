@@ -3,39 +3,41 @@ package com.solana.models
 import com.squareup.moshi.Json
 import org.bitcoinj.core.Base58
 import java.util.*
+import kotlin.collections.AbstractMap
 
-class ProgramAccount {
-    inner class Account(acc: Any) {
+class ProgramAccount(pa: AbstractMap<*, *>) {
+    class Account(acc: Any?) {
         @Json(name = "data")
-        var data: String? = null
+        private var data: String? = null
 
         @Json(name = "executable")
-        val isExecutable: Boolean
+        private val executable: Boolean
 
         @Json(name = "lamports")
-        val lamports: Double
+        private val lamports: Double
 
         @Json(name = "owner")
-        val owner: String?
+        private val owner: String?
 
         @Json(name = "rentEpoch")
-        val rentEpoch: Double
+        private val rentEpoch: Double
         private var encoding: String? = null
         val decodedData: ByteArray
-            get() = if (encoding == RpcSendTransactionConfig.Encoding.base64.toString()) {
+            get() = if (encoding != null && encoding == RpcSendTransactionConfig.Encoding.base64.toString()) {
                 Base64.getDecoder().decode(data)
             } else Base58.decode(data)
 
         init {
-            val account = acc as AbstractMap<*, *>
-            val rawData = account["data"]
+            val account = acc as AbstractMap<*, *>?
+            val rawData = account!!["data"]
             if (rawData is List<*>) {
-                data = rawData[0] as String
-                encoding = rawData[1] as String
+                val dataList = rawData as List<String>
+                data = dataList[0]
+                encoding = dataList[1]
             } else if (rawData is String) {
                 data = rawData
             }
-            isExecutable = account["executable"] as Boolean
+            executable = account["executable"] as Boolean
             lamports = account["lamports"] as Double
             owner = account["owner"] as String?
             rentEpoch = account["rentEpoch"] as Double
@@ -43,16 +45,13 @@ class ProgramAccount {
     }
 
     @Json(name = "account")
-    var account: Account? = null
-        private set
+    private val account: Account
 
     @Json(name = "pubkey")
-    var pubkey: String? = null
-        private set
+    private val pubkey: String?
 
-    constructor() {}
-    constructor(pa: Map<String, Any>) {
-        account = Account(pa["account"]!!)
+    init {
+        account = Account(pa["account"])
         pubkey = pa["pubkey"] as String?
     }
 }

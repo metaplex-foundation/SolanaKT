@@ -1,6 +1,6 @@
 package com.solana
 
-import com.solana.models.PublicKey
+import com.solana.core.PublicKey
 import org.junit.Assert.*
 import org.junit.Test
 import java.io.ByteArrayOutputStream
@@ -63,7 +63,7 @@ class PublicKeyTest {
     fun createProgramAddress() {
         val programId = PublicKey("BPFLoader1111111111111111111111111111111111")
         var programAddress = PublicKey.createProgramAddress(
-            Arrays.asList(PublicKey("SeedPubey1111111111111111111111111111111111").toByteArray()),
+            listOf(PublicKey("SeedPubey1111111111111111111111111111111111").toByteArray()!!),
             programId
         )
         assertTrue(programAddress.equals(PublicKey("GUs5qLUfsEHkcMB9T38vjr18ypEhRuNWiePW2LoK4E3K")))
@@ -106,16 +106,16 @@ class PublicKeyTest {
         val programId = PublicKey("6Cust2JhvweKLh4CVo1dt21s2PJ86uNGkziudpkNPaCj")
         val programId2 = PublicKey("BPFLoader1111111111111111111111111111111111")
         val programAddress = PublicKey.findProgramAddress(
-            Arrays.asList(PublicKey("8VBafTNv1F8k5Bg7DTVwhitw3MGAMTmekHsgLuMJxLC8").toByteArray()),
+            Arrays.asList(PublicKey("8VBafTNv1F8k5Bg7DTVwhitw3MGAMTmekHsgLuMJxLC8").toByteArray()!!),
             programId
         )
         assertTrue(programAddress.address.equals(PublicKey("FGnnqkzkXUGKD7wtgJCqTemU3WZ6yYqkYJ8xoQoXVvUG")))
         val programAddress2 = PublicKey
             .findProgramAddress(
                 Arrays.asList(
-                    PublicKey("SeedPubey1111111111111111111111111111111111").toByteArray(),
-                    PublicKey("3gF2KMe9KiC6FNVBmfg9i267aMPvK37FewCip4eGBFcT").toByteArray(),
-                    PublicKey("HwRVBufQ4haG5XSgpspwKtNd3PC9GM9m1196uJW36vds").toByteArray()
+                    PublicKey("SeedPubey1111111111111111111111111111111111").toByteArray()!!,
+                    PublicKey("3gF2KMe9KiC6FNVBmfg9i267aMPvK37FewCip4eGBFcT").toByteArray()!!,
+                    PublicKey("HwRVBufQ4haG5XSgpspwKtNd3PC9GM9m1196uJW36vds").toByteArray()!!
                 ),
                 programId2
             )

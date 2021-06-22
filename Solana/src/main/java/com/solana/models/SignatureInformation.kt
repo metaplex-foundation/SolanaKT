@@ -3,24 +3,20 @@ package com.solana.models
 import com.squareup.moshi.Json
 import java.util.*
 
-class SignatureInformation {
+class SignatureInformation(info: AbstractMap<*, *>) {
     @Json(name = "err")
-    var err: Any? = null
-        private set
+    private var err: Any?
 
     @Json(name = "memo")
-    var memo: Any? = null
-        private set
+    private val memo: Any?
 
     @Json(name = "signature")
-    var signature: String? = null
-        private set
+    private val signature: String?
 
     @Json(name = "slot")
-    val slot: Long = 0
+    private val slot: Long = 0
 
-    constructor() {}
-    constructor(info: Map<String, Any>) {
+    init {
         err = info["err"]
         memo = info["memo"]
         signature = info["signature"] as String?
