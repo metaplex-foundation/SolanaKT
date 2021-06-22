@@ -2,24 +2,21 @@ package com.solana.models
 
 import com.squareup.moshi.Json
 
-class AccountInfo : RpcResultObject() {
+class AccountInfo(@Json(name = "value") private val value: Value? = null) : RpcResultObject() {
     class Value {
         @Json(name = "data")
-        val data: List<String>? = null
+        private val data: List<String>? = null
 
         @Json(name = "executable")
-        val isExecutable = false
+        private val executable = false
 
         @Json(name = "lamports")
-        val lamports: Long = 0
+        private val lamports: Long = 0
 
         @Json(name = "owner")
-        val owner: String? = null
+        private val owner: String? = null
 
         @Json(name = "rentEpoch")
-        val rentEpoch: Long = 0
+        private val rentEpoch: Long = 0
     }
-
-    @Json(name = "value")
-    val value: Value? = null
 }

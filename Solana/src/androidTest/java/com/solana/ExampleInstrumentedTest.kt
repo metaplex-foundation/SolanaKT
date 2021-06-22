@@ -1,4 +1,4 @@
-package com.solana.solana
+package com.solana
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

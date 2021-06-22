@@ -1,83 +1,96 @@
 package com.solana.models
 
+import com.solana.models.TokenResultObjects.TokenAmountInfo
 import com.squareup.moshi.Json
 
-class ConfirmedTransaction {
+class ConfirmedTransaction(
+    @Json(name = "meta") private val meta: Meta?,
+    @Json(name = "slot") private val slot: Long,
+    @Json(name = "transaction") private val transaction: Transaction?,
+) {
     class Header {
         @Json(name = "numReadonlySignedAccounts")
-        val numReadonlySignedAccounts: Long = 0
+        private val numReadonlySignedAccounts: Long = 0
 
         @Json(name = "numReadonlyUnsignedAccounts")
-        val numReadonlyUnsignedAccounts: Long = 0
+        private val numReadonlyUnsignedAccounts: Long = 0
 
         @Json(name = "numRequiredSignatures")
-        val numRequiredSignatures: Long = 0
+        private val numRequiredSignatures: Long = 0
     }
 
     class Instruction {
         @Json(name = "accounts")
-        val accounts: List<Long>? = null
+        private val accounts: List<Long>? = null
 
         @Json(name = "data")
-        val data: String? = null
+        private val data: String? = null
 
         @Json(name = "programIdIndex")
-        val programIdIndex: Long = 0
+        private val programIdIndex: Long = 0
     }
 
     class Message {
         @Json(name = "accountKeys")
-        val accountKeys: List<String>? = null
+        private val accountKeys: List<String>? = null
 
         @Json(name = "header")
-        val header: Header? = null
+        private val header: Header? = null
 
         @Json(name = "instructions")
-        val instructions: List<Instruction>? = null
+        private val instructions: List<Instruction>? = null
 
         @Json(name = "recentBlockhash")
-        val recentBlockhash: String? = null
+        private val recentBlockhash: String? = null
     }
 
     class Status {
         @Json(name = "Ok")
-        val ok: Any? = null
+        private val ok: Any? = null
+    }
+
+    class TokenBalance {
+        @Json(name = "accountIndex")
+        private val accountIndex: Double? = null
+
+        @Json(name = "mint")
+        private val mint: String? = null
+
+        @Json(name = "uiTokenAmount")
+        private val uiTokenAmount: TokenAmountInfo? = null
     }
 
     class Meta {
         @Json(name = "err")
-        val err: Any? = null
+        private val err: Any? = null
 
         @Json(name = "fee")
-        val fee: Long = 0
+        private val fee: Long = 0
 
         @Json(name = "innerInstructions")
-        val innerInstructions: List<Any>? = null
+        private val innerInstructions: List<Any>? = null
+
+        @Json(name = "preTokenBalances")
+        private val preTokenBalances: List<TokenBalance>? = null
+
+        @Json(name = "postTokenBalances")
+        private val postTokenBalances: List<TokenBalance>? = null
 
         @Json(name = "postBalances")
-        val postBalances: List<Long>? = null
+        private val postBalances: List<Long>? = null
 
         @Json(name = "preBalances")
-        val preBalances: List<Long>? = null
+        private val preBalances: List<Long>? = null
 
         @Json(name = "status")
-        val status: Status? = null
+        private val status: Status? = null
     }
 
     class Transaction {
         @Json(name = "message")
-        val message: Message? = null
+        private val message: Message? = null
 
         @Json(name = "signatures")
-        val signatures: List<String>? = null
+        private val signatures: List<String>? = null
     }
-
-    @Json(name = "meta")
-    val meta: Meta? = null
-
-    @Json(name = "slot")
-    val slot: Long = 0
-
-    @Json(name = "transaction")
-    val transaction: Transaction? = null
 }

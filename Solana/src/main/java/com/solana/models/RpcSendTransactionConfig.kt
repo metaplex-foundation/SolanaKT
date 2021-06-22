@@ -13,4 +13,7 @@ class RpcSendTransactionConfig {
 
     @Json(name = "encoding")
     private val encoding = Encoding.base64
+
+    @Json(name = "skipPreflight")
+    private val skipPreFlight = true
 }

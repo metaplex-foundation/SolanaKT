@@ -2,15 +2,9 @@ package com.solana.models
 
 import com.squareup.moshi.Json
 
-open class RpcResultObject {
+open class RpcResultObject(@Json(name = "context") var context: Context? = null) {
     class Context {
         @Json(name = "slot")
-        val slot: Long = 0
-    }
-
-    @Json(name = "context")
-    protected var context: Context? = null
-    fun gContext(): Context? {
-        return context
+        private val slot: Long = 0
     }
 }
