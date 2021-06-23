@@ -7,6 +7,7 @@ import org.junit.Test
 import java.util.*
 import java.util.logging.Logger
 
+
 class AccountTests {
     @Test
     fun accountFromSecretKey() {

@@ -4,93 +4,93 @@ import com.solana.models.TokenResultObjects.TokenAmountInfo
 import com.squareup.moshi.Json
 
 class ConfirmedTransaction(
-    @Json(name = "meta") private val meta: Meta?,
-    @Json(name = "slot") private val slot: Long,
-    @Json(name = "transaction") private val transaction: Transaction?,
+    @Json(name = "meta") val meta: Meta?,
+    @Json(name = "slot") val slot: Long,
+    @Json(name = "transaction") val transaction: Transaction?,
 ) {
-    class Header {
+    class Header (
         @Json(name = "numReadonlySignedAccounts")
-        private val numReadonlySignedAccounts: Long = 0
+        val numReadonlySignedAccounts: Long,
 
         @Json(name = "numReadonlyUnsignedAccounts")
-        private val numReadonlyUnsignedAccounts: Long = 0
+        val numReadonlyUnsignedAccounts: Long,
 
         @Json(name = "numRequiredSignatures")
-        private val numRequiredSignatures: Long = 0
-    }
+        val numRequiredSignatures: Long
+    )
 
-    class Instruction {
+    class Instruction (
         @Json(name = "accounts")
-        private val accounts: List<Long>? = null
+        val accounts: List<Long>?,
 
         @Json(name = "data")
-        private val data: String? = null
+        val data: String?,
 
         @Json(name = "programIdIndex")
-        private val programIdIndex: Long = 0
-    }
+        val programIdIndex: Long
+    )
 
-    class Message {
+    class Message (
         @Json(name = "accountKeys")
-        private val accountKeys: List<String>? = null
+        val accountKeys: List<String>,
 
         @Json(name = "header")
-        private val header: Header? = null
+        val header: Header,
 
         @Json(name = "instructions")
-        private val instructions: List<Instruction>? = null
+        val instructions: List<Instruction>,
 
         @Json(name = "recentBlockhash")
-        private val recentBlockhash: String? = null
-    }
+        val recentBlockhash: String
+    )
 
-    class Status {
+    class Status (
         @Json(name = "Ok")
-        private val ok: Any? = null
-    }
+        val ok: Any?
+    )
 
-    class TokenBalance {
+    class TokenBalance (
         @Json(name = "accountIndex")
-        private val accountIndex: Double? = null
+        val accountIndex: Double,
 
         @Json(name = "mint")
-        private val mint: String? = null
+        val mint: String,
 
         @Json(name = "uiTokenAmount")
-        private val uiTokenAmount: TokenAmountInfo? = null
-    }
+        val uiTokenAmount: TokenAmountInfo
+    )
 
-    class Meta {
+    class Meta (
         @Json(name = "err")
-        private val err: Any? = null
+        val err: Any?,
 
         @Json(name = "fee")
-        private val fee: Long = 0
+        val fee: Long,
 
         @Json(name = "innerInstructions")
-        private val innerInstructions: List<Any>? = null
+        val innerInstructions: List<Any>,
 
         @Json(name = "preTokenBalances")
-        private val preTokenBalances: List<TokenBalance>? = null
+        val preTokenBalances: List<TokenBalance>,
 
         @Json(name = "postTokenBalances")
-        private val postTokenBalances: List<TokenBalance>? = null
+        val postTokenBalances: List<TokenBalance>,
 
         @Json(name = "postBalances")
-        private val postBalances: List<Long>? = null
+        val postBalances: List<Long>,
 
         @Json(name = "preBalances")
-        private val preBalances: List<Long>? = null
+        val preBalances: List<Long>,
 
         @Json(name = "status")
-        private val status: Status? = null
-    }
+        val status: Status
+    )
 
-    class Transaction {
+    class Transaction (
         @Json(name = "message")
-        private val message: Message? = null
+        val message: ConfirmedTransaction.Message,
 
         @Json(name = "signatures")
-        private val signatures: List<String>? = null
-    }
+        val signatures: List<String>,
+    )
 }

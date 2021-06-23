@@ -12,10 +12,9 @@ class RecentBlockhash(
 
     class Value (
         @Json(name = "blockhash")
-        val blockhash: String? = null,
-
+        val blockhash: String,
         @Json(name = "feeCalculator")
-        val feeCalculator: FeeCalculator? = null
+        val feeCalculator: FeeCalculator
     )
 
 }
