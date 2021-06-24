@@ -4,45 +4,38 @@ import com.squareup.moshi.Json
 import java.util.*
 
 class TokenResultObjects {
-    open class TokenAmountInfo(am: Map<String, Any>) {
-
-        @Json(name = "amount")
-        var amount: String? = am["amount"] as String
-
-        @Json(name = "decimals")
-        var decimals: Int = (am["decimals"] as Double).toInt()
-
-        @Json(name = "uiAmount")
-        var uiAmount: Double = am["uiAmount"] as Double
-
-        @Json(name = "uiAmountString")
-        var uiAmountString: String = am["uiAmountString"] as String
-
+    open class TokenAmountInfo(
+        @Json(name = "amount") var amount: String?,
+        @Json(name = "decimals") var decimals: Int,
+        @Json(name = "uiAmount") var uiAmount: Double,
+        @Json(name = "uiAmountString") var uiAmountString: String
+    ) {
+        constructor(am: Map<String, Any>) : this(
+            amount =  am["amount"] as String,
+            decimals = (am["decimals"] as Double).toInt(),
+            uiAmount = am["uiAmount"] as Double,
+            uiAmountString = am["uiAmountString"] as String
+        )
     }
 
-    class TokenAccount (am: Map<String, Any>) {
-        @Json(name = "amount")
-        val amount: String?
+    class TokenAccount (
+        @Json(name = "amount") val amount: String?,
 
-        @Json(name = "decimals")
-        val decimals: Int
+        @Json(name = "decimals") val decimals: Int,
 
-        @Json(name = "uiAmount")
-        val uiAmount: Double?
+        @Json(name = "uiAmount") val uiAmount: Double?,
 
-        @Json(name = "uiAmountString")
-        val uiAmountString: String?
+        @Json(name = "uiAmountString") val uiAmountString: String?,
 
-        @Json(name = "address")
-        val address: String?
-
-        init {
-            amount = am["amount"] as String
-            decimals = (am["decimals"] as Double).toInt()
-            uiAmount = am["uiAmount"] as Double
-            uiAmountString = am["uiAmountString"] as String
+        @Json(name = "address") val address: String?
+    ) {
+    constructor(am: Map<String, Any>) : this (
+            amount = am["amount"] as String,
+            decimals = (am["decimals"] as Double).toInt(),
+            uiAmount = am["uiAmount"] as Double,
+            uiAmountString = am["uiAmountString"] as String,
             address = am["uiAmountString"] as String
-        }
+        )
     }
 
     class TokenInfo (
