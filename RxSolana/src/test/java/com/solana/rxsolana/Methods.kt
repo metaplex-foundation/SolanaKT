@@ -4,6 +4,7 @@ import com.solana.rxsolana.api.getRecentBlockhash
 import com.solana.rxsolana.api.getConfirmedTransaction
 import com.solana.rxsolana.api.sendTransaction
 import com.solana.rxsolana.api.getBalance
+import com.solana.rxsolana.api.getVoteAccounts
 import com.solana.Solana
 import com.solana.core.Account
 import com.solana.core.PublicKey
@@ -30,9 +31,6 @@ class Methods {
     }
     @Test
     fun TestGetBalance() {
-        val logging = HttpLoggingInterceptor()
-        logging.level = (HttpLoggingInterceptor.Level.BODY)
-        OkHttpClient.Builder().addInterceptor(logging).build()
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getBalance(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV")).blockingGet()
         Assert.assertNotNull(result)
@@ -42,9 +40,17 @@ class Methods {
     fun TestGetConfirmedTransaction() {
         val logging = HttpLoggingInterceptor()
         logging.level = (HttpLoggingInterceptor.Level.BODY)
-        OkHttpClient.Builder().addInterceptor(logging).build()
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana, ))
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getConfirmedTransaction("7Zk9yyJCXHapoKyHwd8AzPeW9fJWCvszR6VAcHUhvitN5W9QG9JRnoYXR8SBQPTh27piWEmdybchDt5j7xxoUth").blockingGet()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetVoteAccounts() {
+        val logging = HttpLoggingInterceptor()
+        logging.level = (HttpLoggingInterceptor.Level.BODY)
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val result = solana.api.getVoteAccounts().blockingGet()
         Assert.assertNotNull(result)
     }
 

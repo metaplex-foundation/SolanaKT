@@ -1,9 +1,5 @@
-package com.solana
+package com.solana.core
 
-import com.solana.core.Account
-import com.solana.core.PublicKey
-import com.solana.core.Transaction
-import com.solana.core.TransactionBuilder
 import com.solana.programs.MemoProgram.writeUtf8
 import com.solana.programs.SystemProgram
 import org.bitcoinj.core.Base58

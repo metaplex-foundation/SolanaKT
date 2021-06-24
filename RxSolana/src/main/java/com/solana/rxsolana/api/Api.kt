@@ -4,6 +4,7 @@ import com.solana.core.Account
 import com.solana.core.PublicKey
 import com.solana.core.Transaction
 import com.solana.models.ConfirmedTransaction
+import com.solana.models.VoteAccounts
 import io.reactivex.Single
 import io.reactivex.disposables.Disposables
 
@@ -49,6 +50,19 @@ public fun Api.getConfirmedTransaction(signature: String): Single<ConfirmedTrans
 public fun Api.sendTransaction(transaction: Transaction, signer: Account): Single<String> {
     return Single.create { emitter ->
         this.sendTransaction(transaction, signer) { result ->
+            result.onSuccess {
+                emitter.onSuccess(it)
+            }.onFailure {
+                emitter.onError(it)
+            }
+        }
+        Disposables.empty()
+    }
+}
+
+public fun Api.getVoteAccounts(): Single<VoteAccounts> {
+    return Single.create { emitter ->
+        this.getVoteAccounts() { result ->
             result.onSuccess {
                 emitter.onSuccess(it)
             }.onFailure {

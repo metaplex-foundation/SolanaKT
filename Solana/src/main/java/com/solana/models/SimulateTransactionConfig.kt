@@ -4,7 +4,7 @@ import com.squareup.moshi.Json
 
 class SimulateTransactionConfig {
     @Json(name = "encoding")
-    private var encoding = RpcSendTransactionConfig.Encoding.base64
+    private var encoding = Encoding.base64
 
     @Json(name = "accounts")
     private var accounts: Map<*, *>? = null
@@ -22,7 +22,7 @@ class SimulateTransactionConfig {
         this.accounts = accounts
     }
 
-    constructor(encoding: RpcSendTransactionConfig.Encoding) {
+    constructor(encoding: Encoding) {
         this.encoding = encoding
     }
 }

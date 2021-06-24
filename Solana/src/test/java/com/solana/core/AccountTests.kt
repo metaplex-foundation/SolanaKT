@@ -1,4 +1,4 @@
-package com.solana
+package com.solana.core
 
 import com.solana.core.Account
 import junit.framework.Assert.assertEquals

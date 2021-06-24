@@ -23,7 +23,7 @@ class ProgramAccount(pa: AbstractMap<*, *>) {
         private val rentEpoch: Double
         private var encoding: String? = null
         val decodedData: ByteArray
-            get() = if (encoding != null && encoding == RpcSendTransactionConfig.Encoding.base64.toString()) {
+            get() = if (encoding != null && encoding == Encoding.base64.toString()) {
                 Base64.getDecoder().decode(data)
             } else Base58.decode(data)
 

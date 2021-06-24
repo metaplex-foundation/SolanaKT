@@ -52,7 +52,7 @@ class Api(private val router: NetworkingRouter) {
         return sendTransaction(transaction, listOf(signer), null, onComplete)
     }
 
-    fun sendTransaction(
+    private fun sendTransaction(
         transaction: Transaction,
         signers: List<Account>,
         recentBlockHash: String?,
@@ -98,6 +98,33 @@ class Api(private val router: NetworkingRouter) {
         // params.add("json");
         return router.call("getConfirmedTransaction", params, ConfirmedTransaction::class.java, onComplete)
     }
+
+    fun getVoteAccounts(onComplete: ((Result<VoteAccounts>) -> Unit)) {
+        return getVoteAccounts(null, onComplete)
+    }
+
+    fun getVoteAccounts(votePubkey: PublicKey?, onComplete: ((Result<VoteAccounts>) -> Unit)) {
+        val params: MutableList<Any> = ArrayList()
+        if (votePubkey != null) {
+            params.add(VoteAccountConfig(votePubkey.toBase58()))
+        }
+        router.call("getVoteAccounts", params, VoteAccounts::class.java, onComplete)
+    }
+
+    /*@Throws(ApiError::class)
+    fun getStakeActivation(publicKey: PublicKey): StakeActivation? {
+        val params: MutableList<Any> = ArrayList()
+        params.add(publicKey.toBase58())
+        return router.call("getStakeActivation", params, StakeActivation::class.java)
+    }
+
+    @Throws(ApiError::class)
+    fun getStakeActivation(publicKey: PublicKey, epoch: Long): StakeActivation? {
+        val params: MutableList<Any> = ArrayList()
+        params.add(publicKey.toBase58())
+        params.add(StakeActivationConfig(epoch))
+        return router.call("getStakeActivation", params, StakeActivation::class.java)
+    }*/
 
     /*@Throws(ApiError::class)
     fun getConfirmedSignaturesForAddress2(
@@ -658,32 +685,5 @@ class Api(private val router: NetworkingRouter) {
         return client.call(method, params, TokenAccountInfo::class.java)
     }
 
-    @Throws(ApiError::class)
-    fun getVoteAccounts(): VoteAccounts? {
-        return getVoteAccounts(null)
-    }
-
-    @Throws(ApiError::class)
-    fun getVoteAccounts(votePubkey: PublicKey?): VoteAccounts? {
-        val params: MutableList<Any> = ArrayList()
-        if (votePubkey != null) {
-            params.add(VoteAccountConfig(votePubkey.toBase58()))
-        }
-        return client.call("getVoteAccounts", params, VoteAccounts::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getStakeActivation(publicKey: PublicKey): StakeActivation? {
-        val params: MutableList<Any> = ArrayList()
-        params.add(publicKey.toBase58())
-        return client.call("getStakeActivation", params, StakeActivation::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getStakeActivation(publicKey: PublicKey, epoch: Long): StakeActivation? {
-        val params: MutableList<Any> = ArrayList()
-        params.add(publicKey.toBase58())
-        params.add(StakeActivationConfig(epoch))
-        return client.call("getStakeActivation", params, StakeActivation::class.java)
-    }*/
+    */
 }
