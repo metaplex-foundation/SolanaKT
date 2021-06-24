@@ -224,9 +224,79 @@ class Methods {
     }
 
     @Test
+    fun TestGetTokenAccountsByOwner() {
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val result = solana.api.getTokenAccountsByOwner(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitVz"), PublicKey("2tWC4JAdL4AxEFJySziYJfsAnW2MHKRo98vbAPiRDSk8")).blockingGet()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
     fun TestGetSlotLeader() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getSlotLeader().blockingGet()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetClusterNodes() {
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val result = solana.api.getClusterNodes().blockingGet()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetTokenAccountBalance() {
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val result = solana.api.getTokenAccountBalance(PublicKey("FzhfekYF625gqAemjNZxjgTZGwfJpavMZpXCLFdypRFD")).blockingGet()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetConfirmedSignaturesForAddress2() {
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val result = solana.api.getConfirmedSignaturesForAddress2(PublicKey("5Zzguz4NsSRFxGkHfM4FmsFpGZiCDtY72zH2jzMcqkJx"), 10, null, null).blockingGet()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetTokenSupply() {
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val result = solana.api.getTokenSupply(PublicKey("2tWC4JAdL4AxEFJySziYJfsAnW2MHKRo98vbAPiRDSk8")).blockingGet()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetTokenLargestAccounts() {
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val result = solana.api.getTokenLargestAccounts(PublicKey("2tWC4JAdL4AxEFJySziYJfsAnW2MHKRo98vbAPiRDSk8")).blockingGet()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetSlotLeaders() {
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val result = solana.api.getSlotLeaders(64203570, 10).blockingGet()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetIdentity() {
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val result = solana.api.getIdentity().blockingGet()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetInflationReward() {
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val result = solana.api.getInflationReward(listOf(PublicKey("5U3bH5b6XtG99aVWLqwVzYPVpQiFHytBD68Rz2eFPZd7"))).blockingGet()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetProgramAccounts() {
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val result = solana.api.getProgramAccounts(PublicKey("SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8")).blockingGet()
         Assert.assertNotNull(result)
     }
 

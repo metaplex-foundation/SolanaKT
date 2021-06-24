@@ -4,17 +4,17 @@ import com.squareup.moshi.Json
 
 class EpochInfo (
     @Json(name = "absoluteSlot")
-    private val absoluteSlot: Long,
+    val absoluteSlot: Long,
 
     @Json(name = "blockHeight")
-    private val blockHeight: Long,
+    val blockHeight: Long,
 
     @Json(name = "epoch")
-    private val epoch: Long,
+    val epoch: Long,
 
     @Json(name = "slotIndex")
-    private val slotIndex: Long,
+    val slotIndex: Long,
 
     @Json(name = "slotsInEpoch")
-    private val slotsInEpoch: Long
+    val slotsInEpoch: Long
 )
