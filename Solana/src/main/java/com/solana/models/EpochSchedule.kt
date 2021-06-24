@@ -2,19 +2,19 @@ package com.solana.models
 
 import com.squareup.moshi.Json
 
-class EpochSchedule {
+class EpochSchedule (
     @Json(name = "slotsPerEpoch")
-    private val slotsPerEpoch: Long = 0
+    val slotsPerEpoch: Long,
 
     @Json(name = "leaderScheduleSlotOffset")
-    private val leaderScheduleSlotOffset: Long = 0
+    val leaderScheduleSlotOffset: Long,
 
     @Json(name = "warmup")
-    private val warmup = false
+    val warmup: Boolean,
 
     @Json(name = "firstNormalEpoch")
-    private val firstNormalEpoch: Long = 0
+    val firstNormalEpoch: Long,
 
     @Json(name = "firstNormalSlot")
-    private val firstNormalSlot: Long = 0
-}
+    val firstNormalSlot: Long
+)

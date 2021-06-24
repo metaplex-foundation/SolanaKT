@@ -35,56 +35,56 @@ class TokenResultObjects {
         val address: String?
     )
 
-    class TokenInfo {
+    class TokenInfo (
         @Json(name = "isNative")
-        private val isNative: Boolean? = null
+        private val isNative: Boolean?,
 
         @Json(name = "mint")
-        private val mint: String? = null
+        private val mint: String?,
 
         @Json(name = "owner")
-        private val owner: String? = null
+        private val owner: String?,
 
         @Json(name = "state")
-        private val state: String? = null
+        private val state: String?,
 
         @Json(name = "tokenAmount")
-        private val tokenAmount: TokenAmountInfo? = null
-    }
+        private val tokenAmount: TokenAmountInfo?
+    )
 
-    class ParsedData {
+    class ParsedData (
         @Json(name = "info")
-        private val info: TokenInfo? = null
+        private val info: TokenInfo,
 
         @Json(name = "type")
-        private val type: String? = null
-    }
+        private val type: String
+    )
 
-    class Data {
+    class Data (
         @Json(name = "parsed")
-        private val parsed: ParsedData? = null
+        private val parsed: ParsedData,
 
         @Json(name = "program")
-        private val program: String? = null
+        private val program: String,
 
         @Json(name = "space")
         private val space: Int? = null
-    }
+    )
 
-    class Value {
+    class Value (
         @Json(name = "data")
-        private val data: Data? = null
+        private val data: Data,
 
         @Json(name = "executable")
-        private val executable = false
+        private val executable: Boolean,
 
         @Json(name = "lamports")
-        private val lamports: Long = 0
+        private val lamports: Long,
 
         @Json(name = "owner")
-        private val owner: String? = null
+        private val owner: String,
 
         @Json(name = "rentEpoch")
         private val rentEpoch: Long = 0
-    }
+    )
 }
