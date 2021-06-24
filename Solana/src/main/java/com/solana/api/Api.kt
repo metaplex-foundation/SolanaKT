@@ -8,6 +8,9 @@ import com.solana.networking.NetworkingRouter
 import com.solana.networking.models.RpcResultTypes
 import org.java_websocket.util.Base64
 import java.lang.RuntimeException
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 data class ApiError(override val message: String?) : Exception(message)
@@ -111,20 +114,241 @@ class Api(private val router: NetworkingRouter) {
         router.call("getVoteAccounts", params, VoteAccounts::class.java, onComplete)
     }
 
-    /*@Throws(ApiError::class)
-    fun getStakeActivation(publicKey: PublicKey): StakeActivation? {
+    fun getStakeActivation(publicKey: PublicKey, onComplete: ((Result<StakeActivation>) -> Unit)) {
         val params: MutableList<Any> = ArrayList()
         params.add(publicKey.toBase58())
-        return router.call("getStakeActivation", params, StakeActivation::class.java)
+        router.call("getStakeActivation", params, StakeActivation::class.java, onComplete)
     }
 
-    @Throws(ApiError::class)
-    fun getStakeActivation(publicKey: PublicKey, epoch: Long): StakeActivation? {
+    fun getStakeActivation(publicKey: PublicKey, epoch: Long, onComplete: ((Result<StakeActivation>) -> Unit)) {
         val params: MutableList<Any> = ArrayList()
         params.add(publicKey.toBase58())
         params.add(StakeActivationConfig(epoch))
-        return router.call("getStakeActivation", params, StakeActivation::class.java)
-    }*/
+        router.call("getStakeActivation", params, StakeActivation::class.java, onComplete)
+    }
+
+    fun getAccountInfo(account: PublicKey, onComplete: ((Result<AccountInfo>) -> Unit)) {
+        return getAccountInfo(account, HashMap(), onComplete)
+    }
+
+    fun getAccountInfo(account: PublicKey, additionalParams: Map<String?, Any?>, onComplete: ((Result<AccountInfo>) -> Unit)) {
+        val params: MutableList<Any> = ArrayList()
+        val parameterMap: MutableMap<String, Any?> = HashMap()
+        parameterMap["commitment"] = additionalParams.getOrDefault("commitment", "max")
+        parameterMap["encoding"] = additionalParams.getOrDefault("encoding", "base64")
+
+        if (additionalParams.containsKey("dataSlice")) {
+            parameterMap["dataSlice"] = additionalParams["dataSlice"]
+        }
+        params.add(account.toString())
+        params.add(parameterMap)
+        router.call("getAccountInfo", params, AccountInfo::class.java, onComplete)
+    }
+
+    fun requestAirdrop(address: PublicKey, lamports: Long, onComplete: ((Result<String>) -> Unit)) {
+        val params: MutableList<Any> = ArrayList()
+        params.add(address.toString())
+        params.add(lamports)
+        router.call("requestAirdrop", params, String::class.java, onComplete)
+    }
+
+    fun getMinimumBalanceForRentExemption(dataLength: Long,  onComplete: ((Result<Long>) -> Unit)) {
+        val params: MutableList<Any> = ArrayList()
+        params.add(dataLength)
+        router.call("getMinimumBalanceForRentExemption", params, Long::class.javaObjectType, onComplete)
+    }
+
+    fun getBlockTime(block: Long, onComplete: ((Result<Long>) -> Unit)) {
+        val params: MutableList<Any> = ArrayList()
+        params.add(block)
+        router.call("getBlockTime", params, Long::class.javaObjectType, onComplete)
+    }
+
+    fun getBlockHeight(onComplete: ((Result<Long>) -> Unit)) {
+        router.call("getBlockHeight", ArrayList(), Long::class.javaObjectType, onComplete)
+    }
+
+    fun minimumLedgerSlot(onComplete: ((Result<Long>) -> Unit)) {
+        router.call("minimumLedgerSlot", ArrayList(), Long::class.javaObjectType, onComplete)
+    }
+
+    fun getVersion(onComplete: ((Result<SolanaVersion>) -> Unit)) {
+        router.call("getVersion", ArrayList(), SolanaVersion::class.java, onComplete)
+    }
+
+    fun getBlockCommitment(block: Long, onComplete: ((Result<BlockCommitment>) -> Unit)) {
+        val params: MutableList<Any> = ArrayList()
+        params.add(block)
+        router.call("getBlockCommitment", params, BlockCommitment::class.java, onComplete)
+    }
+
+    fun getFeeCalculatorForBlockhash(blockhash: String, onComplete: ((Result<FeeCalculatorInfo>) -> Unit)) {
+        val params: MutableList<Any> = ArrayList()
+        params.add(blockhash)
+        router.call("getFeeCalculatorForBlockhash", params, FeeCalculatorInfo::class.java, onComplete)
+    }
+
+    fun getFeeRateGovernor(onComplete: ((Result<FeeRateGovernorInfo>) -> Unit)) {
+        router.call("getFeeRateGovernor", ArrayList(), FeeRateGovernorInfo::class.java, onComplete)
+    }
+
+    fun getFees(onComplete: ((Result<FeesInfo>) -> Unit)){
+        router.call("getFees", ArrayList(), FeesInfo::class.java, onComplete)
+    }
+
+    fun getTransactionCount(onComplete: ((Result<Long>) -> Unit)) {
+        router.call("getTransactionCount", ArrayList(), Long::class.javaObjectType, onComplete)
+    }
+
+    fun getMaxRetransmitSlot(onComplete: ((Result<Long>) -> Unit)) {
+        router.call("getMaxRetransmitSlot", ArrayList(), Long::class.javaObjectType, onComplete)
+    }
+
+    fun getSupply(onComplete: ((Result<Supply>) -> Unit)){
+        router.call("getSupply", ArrayList(), Supply::class.java, onComplete)
+    }
+
+    fun getFirstAvailableBlock(onComplete: ((Result<Long>) -> Unit)){
+        router.call("getFirstAvailableBlock", ArrayList(), Long::class.javaObjectType, onComplete)
+    }
+
+    fun getGenesisHash(onComplete: ((Result<String>) -> Unit)){
+        router.call("getGenesisHash", ArrayList(), String::class.java, onComplete)
+    }
+
+    /**
+     * Returns identity and transaction information about a confirmed block in the ledger
+     */
+    fun getBlock(slot: Int, onComplete: ((Result<Block>) -> Unit)) {
+        val params: MutableList<Any> = ArrayList()
+        params.add(slot)
+        params.add(BlockConfig())
+        router.call("getBlock", params, Block::class.java, onComplete)
+    }
+
+
+    /**
+     * Returns information about the current epoch
+     * @return
+     * @throws ApiError
+     */
+    fun getEpochInfo(onComplete: ((Result<EpochInfo>) -> Unit)) {
+        val params: List<Any> = ArrayList()
+        router.call("getEpochInfo", params, EpochInfo::class.java, onComplete)
+    }
+
+    fun getEpochSchedule(onComplete: ((Result<EpochSchedule>) -> Unit)) {
+        val params: List<Any> = ArrayList()
+        router.call("getEpochSchedule", params, EpochSchedule::class.java, onComplete)
+    }
+
+    /**
+     * Returns identity and transaction information about a confirmed block in the ledger
+     * DEPRECATED: use getBlock instead
+     */
+    @Deprecated("")
+    fun getConfirmedBlock(slot: Int, onComplete: (Result<ConfirmedBlock>) -> Unit) {
+        val params: MutableList<Any> = ArrayList()
+        params.add(slot)
+        params.add(BlockConfig())
+        router.call("getConfirmedBlock", params, ConfirmedBlock::class.java, onComplete)
+    }
+
+    fun getSnapshotSlot(onComplete: (Result<Long>) -> Unit) {
+        router.call("getSnapshotSlot", ArrayList(), Long::class.javaObjectType, onComplete)
+    }
+
+    fun getMaxShredInsertSlot(onComplete: (Result<Long>) -> Unit) {
+        router.call("getMaxShredInsertSlot", ArrayList(), Long::class.javaObjectType, onComplete)
+    }
+
+    fun getSlot(onComplete: (Result<Long>) -> Unit) {
+        router.call("getSlot", ArrayList(), Long::class.javaObjectType, onComplete)
+    }
+
+    /**
+     * Returns a list of confirmed blocks between two slots
+     * DEPRECATED: use getBlocks instead
+     */
+    @Deprecated("")
+    fun getConfirmedBlocks(start: Int, end: Int?, onComplete: (Result<List<Double>>) -> Unit) {
+        val params: List<Int>
+        params = if (end == null) listOf(start) else listOf(start, end)
+        router.call("getConfirmedBlocks", params, List::class.java) { result ->
+            result.map { list ->
+                list.map { it as Double }
+            }.onSuccess {
+                onComplete(Result.success(it))
+            }.onFailure {
+                onComplete(Result.failure(it))
+            }
+        }
+    }
+
+    /**
+     * Returns a list of confirmed blocks between two slots
+     * DEPRECATED: use getBlocks instead
+     */
+    @Deprecated("")
+    fun getConfirmedBlocks(start: Int, onComplete: (Result<List<Double>>) -> Unit){
+        this.getConfirmedBlocks(start, null, onComplete)
+    }
+
+    fun getSplTokenAccountInfo(account: PublicKey, onComplete: (Result<SplTokenAccountInfo>) -> Unit) {
+        val params: MutableList<Any> = ArrayList()
+        val parameterMap: MutableMap<String, Any> = HashMap()
+        parameterMap["encoding"] = "jsonParsed"
+        params.add(account.toString())
+        params.add(parameterMap)
+        router.call("getAccountInfo", params, SplTokenAccountInfo::class.java, onComplete)
+    }
+
+    fun getSlotLeader(onComplete: (Result<PublicKey>) -> Unit) {
+        router.call("getSlotLeader", ArrayList(), String::class.java) { result ->
+            result.map {
+                PublicKey(it)
+            }.onSuccess {
+                onComplete(Result.success(it))
+            }.onFailure {
+                onComplete(Result.failure(it))
+            }
+
+        }
+    }
+
+    private fun getTokenAccount(
+        account: PublicKey,
+        requiredParams: Map<String, Any>,
+        optionalParams: Map<String, Any>?,
+        method: String,
+        onComplete: (Result<TokenAccountInfo>) -> Unit
+    ) {
+        val params: MutableList<Any> = ArrayList()
+        params.add(account.toString())
+
+        // Either mint or programId is required
+        var parameterMap: MutableMap<String?, Any?> = HashMap()
+        if (requiredParams.containsKey("mint")) {
+            parameterMap["mint"] = requiredParams["mint"].toString()
+        } else if (requiredParams.containsKey("programId")) {
+            parameterMap["programId"] = requiredParams["programId"].toString()
+        } else {
+            onComplete(Result.failure(ApiError("mint or programId are mandatory parameters")))
+            return
+        }
+        params.add(parameterMap)
+        if (null != optionalParams) {
+            parameterMap = HashMap()
+            parameterMap["commitment"] = optionalParams["commitment"] ?: "max"
+            parameterMap["encoding"] = optionalParams["encoding"] ?: "jsonParsed"
+            // No default for dataSlice
+            if (optionalParams.containsKey("dataSlice")) {
+                parameterMap["dataSlice"] = optionalParams["dataSlice"]
+            }
+            params.add(parameterMap)
+        }
+        router.call(method, params, TokenAccountInfo::class.java, onComplete)
+    }
 
     /*@Throws(ApiError::class)
     fun getConfirmedSignaturesForAddress2(
@@ -239,125 +463,6 @@ class Api(private val router: NetworkingRouter) {
     }
 
     @Throws(ApiError::class)
-    fun getAccountInfo(account: PublicKey): AccountInfo? {
-        return getAccountInfo(account, HashMap())
-    }
-
-    @Throws(ApiError::class)
-    fun getAccountInfo(account: PublicKey, additionalParams: Map<String?, Any?>): AccountInfo? {
-        val params: MutableList<Any> = ArrayList()
-        val parameterMap: MutableMap<String, Any?> = HashMap()
-        parameterMap["commitment"] = additionalParams.getOrDefault("commitment", "max")
-        parameterMap["encoding"] = additionalParams.getOrDefault("encoding", "base64")
-
-        // No default for dataSlice
-        if (additionalParams.containsKey("dataSlice")) {
-            parameterMap["dataSlice"] = additionalParams["dataSlice"]
-        }
-        params.add(account.toString())
-        params.add(parameterMap)
-        return client.call("getAccountInfo", params, AccountInfo::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getSplTokenAccountInfo(account: PublicKey): SplTokenAccountInfo? {
-        val params: MutableList<Any> = ArrayList()
-        val parameterMap: MutableMap<String, Any> = HashMap()
-        parameterMap["encoding"] = "jsonParsed"
-        params.add(account.toString())
-        params.add(parameterMap)
-        return client.call("getAccountInfo", params, SplTokenAccountInfo::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getMinimumBalanceForRentExemption(dataLength: Long): Long {
-        val params: MutableList<Any> = ArrayList()
-        params.add(dataLength)
-        return client.call("getMinimumBalanceForRentExemption", params, Long::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getBlockTime(block: Long): Long {
-        val params: MutableList<Any> = ArrayList()
-        params.add(block)
-        return client.call("getBlockTime", params, Long::class.java)
-    }
-
-    /**
-     * Seemingly deprecated on the official Solana API.
-     *
-     * @return
-     * @throws ApiError
-     */
-    @Throws(ApiError::class)
-    fun getBlockHeight(): Long {
-        return client.call("getBlockHeight", ArrayList(), Long::class.java)
-    }
-
-    // TODO - implement the parameters - currently takes in none
-    @Throws(ApiError::class)
-    fun getBlockProduction(
-        firstSlot: Long,
-        lastSlot: Long,
-        identity: PublicKey?
-    ): BlockProduction? {
-        val params: List<Any> = ArrayList()
-        return client.call("getBlockProduction", params, BlockProduction::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun minimumLedgerSlot(): Long? {
-        return client.call("minimumLedgerSlot", ArrayList(), Long::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getVersion(): SolanaVersion? {
-        return client.call("getVersion", ArrayList(), SolanaVersion::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun requestAirdrop(address: PublicKey, lamports: Long): String? {
-        val params: MutableList<Any> = ArrayList()
-        params.add(address.toString())
-        params.add(lamports)
-        return client.call("requestAirdrop", params, String::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getBlockCommitment(block: Long): BlockCommitment? {
-        val params: MutableList<Any> = ArrayList()
-        params.add(block)
-        return client.call("getBlockCommitment", params, BlockCommitment::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getFeeCalculatorForBlockhash(blockhash: String): FeeCalculatorInfo? {
-        val params: MutableList<Any> = ArrayList()
-        params.add(blockhash)
-        return client.call("getFeeCalculatorForBlockhash", params, FeeCalculatorInfo::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getFeeRateGovernor(): FeeRateGovernorInfo? {
-        return client.call("getFeeRateGovernor", ArrayList(), FeeRateGovernorInfo::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getFees(): FeesInfo? {
-        return client.call("getFees", ArrayList(), FeesInfo::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getTransactionCount(): Long {
-        return client.call("getTransactionCount", ArrayList(), Long::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getMaxRetransmitSlot(): Long {
-        return client.call("getMaxRetransmitSlot", ArrayList(), Long::class.java)
-    }
-
-    @Throws(ApiError::class)
     fun simulateTransaction(
         transaction: String,
         addresses: List<PublicKey?>
@@ -400,48 +505,6 @@ class Api(private val router: NetworkingRouter) {
         return result
     }
 
-    /**
-     * Returns identity and transaction information about a confirmed block in the ledger
-     * DEPRECATED: use getBlock instead
-     */
-    @Deprecated("")
-    @Throws(ApiError::class)
-    fun getConfirmedBlock(slot: Int): ConfirmedBlock? {
-        val params: MutableList<Any> = ArrayList()
-        params.add(slot)
-        params.add(BlockConfig())
-        return client.call("getConfirmedBlock", params, ConfirmedBlock::class.java)
-    }
-
-    /**
-     * Returns identity and transaction information about a confirmed block in the ledger
-     */
-    @Throws(ApiError::class)
-    fun getBlock(slot: Int): Block? {
-        val params: MutableList<Any> = ArrayList()
-        params.add(slot)
-        params.add(BlockConfig())
-        return client.call("getBlock", params, Block::class.java)
-    }
-
-
-    /**
-     * Returns information about the current epoch
-     * @return
-     * @throws ApiError
-     */
-    @Throws(ApiError::class)
-    fun getEpochInfo(): EpochInfo? {
-        val params: List<Any> = ArrayList()
-        return client.call("getEpochInfo", params, EpochInfo::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getEpochSchedule(): EpochSchedule? {
-        val params: List<Any> = ArrayList()
-        return client.call("getEpochSchedule", params, EpochSchedule::class.java)
-    }
-
     @Throws(ApiError::class)
     fun getTokenAccountsByOwner(owner: PublicKey, tokenMint: PublicKey): PublicKey? {
         val params: MutableList<Any> = ArrayList()
@@ -463,20 +526,7 @@ class Api(private val router: NetworkingRouter) {
         return tokenAccountKey
     }
 
-    @Throws(ApiError::class)
-    fun getInflationRate(): InflationRate? {
-        return client.call("getInflationRate", ArrayList(), InflationRate::class.java)
-    }
 
-    @Throws(ApiError::class)
-    fun getInflationGovernor(): InflationGovernor? {
-        return client.call("getInflationGovernor", ArrayList(), InflationGovernor::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getInflationReward(addresses: List<PublicKey?>): List<InflationReward?>? {
-        return getInflationReward(addresses, null, null)
-    }
 
     @Throws(ApiError::class)
     fun getInflationReward(
@@ -503,16 +553,6 @@ class Api(private val router: NetworkingRouter) {
     }
 
     @Throws(ApiError::class)
-    fun getSlot(): Long {
-        return client.call("getSlot", ArrayList(), Long::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getSlotLeader(): PublicKey? {
-        return PublicKey(client.call("getSlotLeader", ArrayList(), String::class.java))
-    }
-
-    @Throws(ApiError::class)
     fun getSlotLeaders(startSlot: Long, limit: Long): List<PublicKey>? {
         val params: MutableList<Any> = ArrayList()
         params.add(startSlot)
@@ -528,15 +568,7 @@ class Api(private val router: NetworkingRouter) {
         return result
     }
 
-    @Throws(ApiError::class)
-    fun getSnapshotSlot(): Long {
-        return client.call("getSnapshotSlot", ArrayList(), Long::class.java)
-    }
 
-    @Throws(ApiError::class)
-    fun getMaxShredInsertSlot(): Long {
-        return client.call("getMaxShredInsertSlot", ArrayList(), Long::class.java)
-    }
 
     @Throws(ApiError::class)
     fun getIdentity(): PublicKey? {
@@ -552,43 +584,6 @@ class Api(private val router: NetworkingRouter) {
             throw ApiError("unable to get identity")
         }
         return identity
-    }
-
-    @Throws(ApiError::class)
-    fun getSupply(): Supply? {
-        return client.call("getSupply", ArrayList(), Supply::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getFirstAvailableBlock(): Long {
-        return client.call("getFirstAvailableBlock", ArrayList(), Long::class.java)
-    }
-
-    @Throws(ApiError::class)
-    fun getGenesisHash(): String? {
-        return client.call("getGenesisHash", ArrayList(), String::class.java)
-    }
-
-    /**
-     * Returns a list of confirmed blocks between two slots
-     * DEPRECATED: use getBlocks instead
-     */
-    @Deprecated("")
-    @Throws(ApiError::class)
-    fun getConfirmedBlocks(start: Int?, end: Int?): List<Double?>? {
-        val params: List<Any>
-        params = if (end == null) Arrays.asList(start) else Arrays.asList(start, end)
-        return this.client.call("getConfirmedBlocks", params, MutableList::class.java)
-    }
-
-    /**
-     * Returns a list of confirmed blocks between two slots
-     * DEPRECATED: use getBlocks instead
-     */
-    @Deprecated("")
-    @Throws(ApiError::class)
-    fun getConfirmedBlocks(start: Int?): List<Double?>? {
-        return this.getConfirmedBlocks(start, null)
     }
 
     @Throws(ApiError::class)
@@ -654,36 +649,7 @@ class Api(private val router: NetworkingRouter) {
         )
     }
 
-    @Throws(ApiError::class)
-    private fun getTokenAccount(
-        account: PublicKey, requiredParams: Map<String, Any>,
-        optionalParams: Map<String, Any>?, method: String
-    ): TokenAccountInfo? {
-        val params: MutableList<Any> = ArrayList()
-        params.add(account.toString())
 
-        // Either mint or programId is required
-        var parameterMap: MutableMap<String?, Any?> = HashMap()
-        if (requiredParams.containsKey("mint")) {
-            parameterMap["mint"] = requiredParams["mint"].toString()
-        } else if (requiredParams.containsKey("programId")) {
-            parameterMap["programId"] = requiredParams["programId"].toString()
-        } else {
-            throw ApiError("mint or programId are mandatory parameters")
-        }
-        params.add(parameterMap)
-        if (null != optionalParams) {
-            parameterMap = HashMap()
-            parameterMap["commitment"] = optionalParams["commitment"] ?: "max"
-            parameterMap["encoding"] = optionalParams["encoding"] ?: "jsonParsed"
-            // No default for dataSlice
-            if (optionalParams.containsKey("dataSlice")) {
-                parameterMap["dataSlice"] = optionalParams["dataSlice"]
-            }
-            params.add(parameterMap)
-        }
-        return client.call(method, params, TokenAccountInfo::class.java)
-    }
 
     */
 }

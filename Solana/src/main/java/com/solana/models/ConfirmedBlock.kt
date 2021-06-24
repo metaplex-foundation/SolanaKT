@@ -10,11 +10,11 @@ class ConfirmedBlock (
     val blockhash: String?,
 
     @Json(name = "parentSlot")
-     val parentSlot:Long,
+    val parentSlot:Long,
 
     @Json(name = "previousBlockhash")
-     val previousBlockhash: String?,
+    val previousBlockhash: String?,
 
     @Json(name = "transactions")
-     val transactions: List<ConfirmedTransaction>?
+    val transactions: List<ConfirmedTransaction>?
 )

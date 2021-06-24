@@ -2,10 +2,10 @@ package com.solana.models
 
 import com.squareup.moshi.Json
 
-class SolanaVersion {
+class SolanaVersion (
     @Json(name = "solana-core")
-    private val solanaCore: String? = null
+    private val solanaCore: String,
 
     @Json(name = "feature-set")
-    private val featureSet: String? = null
-}
+    private val featureSet: String
+)

@@ -4,7 +4,7 @@ import com.squareup.moshi.Json
 
 class BlockCommitment(
     @Json(name = "commitment")
-    var commitment: LongArray,
+    var commitment: LongArray?,
     @Json(name = "totalStake")
-    var totalStake: Long = 0
+    var totalStake: Long
 )

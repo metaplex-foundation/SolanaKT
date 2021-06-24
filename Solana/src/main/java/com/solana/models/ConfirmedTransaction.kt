@@ -5,7 +5,7 @@ import com.squareup.moshi.Json
 
 class ConfirmedTransaction(
     @Json(name = "meta") val meta: Meta?,
-    @Json(name = "slot") val slot: Long,
+    @Json(name = "slot") val slot: Long?,
     @Json(name = "transaction") val transaction: Transaction?,
 ) {
     class Header (
