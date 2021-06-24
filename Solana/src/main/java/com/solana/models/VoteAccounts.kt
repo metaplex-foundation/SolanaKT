@@ -2,33 +2,34 @@ package com.solana.models
 
 import com.squareup.moshi.Json
 
-class VoteAccounts {
-    class VoteAccountValue {
-        @Json(name = "commission")
-        private val commission: Long = 0
+class VoteAccountValue (
+    @Json(name = "commission")
+    val commission: Long,
 
-        @Json(name = "epochVoteAccount")
-        private val epochVoteAccount = false
+    @Json(name = "epochVoteAccount")
+    val epochVoteAccount: Boolean,
 
-        @Json(name = "epochCredits")
-        private val epochCredits: List<List<Long>>? = null
+    @Json(name = "epochCredits")
+    val epochCredits: List<List<Long>>,
 
-        @Json(name = "nodePubkey")
-        private val nodePubkey: String? = null
+    @Json(name = "nodePubkey")
+    val nodePubkey: String,
 
-        @Json(name = "lastVote")
-        private val lastVote: Long = 0
+    @Json(name = "lastVote")
+    val lastVote: Long,
 
-        @Json(name = "activatedStake")
-        private val activatedStake: Long = 0
+    @Json(name = "activatedStake")
+    val activatedStake: Long,
 
-        @Json(name = "votePubkey")
-        private val votePubkey: String? = null
-    }
+    @Json(name = "votePubkey")
+    val votePubkey: String?
+)
 
+
+class VoteAccounts(
     @Json(name = "current")
-    private val current: List<VoteAccountValue>? = null
+    private val current: List<VoteAccountValue>,
 
     @Json(name = "delinquent")
-    private val delinquent: List<VoteAccountValue>? = null
-}
+    private val delinquent: List<VoteAccountValue>,
+)

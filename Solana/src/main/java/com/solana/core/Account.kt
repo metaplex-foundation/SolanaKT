@@ -73,7 +73,7 @@ class Account {
             val chars = sanitizedJson.split(",").toTypedArray()
 
             // Convert each String character into byte and put it in the buffer
-            chars.forEach { character: String ->
+            Arrays.stream(chars).forEach { character: String ->
                 val byteValue = character.toInt().toByte()
                 buffer.put(byteValue)
             }

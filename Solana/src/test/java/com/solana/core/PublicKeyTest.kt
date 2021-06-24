@@ -1,6 +1,5 @@
-package com.solana
+package com.solana.core
 
-import com.solana.core.PublicKey
 import org.junit.Assert.*
 import org.junit.Test
 import java.io.ByteArrayOutputStream

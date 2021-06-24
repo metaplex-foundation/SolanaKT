@@ -1,4 +1,4 @@
-package com.solana
+package com.solana.core
 
 import com.solana.core.Account
 import junit.framework.Assert.assertEquals
@@ -6,6 +6,7 @@ import org.bitcoinj.core.Base58
 import org.junit.Test
 import java.util.*
 import java.util.logging.Logger
+
 
 class AccountTests {
     @Test

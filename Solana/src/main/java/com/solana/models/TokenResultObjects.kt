@@ -4,35 +4,36 @@ import com.squareup.moshi.Json
 import java.util.*
 
 class TokenResultObjects {
-    open class TokenAmountInfo(am: AbstractMap<*, *>) {
+    open class TokenAmountInfo (
         @Json(name = "amount")
-        private val amount: String?
+        val amount: String?,
 
         @Json(name = "decimals")
-        private val decimals: Int
+        val decimals: Int,
 
         @Json(name = "uiAmount")
-        private val uiAmount: Double?
+        val uiAmount: Double?,
 
         @Json(name = "uiAmountString")
-        private val uiAmountString: String?
+        val uiAmountString: String?
+    )
 
-        init {
-            amount = am["amount"] as String?
-            decimals = (am["decimals"] as Double).toInt()
-            uiAmount = am["uiAmount"] as Double?
-            uiAmountString = am["uiAmountString"] as String?
-        }
-    }
+    class TokenAccount(
+        @Json(name = "amount")
+        val amount: String?,
 
-    class TokenAccount(am: AbstractMap<*, *>) : TokenAmountInfo(am) {
+        @Json(name = "decimals")
+        val decimals: Int,
+
+        @Json(name = "uiAmount")
+        val uiAmount: Double?,
+
+        @Json(name = "uiAmountString")
+        val uiAmountString: String?,
+
         @Json(name = "address")
-        private val address: String?
-
-        init {
-            address = am["address"] as String?
-        }
-    }
+        val address: String?
+    )
 
     class TokenInfo {
         @Json(name = "isNative")

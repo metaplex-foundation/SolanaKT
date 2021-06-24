@@ -4,8 +4,5 @@ import com.solana.models.RpcResultObject
 import com.squareup.moshi.Json
 
 class RpcResultTypes {
-    class ValueLong : RpcResultObject() {
-        @Json(name = "value")
-        val value: Long = 0
-    }
+    class ValueLong(@Json(name = "value") val value: Long) : RpcResultObject()
 }

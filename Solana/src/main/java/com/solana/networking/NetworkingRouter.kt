@@ -13,7 +13,7 @@ import java.lang.reflect.Type
 
 data class NetworkingError(override val message: String?) : Exception(message)
 
-class NetworkingRouter(
+public class NetworkingRouter(
     val endpoint: RPCEndpoint,
     private val httpClient: OkHttpClient = OkHttpClient()
 ) {
