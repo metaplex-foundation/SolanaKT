@@ -4,25 +4,22 @@ import com.squareup.moshi.Json
 
 class SimulateTransactionConfig {
     @Json(name = "encoding")
-    private var encoding = Encoding.base64
+    var encoding = RpcSendTransactionConfig.Encoding.base64
 
     @Json(name = "accounts")
-    private var accounts: Map<*, *>? = null
+    var accounts: Map<*, *>? = null
 
     @Json(name = "commitment")
-    private val commitment = "finalized"
+    val commitment: String = "finalized"
 
     @Json(name = "sigVerify")
-    private val sigVerify = false
+    val sigVerify: Boolean = false
 
     @Json(name = "replaceRecentBlockhash")
-    private val replaceRecentBlockhash = false
+    var replaceRecentBlockhash: Boolean = false
 
-    constructor(accounts: Map<*, *>?) {
-        this.accounts = accounts
-    }
 
-    constructor(encoding: Encoding) {
+    constructor(encoding: RpcSendTransactionConfig.Encoding) {
         this.encoding = encoding
     }
 }

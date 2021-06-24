@@ -9,6 +9,7 @@ import com.solana.networking.models.RpcResultTypes
 import org.java_websocket.util.Base64
 import java.lang.RuntimeException
 import java.util.*
+import java.util.function.Consumer
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -63,7 +64,7 @@ class Api(private val router: NetworkingRouter) {
     ) {
         if (recentBlockHash == null) {
             getRecentBlockhash { result ->
-                result.onSuccess { recentBlockHash ->
+                result.map { recentBlockHash ->
                     transaction.setRecentBlockHash(recentBlockHash)
                     transaction.sign(signers)
                     val serializedTransaction: ByteArray = transaction.serialize()
@@ -71,7 +72,9 @@ class Api(private val router: NetworkingRouter) {
                     val params: MutableList<Any> = ArrayList()
                     params.add(base64Trx)
                     params.add(RpcSendTransactionConfig())
-                    router.call("sendTransaction", params, String::class.java, onComplete)
+                    params
+                }.onSuccess {
+                    router.call("sendTransaction", it, String::class.java, onComplete)
                     return@getRecentBlockhash
                 }.onFailure {
                     onComplete(Result.failure(RuntimeException(it)))
@@ -87,7 +90,6 @@ class Api(private val router: NetworkingRouter) {
             params.add(base64Trx)
             params.add(RpcSendTransactionConfig())
             router.call("sendTransaction", params, String::class.java, onComplete)
-            return
         }
     }
 
@@ -96,9 +98,6 @@ class Api(private val router: NetworkingRouter) {
     ){
         val params: MutableList<Any> = ArrayList()
         params.add(signature)
-        // TODO jsonParsed, base58, base64
-        // the default encoding is JSON
-        // params.add("json");
         return router.call("getConfirmedTransaction", params, ConfirmedTransaction::class.java, onComplete)
     }
 
@@ -216,9 +215,6 @@ class Api(private val router: NetworkingRouter) {
         router.call("getGenesisHash", ArrayList(), String::class.java, onComplete)
     }
 
-    /**
-     * Returns identity and transaction information about a confirmed block in the ledger
-     */
     fun getBlock(slot: Int, onComplete: ((Result<Block>) -> Unit)) {
         val params: MutableList<Any> = ArrayList()
         params.add(slot)
@@ -226,12 +222,6 @@ class Api(private val router: NetworkingRouter) {
         router.call("getBlock", params, Block::class.java, onComplete)
     }
 
-
-    /**
-     * Returns information about the current epoch
-     * @return
-     * @throws ApiError
-     */
     fun getEpochInfo(onComplete: ((Result<EpochInfo>) -> Unit)) {
         val params: List<Any> = ArrayList()
         router.call("getEpochInfo", params, EpochInfo::class.java, onComplete)
@@ -242,11 +232,6 @@ class Api(private val router: NetworkingRouter) {
         router.call("getEpochSchedule", params, EpochSchedule::class.java, onComplete)
     }
 
-    /**
-     * Returns identity and transaction information about a confirmed block in the ledger
-     * DEPRECATED: use getBlock instead
-     */
-    @Deprecated("")
     fun getConfirmedBlock(slot: Int, onComplete: (Result<ConfirmedBlock>) -> Unit) {
         val params: MutableList<Any> = ArrayList()
         params.add(slot)
@@ -266,11 +251,6 @@ class Api(private val router: NetworkingRouter) {
         router.call("getSlot", ArrayList(), Long::class.javaObjectType, onComplete)
     }
 
-    /**
-     * Returns a list of confirmed blocks between two slots
-     * DEPRECATED: use getBlocks instead
-     */
-    @Deprecated("")
     fun getConfirmedBlocks(start: Int, end: Int?, onComplete: (Result<List<Double>>) -> Unit) {
         val params: List<Int>
         params = if (end == null) listOf(start) else listOf(start, end)
@@ -285,11 +265,6 @@ class Api(private val router: NetworkingRouter) {
         }
     }
 
-    /**
-     * Returns a list of confirmed blocks between two slots
-     * DEPRECATED: use getBlocks instead
-     */
-    @Deprecated("")
     fun getConfirmedBlocks(start: Int, onComplete: (Result<List<Double>>) -> Unit){
         this.getConfirmedBlocks(start, null, onComplete)
     }
@@ -312,7 +287,6 @@ class Api(private val router: NetworkingRouter) {
             }.onFailure {
                 onComplete(Result.failure(it))
             }
-
         }
     }
 
@@ -350,73 +324,351 @@ class Api(private val router: NetworkingRouter) {
         router.call(method, params, TokenAccountInfo::class.java, onComplete)
     }
 
-    /*@Throws(ApiError::class)
-    fun getConfirmedSignaturesForAddress2(
-        account: PublicKey,
-        limit: Int
-    ): List<SignatureInformation>? {
-        val params: MutableList<Any> = ArrayList()
-        params.add(account.toString())
-        params.add(ConfirmedSignFAddr2(limit.toLong()))
-        val rawResult: List<AbstractMap> = client.call(
-            "getConfirmedSignaturesForAddress2", params,
-            MutableList::class.java
-        )
-        val result: MutableList<SignatureInformation> = ArrayList()
-        for (item in rawResult) {
-            result.add(SignatureInformation(item))
+    fun getClusterNodes(onComplete: (Result<List<ClusterNode>>) -> Unit) {
+        val params: List<Any> = ArrayList()
+        router.call(
+            "getClusterNodes", params,
+            List::class.java
+        ) { result ->   // List<AbstractMap>
+            result.map {
+                    it.filterNotNull()
+                }.map { result ->
+                    result.map { item -> item as Map<String, Any> }
+                }.map {
+                    val result: MutableList<ClusterNode> = ArrayList()
+                    for (item in it) {
+                        result.add(ClusterNode(item))
+                    }
+                    result
+                }
+                .onSuccess {
+                onComplete(Result.success(it))
+            }.onFailure {
+                onComplete(Result.failure(it))
+            }
         }
-        return result
     }
 
-    @Throws(ApiError::class)
+    fun getTokenAccountBalance(tokenAccount: PublicKey,
+                               onComplete: (Result<TokenResultObjects.TokenAmountInfo>) -> Unit)  {
+        val params: MutableList<Any> = ArrayList()
+        params.add(tokenAccount.toString())
+        router.call(
+            "getTokenAccountBalance",
+            params,
+            Map::class.java
+        ){ result ->
+            result.map {
+                it["value"] as Map<String, Any>
+            }.map {
+                TokenResultObjects.TokenAmountInfo(it)
+            }.onSuccess {
+                onComplete(Result.success(it))
+            }.onFailure {
+                onComplete(Result.failure(it))
+            }
+        }
+    }
+
+    fun getTokenSupply(tokenMint: PublicKey,
+                       onComplete: (Result<TokenResultObjects.TokenAmountInfo>) -> Unit) {
+        val params: MutableList<Any> = ArrayList()
+        params.add(tokenMint.toString())
+        router.call(
+            "getTokenSupply",
+            params,
+            Map::class.java
+        ){ result ->
+            result.map {
+                it["value"]  as Map<String, Any>
+            }.map {
+                TokenResultObjects.TokenAmountInfo(it)
+            }.onSuccess {
+                onComplete(Result.success(it))
+            }.onFailure {
+                onComplete(Result.failure(it))
+            }
+        }
+    }
+
+    fun getTokenAccountsByOwner(owner: PublicKey, tokenMint: PublicKey, onComplete: (Result<PublicKey>) -> Unit) {
+        val params: MutableList<Any> = ArrayList()
+        params.add(owner.toBase58())
+        val parameterMap: MutableMap<String, Any> = HashMap()
+        parameterMap["mint"] = tokenMint.toBase58()
+        params.add(parameterMap)
+        router.call(
+            "getTokenAccountsByOwner", params,
+            Map::class.java
+        ) { result ->
+            result.map {
+                it as Map<String, Any>
+            }.map {
+                it["value"] as List<*>
+            }.map {
+                it[0] as Map<String, Any>
+            }.map {
+                it["pubkey"] as String
+            }.map {
+                PublicKey(it)
+            }.onSuccess {
+                onComplete(Result.success(it))
+            }.onFailure {
+                onComplete(Result.failure(it))
+            }
+        }
+    }
+
+    fun getTokenAccountsByOwner(
+        accountOwner: PublicKey, requiredParams: Map<String, Any>,
+        optionalParams: Map<String, Any>?,
+        onComplete: (Result<TokenAccountInfo>) -> Unit,
+    ) {
+        getTokenAccount(
+            accountOwner,
+            requiredParams,
+            optionalParams,
+            "getTokenAccountsByOwner",
+            onComplete
+        )
+    }
+
+    fun getTokenAccountsByDelegate(
+        accountDelegate: PublicKey,
+        requiredParams: Map<String, Any>,
+        optionalParams: Map<String, Any>?,
+        onComplete: (Result<TokenAccountInfo>) -> Unit
+    ) {
+        return getTokenAccount(
+            accountDelegate,
+            requiredParams,
+            optionalParams,
+            "getTokenAccountsByDelegate",
+            onComplete
+        )
+    }
+
+    fun getTokenLargestAccounts(tokenMint: PublicKey,
+                                onComplete: (Result<List<TokenResultObjects.TokenAccount>>) -> Unit) {
+        val params: MutableList<Any> = ArrayList()
+        params.add(tokenMint.toString())
+        router.call(
+            "getTokenLargestAccounts", params,
+            Map::class.java
+        ){ result ->
+            result.map {
+                it["value"] as List<*>
+            }.map {
+                it.map { item -> item as Map<String, Any> }
+            }.map {
+                val list: MutableList<TokenResultObjects.TokenAccount> = ArrayList()
+                for (item in (it)) {
+                    list.add(TokenResultObjects.TokenAccount(item))
+                }
+                list
+            }.onSuccess {
+                onComplete(Result.success(it))
+            }.onFailure {
+                onComplete(Result.failure(it))
+            }
+        }
+    }
+
+    fun getConfirmedSignaturesForAddress2(
+        account: PublicKey,
+        limit: Int? = null,
+        before: String?  = null,
+        until: String? = null,
+        onComplete: (Result<List<SignatureInformation>>) -> Unit
+    ) {
+        val params: MutableList<Any> = ArrayList()
+        params.add(account.toString())
+        params.add( ConfirmedSignFAddr2(limit = limit?.toLong(), before = before, until = until) )
+
+        router.call(
+            "getConfirmedSignaturesForAddress2", params,
+            List::class.java
+        ) { result ->
+            result.map {
+                it.filterNotNull()
+            }.map{
+                it.map { item -> item as Map<String, Any> }
+            }.map{
+                val list: MutableList<SignatureInformation> = ArrayList()
+                for (item in it) {
+                    list.add(SignatureInformation(item))
+                }
+                list
+            }.onSuccess {
+                onComplete(Result.success(it))
+            }.onFailure {
+                onComplete(Result.failure(it))
+            }
+        }
+
+    }
+
+    fun getIdentity(onComplete: (Result<PublicKey>) -> Unit) {
+        router.call(
+            "getIdentity", ArrayList(),
+            MutableMap::class.java
+        ) { result ->
+            result.map {
+                val base58 = it["identity"] as String
+                PublicKey(base58)
+            }.onSuccess {
+                onComplete(Result.success(it))
+            }.onFailure {
+                onComplete(Result.failure(it))
+            }
+        }
+    }
+
+    fun getSlotLeaders(startSlot: Long,
+                       limit: Long,
+                       onComplete: (Result<List<PublicKey>>) -> Unit
+    ) {
+        val params: MutableList<Any> = ArrayList()
+        params.add(startSlot)
+        params.add(limit)
+        router.call(
+            "getSlotLeaders", params,
+            List::class.java
+        ){ result ->
+            result.map {
+                it.filterNotNull()
+            }.map {
+                it.map { item -> item as String }
+            }.map {
+                val list: MutableList<PublicKey> = ArrayList()
+                for (item in it) {
+                    list.add(PublicKey(item))
+                }
+                list
+            }.onSuccess {
+                onComplete(Result.success(it))
+            }.onFailure {
+                onComplete(Result.failure(it))
+            }
+        }
+    }
+
+    fun getInflationReward(
+        addresses: List<PublicKey>,
+        epoch: Long? = null,
+        commitment: String? = null,
+        onComplete: (Result<List<InflationReward>>) -> Unit
+    ) {
+        val params: MutableList<Any> = ArrayList()
+        params.add(addresses.map(PublicKey::toString))
+
+        epoch?.let {
+            params.add(RpcEpochConfig(it, commitment))
+        }
+
+        router.call(
+            "getInflationReward", params,
+            List::class.java
+        ){ result ->
+            result.map {
+                it.filterNotNull()
+            }.map {
+                it.map { item -> item as Map<String, Any> }
+            }.map {
+                val list: MutableList<InflationReward> = ArrayList()
+                for (item in it) {
+                    list.add(InflationReward(item))
+                }
+                list
+            }.onSuccess {
+                onComplete(Result.success(it))
+            }.onFailure {
+                onComplete(Result.failure(it))
+            }
+        }
+    }
+
+    fun simulateTransaction(
+        transaction: String,
+        addresses: List<PublicKey>,
+        onComplete: (Result<SimulatedTransaction>) -> Unit
+    ) {
+        val simulateTransactionConfig =
+            SimulateTransactionConfig(RpcSendTransactionConfig.Encoding.base64)
+        val base58addresses = addresses.map(PublicKey::toBase58)
+        simulateTransactionConfig.accounts = mapOf(
+                RpcSendTransactionConfig.Encoding.base64 to "encoding",
+                base58addresses to "addresses")
+        simulateTransactionConfig.replaceRecentBlockhash = true
+        val params: MutableList<Any> = ArrayList()
+        params.add(transaction)
+        params.add(simulateTransactionConfig)
+        router.call(
+            "simulateTransaction",
+            params,
+            SimulatedTransaction::class.java,
+            onComplete
+        )
+    }
+
     fun getProgramAccounts(
         account: PublicKey,
         offset: Long,
-        bytes: String?
-    ): List<ProgramAccount?>? {
+        bytes: String,
+        onComplete: (Result<List<ProgramAccount>>) -> Unit
+    ){
         val filters: MutableList<Any> = ArrayList()
         filters.add(Filter(Memcmp(offset, bytes)))
-        val programAccountConfig = ProgramAccountConfig(filters)
-        return getProgramAccounts(account, programAccountConfig)
+        val programAccountConfig = ProgramAccountConfig(filters = filters)
+        return getProgramAccounts(account, programAccountConfig, onComplete)
     }
 
-    @Throws(ApiError::class)
-    fun getProgramAccounts(account: PublicKey?): List<ProgramAccount?>? {
-        return getProgramAccounts(account, ProgramAccountConfig(Encoding.base64))
+    fun getProgramAccounts(account: PublicKey,
+                           onComplete: (Result<List<ProgramAccount>>) -> Unit
+    ) {
+        return getProgramAccounts(account, ProgramAccountConfig(RpcSendTransactionConfig.Encoding.base64), onComplete)
     }
 
-    @Throws(ApiError::class)
-    fun getProgramAccounts(
+    private fun getProgramAccounts(
         account: PublicKey,
-        programAccountConfig: ProgramAccountConfig?
-    ): List<ProgramAccount?>? {
+        programAccountConfig: ProgramAccountConfig?,
+        onComplete: (Result<List<ProgramAccount>>) -> Unit
+    ) {
         val params: MutableList<Any> = ArrayList()
         params.add(account.toString())
         if (programAccountConfig != null) {
             params.add(programAccountConfig)
         }
-        val rawResult: List<AbstractMap> = client.call(
+        router.call(
             "getProgramAccounts", params,
-            MutableList::class.java
-        )
-        val result: MutableList<ProgramAccount?> = ArrayList()
-        for (item in rawResult) {
-            result.add(ProgramAccount(item))
+            List::class.java
+        ){ result ->
+            result.map{
+                it.map { item -> item as Map<String, Any> }
+            }.map{
+                val result: MutableList<ProgramAccount> = ArrayList()
+                for (item in it) {
+                    result.add(ProgramAccount(item))
+                }
+                result
+            }.onSuccess {
+                onComplete(Result.success(it))
+            }.onFailure {
+                onComplete(Result.failure(it))
+            }
         }
-        return result
     }
 
-    @Throws(ApiError::class)
     fun getProgramAccounts(
         account: PublicKey,
-        memcmpList: List<Memcmp?>,
-        dataSize: Int
-    ): List<ProgramAccount>? {
+        memcmpList: List<Memcmp>,
+        dataSize: Int,
+        onComplete: (Result<List<ProgramAccount>>) -> Unit
+    ) {
         val params: MutableList<Any> = ArrayList()
         params.add(account.toString())
         val filters: MutableList<Any> = ArrayList()
-        memcmpList.forEach(Consumer { memcmp: Memcmp? ->
+        memcmpList.forEach(Consumer { memcmp: Memcmp ->
             filters.add(
                 Filter(
                     memcmp
@@ -424,232 +676,61 @@ class Api(private val router: NetworkingRouter) {
             )
         })
         filters.add(DataSize(dataSize.toLong()))
-        val programAccountConfig = ProgramAccountConfig(filters)
+        val programAccountConfig = ProgramAccountConfig(filters = filters)
         params.add(programAccountConfig)
-        val rawResult: List<AbstractMap> = client.call(
+        router.call(
             "getProgramAccounts", params,
-            MutableList::class.java
-        )
-        val result: MutableList<ProgramAccount> = ArrayList()
-        for (item in rawResult) {
-            result.add(ProgramAccount(item))
+            List::class.java
+        ) { result ->
+            result.map{
+                it.map { item -> item as Map<String, Any> }
+            }.map{
+                val result: MutableList<ProgramAccount> = ArrayList()
+                for (item in it) {
+                    result.add(ProgramAccount(item))
+                }
+                result
+            }.onSuccess {
+                onComplete(Result.success(it))
+            }.onFailure {
+                onComplete(Result.failure(it))
+            }
         }
-        return result
     }
 
-    @Throws(ApiError::class)
-    fun getProgramAccounts(account: PublicKey, memcmpList: List<Memcmp?>): List<ProgramAccount>? {
+    fun getProgramAccounts(account: PublicKey,
+                           memcmpList: List<Memcmp>,
+                           onComplete: (Result<List<ProgramAccount>>) -> Unit
+    ) {
         val params: MutableList<Any> = ArrayList()
         params.add(account.toString())
         val filters: MutableList<Any> = ArrayList()
-        memcmpList.forEach(Consumer { memcmp: Memcmp? ->
+        memcmpList.forEach(Consumer { memcmp: Memcmp ->
             filters.add(
                 Filter(
                     memcmp
                 )
             )
         })
-        val programAccountConfig = ProgramAccountConfig(filters)
+        val programAccountConfig = ProgramAccountConfig(filters = filters)
         params.add(programAccountConfig)
-        val rawResult: List<AbstractMap> = client.call(
+        router.call(
             "getProgramAccounts", params,
-            MutableList::class.java
-        )
-        val result: MutableList<ProgramAccount> = ArrayList()
-        for (item in rawResult) {
-            result.add(ProgramAccount(item))
+            List::class.java
+        ){ result ->
+            result.map{
+                it.map { item -> item as Map<String, Any> }
+            }.map{
+                val result: MutableList<ProgramAccount> = ArrayList()
+                for (item in it) {
+                    result.add(ProgramAccount(item))
+                }
+                result
+            }.onSuccess {
+                onComplete(Result.success(it))
+            }.onFailure {
+                onComplete(Result.failure(it))
+            }
         }
-        return result
     }
-
-    @Throws(ApiError::class)
-    fun simulateTransaction(
-        transaction: String,
-        addresses: List<PublicKey?>
-    ): SimulatedTransaction? {
-        val simulateTransactionConfig =
-            SimulateTransactionConfig(Encoding.base64)
-        simulateTransactionConfig.setAccounts(
-            java.util.Map.of(
-                "encoding",
-                Encoding.base64,
-                "addresses",
-                addresses.stream().map<Any>(PublicKey::toBase58).collect(Collectors.toList())
-            )
-        )
-        simulateTransactionConfig.setReplaceRecentBlockhash(true)
-        val params: MutableList<Any> = ArrayList()
-        params.add(transaction)
-        params.add(simulateTransactionConfig)
-        return client.call(
-            "simulateTransaction",
-            params,
-            SimulatedTransaction::class.java
-        )
-    }
-
-
-    @Throws(ApiError::class)
-    fun getClusterNodes(): List<ClusterNode>? {
-        val params: List<Any> = ArrayList()
-
-        // TODO - fix uncasted type stuff
-        val rawResult: List<AbstractMap> = client.call(
-            "getClusterNodes", params,
-            MutableList::class.java
-        )
-        val result: MutableList<ClusterNode> = ArrayList()
-        for (item in rawResult) {
-            result.add(ClusterNode(item))
-        }
-        return result
-    }
-
-    @Throws(ApiError::class)
-    fun getTokenAccountsByOwner(owner: PublicKey, tokenMint: PublicKey): PublicKey? {
-        val params: MutableList<Any> = ArrayList()
-        params.add(owner.toBase58())
-        val parameterMap: MutableMap<String, Any> = HashMap()
-        parameterMap["mint"] = tokenMint.toBase58()
-        params.add(parameterMap)
-        val rawResult: Map<String, Any> = client.call(
-            "getTokenAccountsByOwner", params,
-            MutableMap::class.java
-        )
-        val tokenAccountKey: PublicKey
-        try {
-            val base58 = ((rawResult["value"] as List<*>?)!![0] as Map<*, *>)["pubkey"] as String?
-            tokenAccountKey = PublicKey(base58)
-        } catch (ex: java.lang.Exception) {
-            throw ApiError("unable to get token account by owner")
-        }
-        return tokenAccountKey
-    }
-
-
-
-    @Throws(ApiError::class)
-    fun getInflationReward(
-        addresses: List<PublicKey?>,
-        epoch: Long?,
-        commitment: String?
-    ): List<InflationReward?>? {
-        val params: MutableList<Any> = ArrayList()
-        params.add(addresses.stream().map<Any>(PublicKey::toString).collect(Collectors.toList()))
-        if (null != epoch) {
-            val rpcEpochConfig: RpcEpochConfig
-            rpcEpochConfig = commitment?.let { RpcEpochConfig(epoch, it) } ?: RpcEpochConfig(epoch)
-            params.add(rpcEpochConfig)
-        }
-        val rawResult: List<AbstractMap> = client.call(
-            "getInflationReward", params,
-            MutableList::class.java
-        )
-        val result: MutableList<InflationReward?> = ArrayList()
-        for (item in rawResult) {
-            result.add(InflationReward(item))
-        }
-        return result
-    }
-
-    @Throws(ApiError::class)
-    fun getSlotLeaders(startSlot: Long, limit: Long): List<PublicKey>? {
-        val params: MutableList<Any> = ArrayList()
-        params.add(startSlot)
-        params.add(limit)
-        val rawResult: List<String> = client.call(
-            "getSlotLeaders", params,
-            MutableList::class.java
-        )
-        val result: MutableList<PublicKey> = ArrayList()
-        for (item in rawResult) {
-            result.add(PublicKey(item))
-        }
-        return result
-    }
-
-
-
-    @Throws(ApiError::class)
-    fun getIdentity(): PublicKey? {
-        val rawResult: Map<String, Any> = client.call(
-            "getIdentity", ArrayList(),
-            MutableMap::class.java
-        )
-        val identity: PublicKey
-        try {
-            val base58 = rawResult["identity"] as String?
-            identity = PublicKey(base58)
-        } catch (ex: java.lang.Exception) {
-            throw ApiError("unable to get identity")
-        }
-        return identity
-    }
-
-    @Throws(ApiError::class)
-    fun getTokenAccountBalance(tokenAccount: PublicKey): TokenAmountInfo? {
-        val params: MutableList<Any> = ArrayList()
-        params.add(tokenAccount.toString())
-        val rawResult: Map<String, Any> = client.call(
-            "getTokenAccountBalance", params,
-            MutableMap::class.java
-        )
-        return TokenAmountInfo(rawResult["value"] as AbstractMap?)
-    }
-
-    @Throws(ApiError::class)
-    fun getTokenSupply(tokenMint: PublicKey): TokenAmountInfo? {
-        val params: MutableList<Any> = ArrayList()
-        params.add(tokenMint.toString())
-        val rawResult: Map<String, Any> = client.call(
-            "getTokenSupply", params,
-            MutableMap::class.java
-        )
-        return TokenAmountInfo(rawResult["value"] as AbstractMap?)
-    }
-
-    @Throws(ApiError::class)
-    fun getTokenLargestAccounts(tokenMint: PublicKey): List<TokenAccount>? {
-        val params: MutableList<Any> = ArrayList()
-        params.add(tokenMint.toString())
-        val rawResult: Map<String, Any> = client.call(
-            "getTokenLargestAccounts", params,
-            MutableMap::class.java
-        )
-        val result: MutableList<TokenAccount> = ArrayList()
-        for (item in (rawResult["value"] as List<AbstractMap?>?)!!) {
-            result.add(TokenAccount(item))
-        }
-        return result
-    }
-
-    @Throws(ApiError::class)
-    fun getTokenAccountsByOwner(
-        accountOwner: PublicKey, requiredParams: Map<String, Any>,
-        optionalParams: Map<String, Any>?
-    ): TokenAccountInfo? {
-        return getTokenAccount(
-            accountOwner,
-            requiredParams,
-            optionalParams,
-            "getTokenAccountsByOwner"
-        )
-    }
-
-    @Throws(ApiError::class)
-    fun getTokenAccountsByDelegate(
-        accountDelegate: PublicKey, requiredParams: Map<String, Any>,
-        optionalParams: Map<String, Any>?
-    ): TokenAccountInfo? {
-        return getTokenAccount(
-            accountDelegate,
-            requiredParams,
-            optionalParams,
-            "getTokenAccountsByDelegate"
-        )
-    }
-
-
-
-    */
 }

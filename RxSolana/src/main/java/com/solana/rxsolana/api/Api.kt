@@ -433,3 +433,166 @@ fun Api.getSlotLeader(): Single<PublicKey> {
         Disposables.empty()
     }
 }
+
+fun Api.getClusterNodes(): Single<List<ClusterNode>> {
+    return Single.create { emitter ->
+        this.getClusterNodes() { result ->
+            result.onSuccess {
+                emitter.onSuccess(it)
+            }.onFailure {
+                emitter.onError(it)
+            }
+        }
+        Disposables.empty()
+    }
+}
+
+fun Api.getTokenAccountBalance(tokenMint: PublicKey): Single<TokenResultObjects.TokenAmountInfo> {
+    return Single.create { emitter ->
+        this.getTokenAccountBalance(tokenMint) { result ->
+            result.onSuccess {
+                emitter.onSuccess(it)
+            }.onFailure {
+                emitter.onError(it)
+            }
+        }
+        Disposables.empty()
+    }
+}
+
+fun Api.getTokenSupply(tokenMint: PublicKey): Single<TokenResultObjects.TokenAmountInfo> {
+    return Single.create { emitter ->
+        this.getTokenSupply(tokenMint) { result ->
+            result.onSuccess {
+                emitter.onSuccess(it)
+            }.onFailure {
+                emitter.onError(it)
+            }
+        }
+        Disposables.empty()
+    }
+}
+
+fun Api.getTokenLargestAccounts(tokenMint: PublicKey): Single<List<TokenResultObjects.TokenAccount>> {
+    return Single.create { emitter ->
+        this.getTokenLargestAccounts(tokenMint) { result ->
+            result.onSuccess {
+                emitter.onSuccess(it)
+            }.onFailure {
+                emitter.onError(it)
+            }
+        }
+        Disposables.empty()
+    }
+}
+
+fun Api.getConfirmedSignaturesForAddress2(account: PublicKey,
+                                          limit: Int? = null,
+                                          before: String? = null,
+                                          until: String? = null): Single<List<SignatureInformation>> {
+    return Single.create { emitter ->
+        this.getConfirmedSignaturesForAddress2(account, limit, before, until) { result ->
+            result.onSuccess {
+                emitter.onSuccess(it)
+            }.onFailure {
+                emitter.onError(it)
+            }
+        }
+        Disposables.empty()
+    }
+}
+
+fun Api.getInflationReward(addresses: List<PublicKey>): Single<List<InflationReward>> {
+    return Single.create { emitter ->
+        this.getInflationReward(addresses) { result ->
+            result.onSuccess {
+                emitter.onSuccess(it)
+            }.onFailure {
+                emitter.onError(it)
+            }
+        }
+        Disposables.empty()
+    }
+}
+
+fun Api.getTokenAccountsByOwner(address: PublicKey, tokenMint: PublicKey): Single<PublicKey> {
+    return Single.create { emitter ->
+        this.getTokenAccountsByOwner(address, tokenMint) { result ->
+            result.onSuccess {
+                emitter.onSuccess(it)
+            }.onFailure {
+                emitter.onError(it)
+            }
+        }
+        Disposables.empty()
+    }
+}
+
+
+
+fun Api.getIdentity(): Single<PublicKey> {
+    return Single.create { emitter ->
+        this.getIdentity { result ->
+            result.onSuccess {
+                emitter.onSuccess(it)
+            }.onFailure {
+                emitter.onError(it)
+            }
+        }
+        Disposables.empty()
+    }
+}
+
+fun Api.getSlotLeaders(startSlot: Long,
+                       limit: Long): Single<List<PublicKey>> {
+    return Single.create { emitter ->
+        this.getSlotLeaders(startSlot, limit) { result ->
+            result.onSuccess {
+                emitter.onSuccess(it)
+            }.onFailure {
+                emitter.onError(it)
+            }
+        }
+        Disposables.empty()
+    }
+}
+
+fun Api.simulate(): Single<PublicKey> {
+    return Single.create { emitter ->
+        this.getIdentity { result ->
+            result.onSuccess {
+                emitter.onSuccess(it)
+            }.onFailure {
+                emitter.onError(it)
+            }
+        }
+        Disposables.empty()
+    }
+}
+
+fun Api.simulateTransaction(transaction: String,
+                            addresses: List<PublicKey>,): Single<SimulatedTransaction> {
+    return Single.create { emitter ->
+        this.simulateTransaction(transaction, addresses) { result ->
+            result.onSuccess {
+                emitter.onSuccess(it)
+            }.onFailure {
+                emitter.onError(it)
+            }
+        }
+        Disposables.empty()
+    }
+}
+
+fun Api.getProgramAccounts(address: PublicKey): Single<List<ProgramAccount>> {
+    return Single.create { emitter ->
+        this.getProgramAccounts(address) { result ->
+            result.onSuccess {
+                emitter.onSuccess(it)
+            }.onFailure {
+                emitter.onError(it)
+            }
+        }
+        Disposables.empty()
+    }
+}

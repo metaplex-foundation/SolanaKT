@@ -15,6 +15,6 @@ class BlockProduction(@Json(name = "value") val value: BlockProductionValue) {
         @Json(name = "byIdentity")
         val byIdentity: Map<String, List<Double>>?,
         @Json(name = "range")
-        private val blockProductionRange: BlockProductionRange?
+        val blockProductionRange: BlockProductionRange?
     )
 }

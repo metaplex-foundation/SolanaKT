@@ -3,24 +3,17 @@ package com.solana.models
 import com.squareup.moshi.Json
 import java.util.*
 
-class InflationReward(pa: AbstractMap<*, *>) {
+class InflationReward(pa: Map<String, Any>) {
     @Json(name = "epoch")
-    private val epoch: Double
+    private val epoch: Double = pa["epoch"] as Double
 
     @Json(name = "effectiveSlot")
-    private val effectiveSlot: Double
+    private val effectiveSlot: Double = pa["effectiveSlot"] as Double
 
     @Json(name = "amount")
-    private val amount: Double
+    private val amount: Double = pa["amount"] as Double
 
     @Json(name = "postBalance")
-    private val postBalance: Double
+    private val postBalance: Double = pa["postBalance"] as Double
 
-    // Constructor for deserializing into List
-    init {
-        epoch = (pa["epoch"] as Double?)!!
-        effectiveSlot = (pa["effectiveSlot"] as Double?)!!
-        amount = (pa["amount"] as Double?)!!
-        postBalance = (pa["postBalance"] as Double?)!!
-    }
 }
