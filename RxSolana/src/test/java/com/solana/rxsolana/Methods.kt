@@ -226,7 +226,7 @@ class Methods {
     @Test
     fun TestGetTokenAccountsByOwner() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getTokenAccountsByOwner(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitVz"), PublicKey("2tWC4JAdL4AxEFJySziYJfsAnW2MHKRo98vbAPiRDSk8")).blockingGet()
+        val result = solana.api.getTokenAccountsByOwner(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV"), PublicKey("EJwZgeZrdC8TXTQbQBoL6bfuAnFUUy1PVCMB4DYPzVaS")).blockingGet()
         Assert.assertNotNull(result)
     }
 
