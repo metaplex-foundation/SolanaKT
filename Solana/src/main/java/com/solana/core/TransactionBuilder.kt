@@ -12,7 +12,7 @@ class TransactionBuilder {
         return this
     }
 
-    fun setSigners(signers: List<Account?>?): TransactionBuilder {
+    fun setSigners(signers: List<Account>): TransactionBuilder {
         transaction.sign(signers)
         return this
     }
