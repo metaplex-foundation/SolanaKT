@@ -1,5 +1,6 @@
 package com.solana.rxsolana.api
 
+import com.solana.api.Api
 import com.solana.core.Account
 import com.solana.core.PublicKey
 import com.solana.core.Transaction
@@ -528,6 +529,20 @@ fun Api.getTokenAccountsByOwner(address: PublicKey, tokenMint: PublicKey): Singl
     }
 }
 
+fun Api.getTokenAccountsByDelegate(accountDelegate: PublicKey,
+                                requiredParams: Map<String, Any>,
+                                optionalParams: Map<String, Any>?): Single<TokenAccountInfo> {
+    return Single.create { emitter ->
+        this.getTokenAccountsByDelegate(accountDelegate, requiredParams, optionalParams) { result ->
+            result.onSuccess {
+                emitter.onSuccess(it)
+            }.onFailure {
+                emitter.onError(it)
+            }
+        }
+        Disposables.empty()
+    }
+}
 
 
 fun Api.getIdentity(): Single<PublicKey> {
@@ -557,18 +572,6 @@ fun Api.getSlotLeaders(startSlot: Long,
     }
 }
 
-fun Api.simulate(): Single<PublicKey> {
-    return Single.create { emitter ->
-        this.getIdentity { result ->
-            result.onSuccess {
-                emitter.onSuccess(it)
-            }.onFailure {
-                emitter.onError(it)
-            }
-        }
-        Disposables.empty()
-    }
-}
 
 fun Api.simulateTransaction(transaction: String,
                             addresses: List<PublicKey>,): Single<SimulatedTransaction> {
