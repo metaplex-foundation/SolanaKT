@@ -10,7 +10,7 @@ class Transaction {
     private val message: Message
     private val signatures: MutableList<String>
     private lateinit var serializedMessage: ByteArray
-    fun addInstruction(instruction: TransactionInstruction?): Transaction {
+    fun addInstruction(instruction: TransactionInstruction): Transaction {
         message.addInstruction(instruction)
         return this
     }
