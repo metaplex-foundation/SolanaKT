@@ -7,10 +7,10 @@ import java.nio.ByteBuffer
 import java.util.*
 
 class Transaction {
-    private val message: Message
-    private val signatures: MutableList<String>
+    private val message: Message = Message()
+    private val signatures: MutableList<String> = ArrayList()
     private lateinit var serializedMessage: ByteArray
-    fun addInstruction(instruction: TransactionInstruction?): Transaction {
+    fun addInstruction(instruction: TransactionInstruction): Transaction {
         message.addInstruction(instruction)
         return this
     }
@@ -51,10 +51,5 @@ class Transaction {
 
     companion object {
         const val SIGNATURE_LENGTH = 64
-    }
-
-    init {
-        message = Message()
-        signatures = ArrayList()
     }
 }
