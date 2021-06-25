@@ -1,4 +1,4 @@
-package com.solana.rxsolana.api
+package com.solana.api
 
 import com.solana.core.Account
 import com.solana.core.PublicKey
@@ -16,7 +16,7 @@ import kotlin.collections.HashMap
 
 data class ApiError(override val message: String?) : Exception(message)
 
-class Api(private val router: NetworkingRouter) {
+public class Api(private val router: NetworkingRouter) {
     fun getBalance(account: PublicKey, onComplete: ((Result<Long>) -> Unit)) {
         val params: MutableList<Any> = ArrayList()
         params.add(account.toString())
@@ -72,13 +72,11 @@ class Api(private val router: NetworkingRouter) {
                     val params: MutableList<Any> = ArrayList()
                     params.add(base64Trx)
                     params.add(RpcSendTransactionConfig())
-                    params
+                    params.toList()
                 }.onSuccess {
                     router.call("sendTransaction", it, String::class.java, onComplete)
-                    return@getRecentBlockhash
                 }.onFailure {
                     onComplete(Result.failure(RuntimeException(it)))
-                    return@getRecentBlockhash
                 }
             }
         } else {
@@ -596,9 +594,10 @@ class Api(private val router: NetworkingRouter) {
         val simulateTransactionConfig =
             SimulateTransactionConfig(RpcSendTransactionConfig.Encoding.base64)
         val base58addresses = addresses.map(PublicKey::toBase58)
-        simulateTransactionConfig.accounts = mapOf(
-                RpcSendTransactionConfig.Encoding.base64 to "encoding",
-                base58addresses to "addresses")
+        val accounts = mapOf(
+                "encoding" to RpcSendTransactionConfig.Encoding.base64.getEncoding(),
+                "addresses" to base58addresses)
+        simulateTransactionConfig.accounts = accounts
         simulateTransactionConfig.replaceRecentBlockhash = true
         val params: MutableList<Any> = ArrayList()
         params.add(transaction)

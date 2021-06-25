@@ -1,17 +1,16 @@
-package com.solana.rxsolana
+package com.solana.rxsolana.api
 
-import com.solana.rxsolana.api.*
 import com.solana.Solana
-import com.solana.core.Account
 import com.solana.core.PublicKey
-import com.solana.core.Transaction
 import com.solana.networking.NetworkingRouter
 import com.solana.networking.RPCEndpoint
-import com.solana.programs.MemoProgram
-import com.solana.programs.SystemProgram
+import com.solana.rxsolana.api.*
 import org.junit.Assert
 import org.junit.Test
 import java.util.*
+import java.util.Map
+import kotlin.collections.listOf
+import kotlin.collections.mapOf
 
 class Methods {
     @Test
@@ -231,6 +230,15 @@ class Methods {
         Assert.assertNotNull(result)
     }
 
+    /*@Test
+    fun TestGetTokenAccountsByDelegate() {
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val requiredParams = Map.of<String, Any>("mint", "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
+        val result = solana.api.getTokenAccountsByDelegate(PublicKey.valueOf(
+            "AoUnMozL1ZF4TYyVJkoxQWfjgKKtu8QUK9L4wFdEJick"), requiredParams , mapOf()).blockingGet()
+        Assert.assertNotNull(result)
+    }*/
+
     @Test
     fun TestGetSlotLeader() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
@@ -310,35 +318,4 @@ class Methods {
         Assert.assertNotNull(result)
     }
     */
-
-    @Test
-    fun transactionMemoTest() {
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
-
-        val lamports = 10101
-        val destination: PublicKey = PublicKey("3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG")
-
-        // Create account from private key
-        val feePayer: Account = Account.fromMnemonic(
-            Arrays.asList(
-                "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
-            ), ""
-        )
-        val transaction = Transaction()
-        transaction.addInstruction(
-            SystemProgram.transfer(
-                feePayer.publicKey,
-                destination,
-                lamports.toLong()
-            )
-        )
-
-        // Add instruction to write memo
-        transaction.addInstruction(
-            MemoProgram.writeUtf8(feePayer.publicKey, "Hello from tests :)")
-        )
-
-        val result = solana.api.sendTransaction(transaction, feePayer).blockingGet()
-        Assert.assertNotNull(result)
-    }
 }
