@@ -30,11 +30,12 @@ public class ByteUtilsTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void uint64ToByteStreamLE() {
+    public void uint64ToByteStreamLE() throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
             ByteUtils.uint64ToByteStreamLE(new BigInteger("137001898677442802701"), bos);
         } catch (IOException e) {
+            throw e;
         }
     }
 
