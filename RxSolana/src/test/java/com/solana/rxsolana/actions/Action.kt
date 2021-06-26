@@ -18,12 +18,11 @@ import java.util.*
 class Action {
     @Test
     fun TestSendSOL() {
-        val sender: Account = Account.fromMnemonic(
-            Arrays.asList(
-                "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
-            ), ""
-        )
-
+        val sender: Account = Account.fromXX(listOf(
+            "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
+        ), "")
+        val tosender = sender.publicKey
+        Assert.assertEquals(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV"), tosender)
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.action.sendSOL(
             sender,
@@ -52,7 +51,7 @@ class Action {
         val destination = PublicKey("3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG")
 
         // Create account from private key
-        val feePayer: Account = Account.fromMnemonic(
+        val feePayer: Account = Account.fromBip39Mnemonic(
             Arrays.asList(
                 "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
             ), ""

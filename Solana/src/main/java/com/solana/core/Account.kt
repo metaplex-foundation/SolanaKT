@@ -1,12 +1,18 @@
 package com.solana.core
 
+import com.solana.bip32.Network
+import com.solana.bip32.wallet.Bip44
+import com.solana.bip32.wallet.CoinType
+import com.solana.bip32.wallet.HdAddress
 import com.solana.vendor.TweetNaclFast
-import org.bitcoinj.crypto.DeterministicHierarchy
-import org.bitcoinj.crypto.HDKeyDerivation
-import org.bitcoinj.crypto.HDUtils
-import org.bitcoinj.crypto.MnemonicCode
+import org.bitcoinj.crypto.*
 import java.nio.ByteBuffer
 import java.util.*
+
+
+sealed class DerivationPath(val path: String) {
+    object M_44H_501H_0H_0H : DerivationPath("M/44H/501H/0H/0H")
+}
 
 class Account {
     private var keyPair: TweetNaclFast.Signature.KeyPair
@@ -15,7 +21,7 @@ class Account {
         keyPair = TweetNaclFast.Signature.keyPair()
     }
 
-    constructor(secretKey: ByteArray?) {
+    constructor(secretKey: ByteArray) {
         keyPair = TweetNaclFast.Signature.keyPair_fromSecretKey(secretKey)
     }
 
@@ -29,11 +35,21 @@ class Account {
         get() = keyPair.secretKey
 
     companion object {
-        fun fromMnemonic(words: List<String?>?, passphrase: String?): Account {
+        fun fromXX(words: List<String>, passphrase: String): Account {
+            val bip44 = Bip44()
+            val seed = MnemonicCode.toSeed(words, passphrase)
+            val address: HdAddress =
+                bip44.getRootAddressFromSeed(seed, Network.mainnet, CoinType.solana)
+
+            return Account(TweetNaclFast.Signature.keyPair_fromSeed(address.privateKey.privateKey))
+        }
+
+
+        fun fromMnemonic(words: List<String>, passphrase: String, derivationPath: DerivationPath = DerivationPath.M_44H_501H_0H_0H): Account {
             val seed = MnemonicCode.toSeed(words, passphrase)
             val masterPrivateKey = HDKeyDerivation.createMasterPrivateKey(seed)
             val deterministicHierarchy = DeterministicHierarchy(masterPrivateKey)
-            val child = deterministicHierarchy[HDUtils.parsePath("M/501H/0H/0/0"), true, true]
+            val child = deterministicHierarchy[HDUtils.parsePath(derivationPath.path), true, true]
             val keyPair = TweetNaclFast.Signature.keyPair_fromSeed(child.privKeyBytes)
             return Account(keyPair)
         }
@@ -44,7 +60,7 @@ class Account {
          * @param passphrase seed passphrase
          * @return Solana account
          */
-        fun fromBip39Mnemonic(words: List<String?>?, passphrase: String?): Account {
+        fun fromBip39Mnemonic(words: List<String>, passphrase: String): Account {
             val seed = MnemonicCode.toSeed(words, passphrase)
             val keyPair = TweetNaclFast.Signature.keyPair_fromSeed(seed)
             return Account(keyPair)
