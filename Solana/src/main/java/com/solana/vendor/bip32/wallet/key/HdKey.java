@@ -74,7 +74,7 @@ public class HdKey {
             key.write(childNumber);
             key.write(chainCode);
             key.write(keyData);
-            byte[] checksum = Hash.sha256Twice(key.toByteArray());
+            byte[] checksum = Hash.sha256Twice(key.toByteArray(), 0, key.size());
             key.write(Arrays.copyOfRange(checksum, 0, 4));
         } catch (IOException e) {
             throw new RuntimeException("Unable to write key");
