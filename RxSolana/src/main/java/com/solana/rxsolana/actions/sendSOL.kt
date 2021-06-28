@@ -1,6 +1,7 @@
 package com.solana.rxsolana.actions
 
 import com.solana.actions.Action
+import com.solana.actions.sendSOL
 import com.solana.core.Account
 import com.solana.core.PublicKey
 import io.reactivex.Single

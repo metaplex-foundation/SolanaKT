@@ -31,11 +31,20 @@ class Action {
         Assert.assertNotNull(result)
     }
 
+    @Test
+    fun TestCreateTokenAccount() {
+        val sender: Account = Account.fromMnemonic(listOf(
+            "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
+        ), "")
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val result = solana.action.createTokenAccount(sender, PublicKey("6AUM4fSvCAxCugrbJPFxTqYFp9r3axYx973yoSyzDYVH")).blockingGet()
+        Assert.assertNotNull(result)
+    }
+
 
     @Test
     fun simulateTransactionTest() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
-
         val transaction =
             "ASdDdWBaKXVRA+6flVFiZokic9gK0+r1JWgwGg/GJAkLSreYrGF4rbTCXNJvyut6K6hupJtm72GztLbWNmRF1Q4BAAEDBhrZ0FOHFUhTft4+JhhJo9+3/QL6vHWyI8jkatuFPQzrerzQ2HXrwm2hsYGjM5s+8qMWlbt6vbxngnO8rc3lqgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAy+KIwZmU8DLmYglP3bPzrlpDaKkGu6VIJJwTOYQmRfUBAgIAAQwCAAAAuAsAAAAAAAA="
         val addresses = listOf(PublicKey.valueOf("QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo"))
@@ -43,6 +52,7 @@ class Action {
             solana.api.simulateTransaction(transaction, addresses).blockingGet()
         Assert.assertTrue(simulatedTransaction.value.logs.size > 0)
     }
+
     @Test
     fun transactionMemoTest() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
@@ -71,7 +81,7 @@ class Action {
             MemoProgram.writeUtf8(feePayer.publicKey, "Hello from tests :)")
         )
 
-        val result = solana.api.sendTransaction(transaction, feePayer).blockingGet()
+        val result = solana.api.sendTransaction(transaction, listOf(feePayer)).blockingGet()
         Assert.assertNotNull(result)
     }
 }
