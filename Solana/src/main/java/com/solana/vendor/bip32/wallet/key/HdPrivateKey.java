@@ -1,10 +1,4 @@
-/**
- * Copyright (c) 2018 orogvany
- *
- * Distributed under the MIT software license, see the accompanying file
- * LICENSE or https://opensource.org/licenses/mit-license.php
- */
-package com.solana.bip32.wallet.key;
+package com.solana.vendor.bip32.wallet.key;
 
 /**
  * Defines a key with a given private key

@@ -1,12 +1,4 @@
-/**
- * Copyright (c) 2018 orogvany
- *
- * Distributed under the MIT software license, see the accompanying file
- * LICENSE or https://opensource.org/licenses/mit-license.php
- */
-package com.solana.bip32.crypto;
-
-import com.solana.bip32.exception.CryptoException;
+package com.solana.vendor.bip32.crypto;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -34,7 +26,7 @@ public class HmacSha512 {
             sha512_HMAC.init(keySpec);
             return sha512_HMAC.doFinal(key);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            throw new CryptoException("Unable to perform hmac512.", e);
+            throw new RuntimeException("Unable to perform hmac512.", e);
         }
     }
 }

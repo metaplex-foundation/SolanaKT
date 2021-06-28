@@ -1,10 +1,4 @@
-/**
- * Copyright (c) 2018 orogvany
- *
- * Distributed under the MIT software license, see the accompanying file
- * LICENSE or https://opensource.org/licenses/mit-license.php
- */
-package com.solana.bip32.crypto;
+package com.solana.vendor.bip32.crypto;
 
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.crypto.ec.CustomNamedCurves;

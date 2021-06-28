@@ -4,17 +4,15 @@
  * Distributed under the MIT software license, see the accompanying file
  * LICENSE or https://opensource.org/licenses/mit-license.php
  */
-package com.solana.bip32.wallet;
+package com.solana.vendor.bip32.wallet;
 
-import com.solana.bip32.Network;
-import com.solana.bip32.crypto.Hash;
-import com.solana.bip32.crypto.HdUtil;
-import com.solana.bip32.crypto.HmacSha512;
-import com.solana.bip32.crypto.Secp256k1;
-import com.solana.bip32.exception.CryptoException;
-import com.solana.bip32.wallet.key.Curve;
-import com.solana.bip32.wallet.key.HdPrivateKey;
-import com.solana.bip32.wallet.key.HdPublicKey;
+import com.solana.vendor.bip32.crypto.Hash;
+import com.solana.vendor.bip32.crypto.HdUtil;
+import com.solana.vendor.bip32.crypto.HmacSha512;
+import com.solana.vendor.bip32.crypto.Secp256k1;
+import com.solana.vendor.bip32.wallet.key.HdPrivateKey;
+import com.solana.vendor.bip32.wallet.key.HdPublicKey;
+import com.solana.vendor.bip32.wallet.key.SolanaCurve;
 
 import net.i2p.crypto.eddsa.EdDSAPrivateKey;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
@@ -24,8 +22,8 @@ import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 import org.bouncycastle.math.ec.ECPoint;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class HdKeyGenerator {
@@ -33,19 +31,15 @@ public class HdKeyGenerator {
     private static final EdDSAParameterSpec ED25519SPEC = EdDSANamedCurveTable.getByName("ed25519");
     public static final String MASTER_PATH = "m";
 
-    public HdAddress getAddressFromSeed(byte[] seed, Network network, CoinType coinType) {
+    public HdAddress getAddressFromSeed(byte[] seed, SolanaCoin solanaCoin) {
 
-        Curve curve = coinType.getCurve();
+        SolanaCurve curve = solanaCoin.getCurve();
         HdPublicKey publicKey = new HdPublicKey();
         HdPrivateKey privateKey = new HdPrivateKey();
-        HdAddress address = new HdAddress(privateKey, publicKey, coinType, MASTER_PATH);
+        HdAddress address = new HdAddress(privateKey, publicKey, solanaCoin, MASTER_PATH);
 
         byte[] I;
-        try {
-            I = HmacSha512.hmac512(seed, curve.getSeed().getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            throw new CryptoException("Unable to decode seed.");
-        }
+        I = HmacSha512.hmac512(seed, curve.getSeed().getBytes(StandardCharsets.UTF_8));
 
         //split into left/right
         byte[] IL = Arrays.copyOfRange(I, 0, 32);
@@ -54,11 +48,10 @@ public class HdKeyGenerator {
         BigInteger masterSecretKey = HdUtil.parse256(IL);
 
         //In case IL is 0 or >=n, the master key is invalid.
-        if (curve != Curve.ed25519 && masterSecretKey.compareTo(BigInteger.ZERO) == 0 || masterSecretKey.compareTo(Secp256k1.getN()) > 0) {
-            throw new CryptoException("The master key is invalid");
+        if ( masterSecretKey.compareTo(BigInteger.ZERO) == 0 || masterSecretKey.compareTo(Secp256k1.getN()) > 0) {
+            throw new RuntimeException("The master key is invalid");
         }
 
-        privateKey.setVersion(network.getPrivateKeyVersion());
         privateKey.setDepth(0);
         privateKey.setFingerprint(new byte[]{0, 0, 0, 0});
         privateKey.setChildNumber(new byte[]{0, 0, 0, 0});
@@ -67,36 +60,23 @@ public class HdKeyGenerator {
 
         ECPoint point = Secp256k1.point(masterSecretKey);
 
-        publicKey.setVersion(network.getPublicKeyVersion());
         publicKey.setDepth(0);
         publicKey.setFingerprint(new byte[]{0, 0, 0, 0});
         publicKey.setChildNumber(new byte[]{0, 0, 0, 0});
         publicKey.setChainCode(IR);
         publicKey.setKeyData(Secp256k1.serP(point));
 
-        switch (curve) {
-            case bitcoin:
-                privateKey.setPrivateKey(privateKey.getKeyData());
-                publicKey.setPublicKey(publicKey.getKeyData());
-                break;
-            case ed25519:
-                privateKey.setPrivateKey(IL);
-                EdDSAPrivateKey sk = new EdDSAPrivateKey(new EdDSAPrivateKeySpec(IL, ED25519SPEC));
-                EdDSAPublicKey pk = new EdDSAPublicKey(new EdDSAPublicKeySpec(sk.getA(), sk.getParams()));
-                publicKey.setPublicKey(HdUtil.append(new byte[]{0}, pk.getAbyte()));
-                break;
-        }
+        privateKey.setPrivateKey(IL);
+        EdDSAPrivateKey sk = new EdDSAPrivateKey(new EdDSAPrivateKeySpec(IL, ED25519SPEC));
+        EdDSAPublicKey pk = new EdDSAPublicKey(new EdDSAPublicKeySpec(sk.getA(), sk.getParams()));
+        publicKey.setPublicKey(HdUtil.append(new byte[]{0}, pk.getAbyte()));
 
         return address;
     }
 
-    public HdPublicKey getPublicKey(HdPublicKey parent, long child, boolean isHardened, Curve curve) {
+    public HdPublicKey getPublicKey(HdPublicKey parent, long child, boolean isHardened) {
         if (isHardened) {
-            throw new CryptoException("Cannot derive child public keys from hardened keys");
-        }
-
-        if (curve == Curve.ed25519) {
-            throw new UnsupportedOperationException("Unable to derive ed25519 public key chaining");
+            throw new RuntimeException("Cannot derive child public keys from hardened keys");
         }
 
         byte[] key = parent.getKeyData();
@@ -121,8 +101,7 @@ public class HdKeyGenerator {
         point = point.add(Secp256k1.deserP(parent.getKeyData()));
 
         if (ILBigInt.compareTo(Secp256k1.getN()) > 0 || point.isInfinity()) {
-            throw new CryptoException("This key is invalid, should proceed to next key");
-//            return getPublicKey(parent, child+1, isHardened);
+            throw new RuntimeException("This key is invalid, should proceed to next key");
         }
 
         byte[] childKey = Secp256k1.serP(point);
@@ -143,8 +122,6 @@ public class HdKeyGenerator {
 
         if (isHardened) {
             child += 0x80000000;
-        } else if (parent.getCoinType().getCurve() == Curve.ed25519) {
-            throw new CryptoException("ed25519 only supports hardened keys");
         }
 
         byte[] xChain = parent.getPrivateKey().getChainCode();
@@ -197,24 +174,16 @@ public class HdKeyGenerator {
         publicKey.setChainCode(IR);
         publicKey.setKeyData(Secp256k1.serP(point));
 
-        switch (parent.getCoinType().getCurve()) {
-            case bitcoin:
-                privateKey.setPrivateKey(privateKey.getKeyData());
-                publicKey.setPublicKey(publicKey.getKeyData());
-                break;
-            case ed25519:
-                privateKey.setPrivateKey(IL);
-                h160 = Hash.h160(parent.getPublicKey().getPublicKey());
-                childFingerprint = new byte[]{h160[0], h160[1], h160[2], h160[3]};
-                publicKey.setFingerprint(childFingerprint);
-                privateKey.setFingerprint(childFingerprint);
-                privateKey.setKeyData(HdUtil.append(new byte[]{0}, IL));
+        privateKey.setPrivateKey(IL);
+        h160 = Hash.h160(parent.getPublicKey().getPublicKey());
+        childFingerprint = new byte[]{h160[0], h160[1], h160[2], h160[3]};
+        publicKey.setFingerprint(childFingerprint);
+        privateKey.setFingerprint(childFingerprint);
+        privateKey.setKeyData(HdUtil.append(new byte[]{0}, IL));
 
-                EdDSAPrivateKey sk = new EdDSAPrivateKey(new EdDSAPrivateKeySpec(IL, ED25519SPEC));
-                EdDSAPublicKey pk = new EdDSAPublicKey(new EdDSAPublicKeySpec(sk.getA(), sk.getParams()));
-                publicKey.setPublicKey(HdUtil.append(new byte[]{0}, pk.getAbyte()));
-                break;
-        }
+        EdDSAPrivateKey sk = new EdDSAPrivateKey(new EdDSAPrivateKeySpec(IL, ED25519SPEC));
+        EdDSAPublicKey pk = new EdDSAPublicKey(new EdDSAPublicKeySpec(sk.getA(), sk.getParams()));
+        publicKey.setPublicKey(HdUtil.append(new byte[]{0}, pk.getAbyte()));
 
         return address;
     }
@@ -224,6 +193,6 @@ public class HdKeyGenerator {
         {
             parentPath = MASTER_PATH;
         }
-        return parentPath + "/" + child + (isHardened ? "'":"");
+        return parentPath + "/" + child + (isHardened ? "H":"");
     }
 }

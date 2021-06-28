@@ -1,12 +1,5 @@
-/**
- * Copyright (c) 2018 orogvany
- *
- * Distributed under the MIT software license, see the accompanying file
- * LICENSE or https://opensource.org/licenses/mit-license.php
- */
-package com.solana.bip32.crypto;
+package com.solana.vendor.bip32.crypto;
 
-import com.solana.bip32.exception.CryptoException;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 
 import java.security.MessageDigest;
@@ -28,22 +21,7 @@ public class Hash {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             return digest.digest(input);
         } catch (NoSuchAlgorithmException e) {
-            throw new CryptoException("Unable to find SHA-256", e);
-        }
-    }
-
-    /**
-     * SHA-512
-     *
-     * @param input input
-     * @return sha512(input)
-     */
-    public static byte[] sha512(byte[] input) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-512");
-            return digest.digest(input);
-        } catch (NoSuchAlgorithmException e) {
-            throw new CryptoException("Unable to find SHA-512", e);
+            throw new RuntimeException("Unable to find SHA-256", e);
         }
     }
 
@@ -64,7 +42,7 @@ public class Hash {
             digest.update(digest.digest());
             return digest.digest();
         } catch (NoSuchAlgorithmException e) {
-            throw new CryptoException("Unable to find SHA-256", e);
+            throw new RuntimeException("Unable to find SHA-256", e);
         }
     }
 

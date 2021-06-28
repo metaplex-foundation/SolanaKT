@@ -18,7 +18,7 @@ import java.util.*
 class Action {
     @Test
     fun TestSendSOL() {
-        val sender: Account = Account.fromXX(listOf(
+        val sender: Account = Account.fromBip44MnemonicWithChange(listOf(
             "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
         ), "")
         val tosender = sender.publicKey

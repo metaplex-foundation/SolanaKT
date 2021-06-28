@@ -1,13 +1,6 @@
-/**
- * Copyright (c) 2018 orogvany
- * <p>
- * Distributed under the MIT software license, see the accompanying file
- * LICENSE or https://opensource.org/licenses/mit-license.php
- */
-package com.solana.bip32.wallet.key;
+package com.solana.vendor.bip32.wallet.key;
 
-import com.solana.bip32.crypto.Hash;
-import com.solana.bip32.exception.CryptoException;
+import com.solana.vendor.bip32.crypto.Hash;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -84,7 +77,7 @@ public class HdKey {
             byte[] checksum = Hash.sha256Twice(key.toByteArray());
             key.write(Arrays.copyOfRange(checksum, 0, 4));
         } catch (IOException e) {
-            throw new CryptoException("Unable to write key");
+            throw new RuntimeException("Unable to write key");
         }
 
         return key.toByteArray();
@@ -100,9 +93,5 @@ public class HdKey {
 
     public byte[] getVersion() {
         return version;
-    }
-
-    public byte[] getFingerprint() {
-        return fingerprint;
     }
 }
