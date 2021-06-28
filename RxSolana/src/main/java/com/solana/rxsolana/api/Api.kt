@@ -47,7 +47,7 @@ fun Api.getConfirmedTransaction(signature: String): Single<ConfirmedTransaction>
     }
 }
 
-fun Api.sendTransaction(transaction: Transaction, signer: Account): Single<String> {
+fun Api.sendTransaction(transaction: Transaction, signer: List<Account>): Single<String> {
     return Single.create { emitter ->
         this.sendTransaction(transaction, signer) { result ->
             result.onSuccess {

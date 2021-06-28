@@ -45,21 +45,8 @@ public class Api(private val router: NetworkingRouter) {
 
     fun sendTransaction(
         transaction: Transaction,
-        signer: Account,
-        recentBlockHash: String?,
-        onComplete: ((Result<String>) -> Unit)
-    ) {
-        return sendTransaction(transaction, listOf(signer), recentBlockHash, onComplete)
-    }
-
-    fun sendTransaction(transaction: Transaction, signer: Account, onComplete: ((Result<String>) -> Unit)) {
-        return sendTransaction(transaction, listOf(signer), null, onComplete)
-    }
-
-    private fun sendTransaction(
-        transaction: Transaction,
         signers: List<Account>,
-        recentBlockHash: String?,
+        recentBlockHash: String? = null,
         onComplete: ((Result<String>) -> Unit)
     ) {
         if (recentBlockHash == null) {
@@ -69,10 +56,7 @@ public class Api(private val router: NetworkingRouter) {
                     transaction.sign(signers)
                     val serializedTransaction: ByteArray = transaction.serialize()
                     val base64Trx: String = Base64.encodeBytes(serializedTransaction)
-                    val params: MutableList<Any> = ArrayList()
-                    params.add(base64Trx)
-                    params.add(RpcSendTransactionConfig())
-                    params.toList()
+                    listOf(base64Trx, RpcSendTransactionConfig())
                 }.onSuccess {
                     router.call("sendTransaction", it, String::class.java, onComplete)
                 }.onFailure {
@@ -84,9 +68,7 @@ public class Api(private val router: NetworkingRouter) {
             transaction.sign(signers)
             val serializedTransaction: ByteArray = transaction.serialize()
             val base64Trx: String = Base64.encodeBytes(serializedTransaction)
-            val params: MutableList<Any> = ArrayList()
-            params.add(base64Trx)
-            params.add(RpcSendTransactionConfig())
+            val params = listOf(base64Trx, RpcSendTransactionConfig())
             router.call("sendTransaction", params, String::class.java, onComplete)
         }
     }
