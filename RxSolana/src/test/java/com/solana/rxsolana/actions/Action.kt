@@ -41,6 +41,15 @@ class Action {
         Assert.assertNotNull(result)
     }
 
+    @Test
+    fun TestCloseTokenAccount() {
+        val sender: Account = Account.fromMnemonic(listOf(
+            "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
+        ), "")
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val result = solana.action.closeTokenAccount(sender, PublicKey("FunTu3uhvMX4L99KBckyW5dq4YscxszdvciGdXcYJngi")).blockingGet()
+        Assert.assertNotNull(result)
+    }
 
     @Test
     fun simulateTransactionTest() {
