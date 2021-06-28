@@ -3,6 +3,7 @@ package com.solana.core
 import com.solana.core.Account
 import junit.framework.Assert.assertEquals
 import org.bitcoinj.core.Base58
+import org.junit.Assert
 import org.junit.Test
 import java.util.*
 import java.util.logging.Logger
@@ -19,16 +20,50 @@ class AccountTests {
         )
     }
 
+    @Test
+    fun fromBip44Mnemonic() {
+        val acc = Account.fromMnemonic(
+            Arrays.asList(
+                "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
+
+            ), ""
+            , DerivationPath.BIP44_M_44H_501H_0H
+        )
+        Assert.assertEquals("G75kGJiizyFNdnvvHxkrBrcwLomGJT2CigdXnsYzrFHv", acc.publicKey.toString())
+    }
+
+    @Test
+    fun fromBip44MnemonicChange() {
+        val acc = Account.fromMnemonic(
+            Arrays.asList(
+                "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
+
+            ), ""
+            , DerivationPath.BIP44_M_44H_501H_0H_OH
+        )
+        Assert.assertEquals("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV", acc.publicKey.toString())
+    }
 
     @Test
     fun fromMnemonic() {
         val acc: Account = Account.fromMnemonic(
             Arrays.asList(
-                "spider", "federal", "bleak", "unable", "ask", "weasel",
-                "diamond", "electric", "illness", "wheat", "uphold", "mind"
+                "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
             ), ""
         )
-        assertEquals("BQWWFhzBdw2vKKBUX17NHeFbCoFQHfRARpdztPE2tDJ", acc.publicKey.toString())
+        assertEquals("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV", acc.publicKey.toString())
+    }
+
+    @Test
+    fun fromDepricatedMnemonicChange() {
+        val acc = Account.fromMnemonic(
+            Arrays.asList(
+                "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
+
+            ), ""
+            , DerivationPath.DEPRECATED_M_501H_0H_0_0
+        )
+        Assert.assertEquals("8knQfbiYmUfwsfcSihzX9FMU64GCc5XWcfcZtyNCoHSB", acc.publicKey.toString())
     }
 
     @Test
@@ -39,19 +74,4 @@ class AccountTests {
         assertEquals("2cXAj2TagK3t6rb2CGRwyhF6sTFJgLyzyDGSWBcGd8Go", acc.publicKey.toString())
     }
 
-    @Test
-    fun fromBip39MnemonicTest() {
-        val account: Account = Account.fromBip39Mnemonic(
-            Arrays.asList(
-                "iron", "make", "indoor", "where", "explain", "model", "maximum", "wonder",
-                "toward", "salad", "fan", "try"
-            ),
-            ""
-        )
-        Logger.getAnonymousLogger().info("Derived pubkey = " + account.publicKey.toBase58())
-        assertEquals(
-            "BeepMww3KwiDeEhEeZmqk4TegvJYNuDERPWm142X6Mx3",
-            account.publicKey.toBase58()
-        )
-    }
 }

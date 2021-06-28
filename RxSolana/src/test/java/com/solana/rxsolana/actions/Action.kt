@@ -2,6 +2,7 @@ package com.solana.rxsolana.actions
 
 import com.solana.Solana
 import com.solana.core.Account
+import com.solana.core.DerivationPath
 import com.solana.core.PublicKey
 import com.solana.core.Transaction
 import com.solana.models.SimulatedTransaction
@@ -18,12 +19,9 @@ import java.util.*
 class Action {
     @Test
     fun TestSendSOL() {
-        val sender: Account = Account.fromMnemonic(
-            Arrays.asList(
-                "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
-            ), ""
-        )
-
+        val sender: Account = Account.fromMnemonic(listOf(
+            "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
+        ), "")
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.action.sendSOL(
             sender,
@@ -32,6 +30,7 @@ class Action {
         ).blockingGet()
         Assert.assertNotNull(result)
     }
+
 
     @Test
     fun simulateTransactionTest() {
@@ -42,7 +41,7 @@ class Action {
         val addresses = listOf(PublicKey.valueOf("QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo"))
         val simulatedTransaction: SimulatedTransaction =
             solana.api.simulateTransaction(transaction, addresses).blockingGet()
-        Assert.assertTrue(simulatedTransaction.value.logs!!.size > 0)
+        Assert.assertTrue(simulatedTransaction.value.logs.size > 0)
     }
     @Test
     fun transactionMemoTest() {
@@ -56,6 +55,7 @@ class Action {
             Arrays.asList(
                 "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
             ), ""
+            , DerivationPath.BIP44_M_44H_501H_0H_OH
         )
         val transaction = Transaction()
         transaction.addInstruction(
