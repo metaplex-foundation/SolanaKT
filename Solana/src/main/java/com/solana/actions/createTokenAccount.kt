@@ -34,7 +34,7 @@ fun Action.createTokenAccount(
             )
 
             transaction.addInstruction(initializeAccountInstruction)
-            api.sendTransaction(transaction, listOf(newAccount, account), null){ result ->
+            this.serializeAndSendWithFee(transaction, listOf(newAccount, account), null){ result ->
                 result.onSuccess { transactionId ->
                     onComplete(Result.success(Pair(transactionId, newAccount.publicKey)))
                 }.onFailure { error ->
