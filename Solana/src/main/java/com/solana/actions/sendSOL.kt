@@ -1,6 +1,5 @@
 package com.solana.actions
 
-import com.solana.api.sendTransaction
 import com.solana.core.Account
 import com.solana.core.PublicKey
 import com.solana.core.Transaction
@@ -16,7 +15,7 @@ fun Action.sendSOL(
     val instructions = SystemProgram.transfer(account.publicKey, destination, amount)
     val transaction = Transaction()
     transaction.addInstruction(instructions)
-    api.sendTransaction(transaction, listOf(account), null){ result ->
+    this.serializeAndSendWithFee(transaction, listOf(account), null){ result ->
         result.onSuccess {
             onComplete(Result.success(it))
         }.onFailure {
