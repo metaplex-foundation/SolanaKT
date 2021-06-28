@@ -41,7 +41,7 @@ public class SolanaBip44 {
 
     private byte[] getPrivateKeyFromBip44SeedWithChange(byte[] seed) {
         HdAddress masterAddress = hdKeyGenerator.getAddressFromSeed(seed, solanaCoin);
-        HdAddress purposeAddress = hdKeyGenerator.getAddress(masterAddress, PURPOSE, solanaCoin.getAlwaysHardened()); // 55H
+        HdAddress purposeAddress = hdKeyGenerator.getAddress(masterAddress, PURPOSE, solanaCoin.getAlwaysHardened()); // 44H
         HdAddress coinTypeAddress = hdKeyGenerator.getAddress(purposeAddress, TYPE, solanaCoin.getAlwaysHardened()); // 501H
         HdAddress accountAddress = hdKeyGenerator.getAddress(coinTypeAddress, ACCOUNT, solanaCoin.getAlwaysHardened()); //0H
         HdAddress changeAddress = hdKeyGenerator.getAddress(accountAddress, CHANGE, solanaCoin.getAlwaysHardened()); //0H
@@ -50,7 +50,7 @@ public class SolanaBip44 {
 
     private byte[] getPrivateKeyFromBip44Seed(byte[] seed) {
         HdAddress masterAddress = hdKeyGenerator.getAddressFromSeed(seed, solanaCoin);
-        HdAddress purposeAddress = hdKeyGenerator.getAddress(masterAddress, PURPOSE, solanaCoin.getAlwaysHardened()); // 55H
+        HdAddress purposeAddress = hdKeyGenerator.getAddress(masterAddress, PURPOSE, solanaCoin.getAlwaysHardened()); // 44H
         HdAddress coinTypeAddress = hdKeyGenerator.getAddress(purposeAddress, TYPE, solanaCoin.getAlwaysHardened()); // 501H
         HdAddress accountAddress = hdKeyGenerator.getAddress(coinTypeAddress, ACCOUNT, solanaCoin.getAlwaysHardened()); //0H
         return accountAddress.getPrivateKey().getPrivateKey();
