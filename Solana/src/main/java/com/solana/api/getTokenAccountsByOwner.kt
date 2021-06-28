@@ -1,6 +1,7 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
+import com.solana.models.TokenAccountInfo
 
 fun Api.getTokenAccountsByOwner(owner: PublicKey, tokenMint: PublicKey, onComplete: (Result<PublicKey>) -> Unit) {
     val params: MutableList<Any> = ArrayList()
@@ -28,4 +29,18 @@ fun Api.getTokenAccountsByOwner(owner: PublicKey, tokenMint: PublicKey, onComple
             onComplete(Result.failure(it))
         }
     }
+}
+
+fun Api.getTokenAccountsByOwner(
+    accountOwner: PublicKey, requiredParams: Map<String, Any>,
+    optionalParams: Map<String, Any>?,
+    onComplete: (Result<TokenAccountInfo>) -> Unit,
+) {
+    getTokenAccount(
+        accountOwner,
+        requiredParams,
+        optionalParams,
+        "getTokenAccountsByOwner",
+        onComplete
+    )
 }
