@@ -12,13 +12,13 @@ object SystemProgram : Program() {
     const val PROGRAM_INDEX_TRANSFER = 2
     @JvmStatic
     fun transfer(
-        fromPublicKey: PublicKey?,
-        toPublickKey: PublicKey?,
+        fromPublicKey: PublicKey,
+        toPublickKey: PublicKey,
         lamports: Long
     ): TransactionInstruction {
         val keys = ArrayList<AccountMeta>()
-        keys.add(AccountMeta(fromPublicKey!!, true, true))
-        keys.add(AccountMeta(toPublickKey!!, false, true))
+        keys.add(AccountMeta(fromPublicKey, true, true))
+        keys.add(AccountMeta(toPublickKey, false, true))
 
         // 4 byte instruction index + 8 bytes lamports
         val data = ByteArray(4 + 8)
