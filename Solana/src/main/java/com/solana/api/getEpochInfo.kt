@@ -4,5 +4,5 @@ import com.solana.models.EpochInfo
 
 fun Api.getEpochInfo(onComplete: ((Result<EpochInfo>) -> Unit)) {
     val params: List<Any> = ArrayList()
-    router.call("getEpochInfo", params, EpochInfo::class.java, onComplete)
+    router.request("getEpochInfo", params, EpochInfo::class.java, onComplete)
 }

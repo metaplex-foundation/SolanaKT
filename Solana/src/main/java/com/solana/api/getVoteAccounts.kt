@@ -9,5 +9,5 @@ fun Api.getVoteAccounts(votePubkey: PublicKey? = null, onComplete: ((Result<Vote
     if (votePubkey != null) {
         params.add(VoteAccountConfig(votePubkey.toBase58()))
     }
-    router.call("getVoteAccounts", params, VoteAccounts::class.java, onComplete)
+    router.request("getVoteAccounts", params, VoteAccounts::class.java, onComplete)
 }

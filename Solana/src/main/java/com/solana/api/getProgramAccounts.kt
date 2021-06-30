@@ -39,7 +39,7 @@ private fun <T> Api.getProgramAccounts(
     if (programAccountConfig != null) {
         params.add(programAccountConfig)
     }
-    router.call(
+    router.request(
         "getProgramAccounts", params,
         List::class.java
     ){ result ->
@@ -80,7 +80,7 @@ fun <T> Api.getProgramAccounts(
     filters.add(DataSize(dataSize.toLong()))
     val programAccountConfig = ProgramAccountConfig(filters = filters)
     params.add(programAccountConfig)
-    router.call(
+    router.request(
         "getProgramAccounts", params,
         List::class.java
     ) { result ->
@@ -116,7 +116,7 @@ fun <T>Api.getProgramAccounts(account: PublicKey,
     })
     val programAccountConfig = ProgramAccountConfig(filters = filters)
     params.add(programAccountConfig)
-    router.call(
+    router.request(
         "getProgramAccounts", params,
         List::class.java
     ){ result ->

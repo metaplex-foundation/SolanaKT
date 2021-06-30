@@ -7,5 +7,5 @@ fun Api.getBlock(slot: Int, onComplete: ((Result<Block>) -> Unit)) {
     val params: MutableList<Any> = ArrayList()
     params.add(slot)
     params.add(BlockConfig())
-    router.call("getBlock", params, Block::class.java, onComplete)
+    router.request("getBlock", params, Block::class.java, onComplete)
 }

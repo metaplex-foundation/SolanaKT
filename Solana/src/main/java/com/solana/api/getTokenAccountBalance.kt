@@ -7,7 +7,7 @@ fun Api.getTokenAccountBalance(tokenAccount: PublicKey,
                            onComplete: (Result<TokenResultObjects.TokenAmountInfo>) -> Unit)  {
     val params: MutableList<Any> = ArrayList()
     params.add(tokenAccount.toString())
-    router.call(
+    router.request(
         "getTokenAccountBalance",
         params,
         Map::class.java

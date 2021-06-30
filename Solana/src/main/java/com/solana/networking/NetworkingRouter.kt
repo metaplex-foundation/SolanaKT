@@ -29,7 +29,7 @@ class NetworkingRouter(
         private val JSON: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()
     }
 
-    fun <T> call(
+    fun <T> request(
         method: String,
         params: List<Any>?,
         clazz: Class<T>?,

@@ -17,7 +17,7 @@ fun Api.getInflationReward(
         params.add(RpcEpochConfig(it, commitment))
     }
 
-    router.call(
+    router.request(
         "getInflationReward", params,
         List::class.java
     ){ result ->

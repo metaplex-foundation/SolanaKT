@@ -4,7 +4,7 @@ import com.solana.models.ClusterNode
 
 fun Api.getClusterNodes(onComplete: (Result<List<ClusterNode>>) -> Unit) {
     val params: List<Any> = ArrayList()
-    router.call(
+    router.request(
         "getClusterNodes", params,
         List::class.java
     ) { result ->   // List<AbstractMap>
