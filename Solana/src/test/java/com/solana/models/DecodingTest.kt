@@ -9,7 +9,7 @@ class DecodingTests {
     @Test
     fun testDecodingMint() {
         val rawData = listOf("AQAAAAYa2dBThxVIU37ePiYYSaPft/0C+rx1siPI5GrbhT0MABCl1OgAAAAGAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==","base64")
-        val buffer = Buffer(rawData, MintLayOut().layout, Mint::class.java)
+        val buffer = Buffer(rawData, MintLayOut(), Mint::class.java)
         assertNotNull(buffer.value)
         val mintLayout = buffer.value!!
 
@@ -23,7 +23,7 @@ class DecodingTests {
     @Test
     fun testDecodingAccountInfo() {
         val rawData: List<String> = listOf("BhrZ0FOHFUhTft4+JhhJo9+3/QL6vHWyI8jkatuFPQwCqmOzhzy1ve5l2AqL0ottCChJZ1XSIW3k3C7TaBQn7aCGAQAAAAAAAQAAAOt6vNDYdevCbaGxgaMzmz7yoxaVu3q9vGeCc7ytzeWqAQAAAAAAAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","base64")
-        val buffer = Buffer(rawData, AccountInfoLayout().layout, AccountInfoData::class.java)
+        val buffer = Buffer(rawData, AccountInfoLayout(), AccountInfoData::class.java)
         assertNotNull(buffer.value)
         val accountInfo = buffer.value!!
         assertEquals("QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo", accountInfo.mint.toBase58())
@@ -40,7 +40,7 @@ class DecodingTests {
     @Test
     fun testDecodingAccountInfo2() {
         val string = listOf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAOt6vNDYdevCbaGxgaMzmz7yoxaVu3q9vGeCc7ytzeWq","base64")
-        val buffer = Buffer(string, AccountInfoLayout().layout, AccountInfoData::class.java)
+        val buffer = Buffer(string, AccountInfoLayout(), AccountInfoData::class.java)
         assertNotNull(buffer.value)
         val accountInfo = buffer.value!!
 
@@ -54,7 +54,7 @@ class DecodingTests {
 
 
         val string2 = listOf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAOt6vNDYdevCbaGxgaMzmz7yoxaVu3q9vGeCc7ytzeWq","base64")
-        val buffer2 = Buffer(string2, AccountInfoLayout().layout, AccountInfoData::class.java)
+        val buffer2 = Buffer(string2, AccountInfoLayout(), AccountInfoData::class.java)
         assertNotNull(buffer.value)
         val accountInfo2 = buffer2.value!!
         assertEquals(true, accountInfo2.isFrozen)
