@@ -2,6 +2,8 @@ package com.solana.rxsolana.api
 
 import com.solana.Solana
 import com.solana.core.PublicKey
+import com.solana.models.Buffer.TokenSwapInfo
+import com.solana.models.Buffer.TokenSwapInfoLayOut
 import com.solana.networking.NetworkingRouter
 import com.solana.networking.RPCEndpoint
 import com.solana.rxsolana.api.*
@@ -305,7 +307,7 @@ class Methods {
     @Test
     fun TestGetProgramAccounts() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getProgramAccounts(PublicKey("SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8")).blockingGet()
+        val result = solana.api.getProgramAccounts(PublicKey("SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8"), TokenSwapInfo::class.java, TokenSwapInfoLayOut()).blockingGet()
         Assert.assertNotNull(result)
     }
 

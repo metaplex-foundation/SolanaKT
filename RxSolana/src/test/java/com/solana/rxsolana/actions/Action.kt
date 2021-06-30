@@ -32,6 +32,18 @@ class Action {
     }
 
     @Test
+    fun TestGetTokenWallets() {
+        val sender: Account = Account.fromMnemonic(listOf(
+            "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
+        ), "")
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val result = solana.action.getTokenWallets(
+            sender.publicKey
+        ).blockingGet()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
     fun TestCreateTokenAccount() {
         val sender: Account = Account.fromMnemonic(listOf(
             "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
