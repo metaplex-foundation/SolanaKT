@@ -3,7 +3,6 @@ package com.solana.models
 import com.solana.models.Buffer.AccountInfoData
 import com.solana.models.Buffer.AccountInfoLayout
 import com.solana.models.Buffer.Buffer
-import org.junit.Assert
 import org.junit.Test
 import org.junit.Assert.*
 
