@@ -101,7 +101,7 @@ fun Api.getStakeActivation(publicKey: PublicKey, epoch: Long): Single<StakeActiv
 
 fun <T>Api.getAccountInfo(publicKey: PublicKey,
                        decodeTo: Class<T>,
-                       bufferLayout: BufferLayout
+                       bufferLayout: BufferLayout<T>
 ): Single<BufferInfo<T>> {
     return Single.create { emitter ->
         this.getAccountInfo(publicKey, decodeTo, bufferLayout) { result ->
@@ -593,7 +593,7 @@ fun Api.simulateTransaction(transaction: String,
 
 fun <T>Api.getProgramAccounts(address: PublicKey,
                            decodeTo: Class<T>,
-                           bufferLayout: BufferLayout
+                           bufferLayout: BufferLayout<T>
 ): Single<List<ProgramAccount<T>>> {
     return Single.create { emitter ->
         this.getProgramAccounts(address, decodeTo, bufferLayout) { result ->
