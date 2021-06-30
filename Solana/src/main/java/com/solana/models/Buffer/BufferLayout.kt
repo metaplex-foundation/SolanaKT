@@ -8,7 +8,7 @@ data class LayoutEntry(val key: String?, val length: Int)
 abstract class BufferLayout(open val layout: List<LayoutEntry>) {
     val BUFFER_LENGTH: Int get() {
         return this.layout.fold(0, { acc, next ->
-            if (next.key != null) {
+            if (next.key == null) {
                 acc + 0
             } else {
                 acc + next.length
