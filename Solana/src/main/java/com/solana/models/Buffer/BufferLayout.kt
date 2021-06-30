@@ -28,7 +28,7 @@ class Buffer<T>{
         }
 
         val dataList = rawData as List<String>
-        if(dataList[1].length >= bufferLayout.BUFFER_LENGTH){
+        if(dataList[0].isBlank() || dataList[0].length < bufferLayout.BUFFER_LENGTH){
             value = null
             return
         }
