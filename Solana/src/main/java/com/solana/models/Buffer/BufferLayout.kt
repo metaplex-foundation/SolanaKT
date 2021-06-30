@@ -21,7 +21,7 @@ abstract class BufferLayout(open val layout: List<LayoutEntry>) {
 
 class Buffer<T>{
     val value: T?
-    constructor(rawData: Any, layout: List<LayoutEntry>, clazz: Class<*>) {
+    constructor(rawData: Any, layout: List<LayoutEntry>, clazz: Class<T>) {
         if (rawData is String) {
             value = rawData as T
             return

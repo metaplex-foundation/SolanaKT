@@ -76,7 +76,7 @@ fun ByteArray.toInt32(): Int {
     if (this.size != 4) {
         throw Exception("wrong len")
     }
-    //this.reverse()
+    this.reverse()
     return ByteBuffer.wrap(this).int
 }
 
@@ -84,6 +84,6 @@ fun ByteArray.toLong(): Long {
     if (this.size != 8) {
         throw Exception("wrong len")
     }
-    //this.reverse()
+    this.reverse()
     return ByteBuffer.wrap(this).long
 }
