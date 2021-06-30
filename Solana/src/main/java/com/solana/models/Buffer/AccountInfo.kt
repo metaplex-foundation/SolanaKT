@@ -20,7 +20,7 @@ class AccountInfoLayout(
     )
 ) : BufferLayout(layout)
 
-class AccountInfoData(val keys: Map<String, ByteArray>) {
+class AccountInfo(val keys: Map<String, ByteArray>) {
     val mint: PublicKey
     val owner: PublicKey
     val lamports: Long

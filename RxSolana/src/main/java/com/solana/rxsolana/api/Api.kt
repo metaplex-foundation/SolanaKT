@@ -5,7 +5,6 @@ import com.solana.core.Account
 import com.solana.core.PublicKey
 import com.solana.core.Transaction
 import com.solana.models.*
-import com.solana.models.Buffer.AccountInfoData
 import com.solana.models.Buffer.BufferLayout
 import io.reactivex.Single
 import io.reactivex.disposables.Disposables
