@@ -5,6 +5,7 @@ import com.solana.vendor.toInt32
 import com.solana.vendor.toLong
 
 class AccountInfoLayout(
+    override val clazz: Class<AccountInfo> = AccountInfo::class.java,
     override val layout: List<LayoutEntry> = listOf(
         LayoutEntry("mint", PublicKey.PUBLIC_KEY_LENGTH),
         LayoutEntry("owner", PublicKey.PUBLIC_KEY_LENGTH),
@@ -18,7 +19,7 @@ class AccountInfoLayout(
         LayoutEntry("closeAuthorityOption", 4),
         LayoutEntry("closeAuthority", PublicKey.PUBLIC_KEY_LENGTH)
     )
-) : BufferLayout(layout)
+) : BufferLayout<AccountInfo>(layout, clazz)
 
 class AccountInfo(val keys: Map<String, ByteArray>) {
     val mint: PublicKey

@@ -7,7 +7,7 @@ import com.solana.models.RPC
 
 fun <T>Api.getAccountInfo(account: PublicKey,
                           decodeTo: Class<T>,
-                          bufferLayout: BufferLayout,
+                          bufferLayout: BufferLayout<T>,
                           onComplete: ((Result<BufferInfo<T>>) -> Unit)) {
     return getAccountInfo(account, HashMap(), decodeTo, bufferLayout, onComplete)
 }
@@ -15,7 +15,7 @@ fun <T>Api.getAccountInfo(account: PublicKey,
 fun <T>Api.getAccountInfo(account: PublicKey,
                           additionalParams: Map<String, Any?>,
                           decodeTo: Class<T>,
-                          bufferLayout: BufferLayout,
+                          bufferLayout: BufferLayout<T>,
                           onComplete: ((Result<BufferInfo<T>>) -> Unit)) {
     val params: MutableList<Any> = ArrayList()
     val parameterMap: MutableMap<String, Any?> = HashMap()

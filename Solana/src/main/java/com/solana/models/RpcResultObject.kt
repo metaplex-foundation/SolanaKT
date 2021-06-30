@@ -10,7 +10,7 @@ open class RpcResultObject(@Json(name = "context") var context: Context? = null)
     )
 }
 
-class BufferInfo<T>(acc: Any?, clazz: Class<T>, bufferLayout: BufferLayout){
+class BufferInfo<T>(acc: Any?, clazz: Class<T>, bufferLayout: BufferLayout<T>){
     @Json(name = "data") var data: Buffer<T>? = null
     @Json(name = "executable") val executable: Boolean
     @Json(name = "lamports") val lamports: Double
@@ -21,7 +21,7 @@ class BufferInfo<T>(acc: Any?, clazz: Class<T>, bufferLayout: BufferLayout){
     init {
         val account = acc as Map<String, Any>
         val rawData = account["data"]!!
-        data = Buffer(rawData, bufferLayout, clazz)
+        data = Buffer(rawData, bufferLayout)
         executable = account["executable"] as Boolean
         lamports = account["lamports"] as Double
         owner = account["owner"] as String?
@@ -29,7 +29,7 @@ class BufferInfo<T>(acc: Any?, clazz: Class<T>, bufferLayout: BufferLayout){
     }
 }
 
-class RPC<T>(pa: Map<String, Any>, clazz: Class<T>, bufferLayout: BufferLayout){
+class RPC<T>(pa: Map<String, Any>, clazz: Class<T>, bufferLayout: BufferLayout<T>){
 
     @Json(name = "context") var context: Context?
     @Json(name = "value") val value: BufferInfo<T>?
