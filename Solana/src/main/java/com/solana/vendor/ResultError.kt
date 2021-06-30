@@ -1,72 +1,37 @@
 package com.solana.vendor
 
+import java.lang.Exception
+
 typealias ResultError = Exception
 
-/**
- * This property is guaranteed to be never null, and is named after the
- * iOS counterpart. You must always use [localizedDescription] to get the error
- * message out of [ResultError].
- */
-val ResultError.localizedDescription: String
-    get() = this.localizedMessage ?: "Error: $this"
-
-/**
- * Sum type that represent a success case (valid value) or a
- * failure case (exception).
- *
- * @param <A> The inner type of the success case.
- */
 sealed class Result<out A, out E : ResultError> {
-    /**
-     * Attach a callback that will be called for success cases.
-     */
+
     abstract fun onSuccess(f: (A) -> Unit): Result<A, E>
 
-    /**
-     * Attach a callback that will be called for failure cases.
-     */
     abstract fun onFailure(f: (E) -> Unit): Result<A, E>
 
-    /**
-     * Attach a callback that throws the exception for failure cases.
-     */
+
     abstract fun throwOnFailure(): Result<A, E>
 
-    /**
-     * Transform the valid case value to another type.
-     */
+
     abstract fun <B> map(f: (A) -> B): Result<B, E>
 
-    /**
-     * Transform the failure case value to another type.
-     */
     abstract fun <E2 : ResultError> mapError(f: (E) -> E2): Result<A, E2>
 
-    /**
-     * Extract the contained value, or throws and error.
-     */
+
     abstract fun getOrThrows(): A
 
     companion object {
-        /**
-         * Make a new success case object with the given value.
-         */
+
         fun <A> success(a: A): Result<A, Nothing> {
             return Success(a)
         }
 
-        /**
-         * Make a new failure case object containing an exception
-         * with the given message.
-         */
         fun failure(message: String): Result<Nothing, ResultError> {
             return Failure(ResultError(message))
         }
 
-        /**
-         * Make a new failure case object containing an exception
-         * with the given exception.
-         */
+
         fun <E : ResultError> failure(exception: E): Result<Nothing, E> {
             return Failure(exception)
         }
@@ -89,9 +54,6 @@ sealed class Result<out A, out E : ResultError> {
     }
 }
 
-/**
- * Internal implementation of the success case. Do not make this public.
- */
 private class Success<A, E : ResultError>(val value: A) : Result<A, E>() {
     override fun <B> map(f: (A) -> B): Result<B, E> {
         return Success(f(value))
@@ -119,9 +81,6 @@ private class Success<A, E : ResultError>(val value: A) : Result<A, E>() {
     }
 }
 
-/**
- * Internal implementation of the failure case. Do not make this public.
- */
 private class Failure<A, E : ResultError> internal constructor(e: E) : Result<A, E>() {
     val exception: E = e
 
@@ -151,9 +110,6 @@ private class Failure<A, E : ResultError> internal constructor(e: E) : Result<A,
     }
 }
 
-/**
- * Extract the contained value, or return the default value.
- */
 fun <A, E : ResultError> Result<A, E>.getOrDefault(defaultValue: A): A {
     return when (this) {
         is Success -> this.value
@@ -161,10 +117,6 @@ fun <A, E : ResultError> Result<A, E>.getOrDefault(defaultValue: A): A {
     }
 }
 
-/**
- * Gives a chance to recover from the failure state, but allows
- * to confirm the failure if it can't be helped.
- */
 fun <A, E : ResultError, E2 : ResultError> Result<A, E>.recover(f: (E) -> Result<A, E2>): Result<A, E2> {
     return when (this) {
         is Success -> Result.success(this.value)
@@ -172,9 +124,6 @@ fun <A, E : ResultError, E2 : ResultError> Result<A, E>.recover(f: (E) -> Result
     }
 }
 
-/**
- * Transform the valid case value to another instance of another type.
- */
 fun <A, B, E : ResultError, E2 : E> Result<A, E>.flatMap(f: (A) -> Result<B, E2>): Result<B, E> {
     return when (this) {
         is Success -> f(this.value)
@@ -182,11 +131,7 @@ fun <A, B, E : ResultError, E2 : E> Result<A, E>.flatMap(f: (A) -> Result<B, E2>
     }
 }
 
-/**
- * Create a [Result] with custom error from a nullable value.
- * The failure case takes a closure to avoid evaluation in
- * case it is not necessary.
- */
 fun <A, E : ResultError> A?.toResult(otherwise: () -> E): Result<A, E> {
     return if (this != null) Result.success(this) else Result.failure(otherwise())
 }
+

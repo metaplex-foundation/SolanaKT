@@ -5,6 +5,7 @@ import org.bitcoinj.core.Utils
 import java.io.IOException
 import java.io.OutputStream
 import java.math.BigInteger
+import java.nio.ByteBuffer
 import java.util.*
 
 object ByteUtils {
@@ -69,4 +70,20 @@ object ByteUtils {
         val valByte = data[posByte].toInt()
         return (valByte shr posBit) and 1
     }
+}
+
+fun ByteArray.toInt32(): Int {
+    if (this.size != 4) {
+        throw Exception("wrong len")
+    }
+    this.reverse()
+    return ByteBuffer.wrap(this).int
+}
+
+fun ByteArray.toLong(): Long {
+    if (this.size != 8) {
+        throw Exception("wrong len")
+    }
+    this.reverse()
+    return ByteBuffer.wrap(this).long
 }

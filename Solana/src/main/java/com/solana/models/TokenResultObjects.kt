@@ -20,13 +20,9 @@ class TokenResultObjects {
 
     class TokenAccount (
         @Json(name = "amount") val amount: String?,
-
         @Json(name = "decimals") val decimals: Int,
-
         @Json(name = "uiAmount") val uiAmount: Double?,
-
         @Json(name = "uiAmountString") val uiAmountString: String?,
-
         @Json(name = "address") val address: String?
     ) {
     constructor(am: Map<String, Any>) : this (

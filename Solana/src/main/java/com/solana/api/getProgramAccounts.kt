@@ -2,30 +2,37 @@ package com.solana.api
 
 import com.solana.core.PublicKey
 import com.solana.models.*
+import com.solana.models.Buffer.BufferLayout
 import java.util.function.Consumer
 
-fun Api.getProgramAccounts(
+fun <T>Api.getProgramAccounts(
     account: PublicKey,
     offset: Long,
     bytes: String,
-    onComplete: (Result<List<ProgramAccount>>) -> Unit
+    decodeTo: Class<T>,
+    bufferLayout: BufferLayout,
+    onComplete: (Result<List<ProgramAccount<T>>>) -> Unit
 ){
     val filters: MutableList<Any> = ArrayList()
     filters.add(Filter(Memcmp(offset, bytes)))
     val programAccountConfig = ProgramAccountConfig(filters = filters)
-    return getProgramAccounts(account, programAccountConfig, onComplete)
+    return getProgramAccounts(account, programAccountConfig, decodeTo, bufferLayout, onComplete)
 }
 
-fun Api.getProgramAccounts(account: PublicKey,
-                       onComplete: (Result<List<ProgramAccount>>) -> Unit
+fun <T> Api.getProgramAccounts(account: PublicKey,
+                               decodeTo: Class<T>,
+                               bufferLayout: BufferLayout,
+                               onComplete: (Result<List<ProgramAccount<T>>>) -> Unit
 ) {
-    return getProgramAccounts(account, ProgramAccountConfig(RpcSendTransactionConfig.Encoding.base64), onComplete)
+    return getProgramAccounts(account, ProgramAccountConfig(RpcSendTransactionConfig.Encoding.base64), decodeTo, bufferLayout, onComplete)
 }
 
-private fun Api.getProgramAccounts(
+private fun <T> Api.getProgramAccounts(
     account: PublicKey,
     programAccountConfig: ProgramAccountConfig?,
-    onComplete: (Result<List<ProgramAccount>>) -> Unit
+    decodeTo: Class<T>,
+    bufferLayout: BufferLayout,
+    onComplete: (Result<List<ProgramAccount<T>>>) -> Unit
 ) {
     val params: MutableList<Any> = ArrayList()
     params.add(account.toString())
@@ -39,9 +46,9 @@ private fun Api.getProgramAccounts(
         result.map{
             it.map { item -> item as Map<String, Any> }
         }.map{
-            val result: MutableList<ProgramAccount> = ArrayList()
+            val result: MutableList<ProgramAccount<T>> = ArrayList()
             for (item in it) {
-                result.add(ProgramAccount(item))
+                result.add(ProgramAccount(item, decodeTo, bufferLayout))
             }
             result
         }.onSuccess {
@@ -52,11 +59,13 @@ private fun Api.getProgramAccounts(
     }
 }
 
-fun Api.getProgramAccounts(
+fun <T> Api.getProgramAccounts(
     account: PublicKey,
     memcmpList: List<Memcmp>,
     dataSize: Int,
-    onComplete: (Result<List<ProgramAccount>>) -> Unit
+    decodeTo: Class<T>,
+    bufferLayout: BufferLayout,
+    onComplete: (Result<List<ProgramAccount<T>>>) -> Unit
 ) {
     val params: MutableList<Any> = ArrayList()
     params.add(account.toString())
@@ -78,9 +87,9 @@ fun Api.getProgramAccounts(
         result.map{
             it.map { item -> item as Map<String, Any> }
         }.map{
-            val result: MutableList<ProgramAccount> = ArrayList()
+            val result: MutableList<ProgramAccount<T>> = ArrayList()
             for (item in it) {
-                result.add(ProgramAccount(item))
+                result.add(ProgramAccount(item, decodeTo, bufferLayout))
             }
             result
         }.onSuccess {
@@ -91,9 +100,50 @@ fun Api.getProgramAccounts(
     }
 }
 
-fun Api.getProgramAccounts(account: PublicKey,
-                       memcmpList: List<Memcmp>,
-                       onComplete: (Result<List<ProgramAccount>>) -> Unit
+/*fun <T> Api.getProgramAccounts(
+    account: PublicKey,
+    memcmpList: List<Memcmp>,
+    dataSize: Int,
+    decodeTo: Class<T>,
+    bufferLayout: BufferLayout,
+    onComplete: (Result<List<ProgramAccount<T>>>) -> Unit
+) {
+    val params: MutableList<Any> = ArrayList()
+    params.add(account.toString())
+    val filters: MutableList<Any> = ArrayList()
+    memcmpList.forEach(Consumer { memcmp: Memcmp ->
+        filters.add(
+            Filter(
+                memcmp
+            )
+        )
+    })
+    filters.add(DataSize(dataSize.toLong()))
+    val programAccountConfig = ProgramAccountConfig(filters = filters)
+    params.add(programAccountConfig)
+    router.call(
+        "getProgramAccounts", params,
+        List::class.java
+    ) { result ->
+        result.map{
+            it.map { item -> item as Map<String, Any> }
+        }.map{
+            val result: MutableList<ProgramAccount<T>> = ArrayList()
+            for (item in it) {
+                result.add(ProgramAccount(item, decodeTo, bufferLayout))
+            }
+            result
+        }.onSuccess {
+            onComplete(Result.success(it))
+        }.onFailure {
+            onComplete(Result.failure(it))
+        }
+    }
+}*/
+
+fun <T>Api.getProgramAccounts(account: PublicKey,
+                       memcmpList: List<Memcmp>, decodeTo: Class<T>, bufferLayout: BufferLayout,
+                       onComplete: (Result<List<ProgramAccount<T>>>) -> Unit
 ) {
     val params: MutableList<Any> = ArrayList()
     params.add(account.toString())
@@ -114,9 +164,9 @@ fun Api.getProgramAccounts(account: PublicKey,
         result.map{
             it.map { item -> item as Map<String, Any> }
         }.map{
-            val result: MutableList<ProgramAccount> = ArrayList()
+            val result: MutableList<ProgramAccount<T>> = ArrayList()
             for (item in it) {
-                result.add(ProgramAccount(item))
+                result.add(ProgramAccount(item, decodeTo, bufferLayout))
             }
             result
         }.onSuccess {
