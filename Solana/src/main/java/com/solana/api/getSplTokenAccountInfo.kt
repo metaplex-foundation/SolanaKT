@@ -9,5 +9,5 @@ fun Api.getSplTokenAccountInfo(account: PublicKey, onComplete: (Result<SplTokenA
     parameterMap["encoding"] = "jsonParsed"
     params.add(account.toString())
     params.add(parameterMap)
-    router.call("getAccountInfo", params, SplTokenAccountInfo::class.java, onComplete)
+    router.request("getAccountInfo", params, SplTokenAccountInfo::class.java, onComplete)
 }

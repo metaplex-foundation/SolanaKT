@@ -34,5 +34,5 @@ fun Api.getTokenAccount(
         }
         params.add(parameterMap)
     }
-    router.call(method, params, TokenAccountInfo::class.java, onComplete)
+    router.request(method, params, TokenAccountInfo::class.java, onComplete)
 }

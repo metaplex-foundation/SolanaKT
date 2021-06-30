@@ -6,5 +6,5 @@ fun Api.requestAirdrop(address: PublicKey, lamports: Long, onComplete: ((Result<
     val params: MutableList<Any> = ArrayList()
     params.add(address.toString())
     params.add(lamports)
-    router.call("requestAirdrop", params, String::class.java, onComplete)
+    router.request("requestAirdrop", params, String::class.java, onComplete)
 }

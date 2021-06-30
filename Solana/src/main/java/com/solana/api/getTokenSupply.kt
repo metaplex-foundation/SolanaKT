@@ -7,7 +7,7 @@ fun Api.getTokenSupply(tokenMint: PublicKey,
                    onComplete: (Result<TokenResultObjects.TokenAmountInfo>) -> Unit) {
     val params: MutableList<Any> = ArrayList()
     params.add(tokenMint.toString())
-    router.call(
+    router.request(
         "getTokenSupply",
         params,
         Map::class.java

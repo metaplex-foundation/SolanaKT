@@ -15,7 +15,7 @@ fun Api.getConfirmedSignaturesForAddress2(
     params.add(account.toString())
     params.add( ConfirmedSignFAddr2(limit = limit?.toLong(), before = before, until = until) )
 
-    router.call(
+    router.request(
         "getConfirmedSignaturesForAddress2", params,
         List::class.java
     ) { result ->

@@ -7,5 +7,5 @@ fun Api.getConfirmedTransaction(signature: String,
 ){
     val params: MutableList<Any> = ArrayList()
     params.add(signature)
-    return router.call("getConfirmedTransaction", params, ConfirmedTransaction::class.java, onComplete)
+    return router.request("getConfirmedTransaction", params, ConfirmedTransaction::class.java, onComplete)
 }

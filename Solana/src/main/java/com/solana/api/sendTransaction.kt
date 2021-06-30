@@ -21,7 +21,7 @@ fun Api.sendTransaction(
                 val base64Trx: String = Base64.encodeBytes(serializedTransaction)
                 listOf(base64Trx, RpcSendTransactionConfig())
             }.onSuccess {
-                router.call("sendTransaction", it, String::class.java, onComplete)
+                router.request("sendTransaction", it, String::class.java, onComplete)
             }.onFailure {
                 onComplete(Result.failure(RuntimeException(it)))
             }
@@ -32,6 +32,6 @@ fun Api.sendTransaction(
         val serializedTransaction: ByteArray = transaction.serialize()
         val base64Trx: String = Base64.encodeBytes(serializedTransaction)
         val params = listOf(base64Trx, RpcSendTransactionConfig())
-        router.call("sendTransaction", params, String::class.java, onComplete)
+        router.request("sendTransaction", params, String::class.java, onComplete)
     }
 }

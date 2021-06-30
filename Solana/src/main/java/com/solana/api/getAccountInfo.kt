@@ -27,7 +27,7 @@ fun <T>Api.getAccountInfo(account: PublicKey,
     }
     params.add(account.toString())
     params.add(parameterMap)
-    router.call("getAccountInfo", params, Map::class.java) { result ->
+    router.request("getAccountInfo", params, Map::class.java) { result ->
         result
             .map {
                 it as Map<String, Any>

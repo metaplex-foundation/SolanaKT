@@ -3,7 +3,7 @@ package com.solana.api
 import com.solana.core.PublicKey
 
 fun Api.getIdentity(onComplete: (Result<PublicKey>) -> Unit) {
-    router.call(
+    router.request(
         "getIdentity", ArrayList(),
         MutableMap::class.java
     ) { result ->

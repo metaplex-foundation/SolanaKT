@@ -7,5 +7,5 @@ fun Api.getConfirmedBlock(slot: Int, onComplete: (Result<ConfirmedBlock>) -> Uni
     val params: MutableList<Any> = ArrayList()
     params.add(slot)
     params.add(BlockConfig())
-    router.call("getConfirmedBlock", params, ConfirmedBlock::class.java, onComplete)
+    router.request("getConfirmedBlock", params, ConfirmedBlock::class.java, onComplete)
 }

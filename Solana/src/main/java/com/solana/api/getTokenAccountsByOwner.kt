@@ -9,7 +9,7 @@ fun Api.getTokenAccountsByOwner(owner: PublicKey, tokenMint: PublicKey, onComple
     val parameterMap: MutableMap<String, Any> = HashMap()
     parameterMap["mint"] = tokenMint.toBase58()
     params.add(parameterMap)
-    router.call(
+    router.request(
         "getTokenAccountsByOwner", params,
         Map::class.java
     ) { result ->

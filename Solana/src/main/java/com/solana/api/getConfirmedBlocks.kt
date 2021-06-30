@@ -3,7 +3,7 @@ package com.solana.api
 fun Api.getConfirmedBlocks(start: Int, end: Int? = null, onComplete: (Result<List<Double>>) -> Unit) {
     val params: List<Int>
     params = if (end == null) listOf(start) else listOf(start, end)
-    router.call("getConfirmedBlocks", params, List::class.java) { result ->
+    router.request("getConfirmedBlocks", params, List::class.java) { result ->
         result.map { list ->
             list.map { it as Double }
         }.onSuccess {

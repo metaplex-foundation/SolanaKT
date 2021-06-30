@@ -7,7 +7,7 @@ fun Api.getTokenLargestAccounts(tokenMint: PublicKey,
                             onComplete: (Result<List<TokenResultObjects.TokenAccount>>) -> Unit) {
     val params: MutableList<Any> = ArrayList()
     params.add(tokenMint.toString())
-    router.call(
+    router.request(
         "getTokenLargestAccounts", params,
         Map::class.java
     ){ result ->

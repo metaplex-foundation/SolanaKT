@@ -21,7 +21,7 @@ fun Api.simulateTransaction(
     val params: MutableList<Any> = ArrayList()
     params.add(transaction)
     params.add(simulateTransactionConfig)
-    router.call(
+    router.request(
         "simulateTransaction",
         params,
         SimulatedTransaction::class.java,
