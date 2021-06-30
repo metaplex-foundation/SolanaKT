@@ -1,12 +1,24 @@
 package com.solana.models
 
-import com.solana.models.Buffer.AccountInfoData
-import com.solana.models.Buffer.AccountInfoLayout
-import com.solana.models.Buffer.Buffer
+import com.solana.models.Buffer.*
 import org.junit.Test
 import org.junit.Assert.*
 
 class DecodingTests {
+
+    @Test
+    fun testDecodingMint() {
+        val rawData = listOf("AQAAAAYa2dBThxVIU37ePiYYSaPft/0C+rx1siPI5GrbhT0MABCl1OgAAAAGAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==","base64")
+        val buffer = Buffer(rawData, MintLayOut().layout, Mint::class.java)
+        assertNotNull(buffer.value)
+        val mintLayout = buffer.value!!
+
+        assertEquals("QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo", mintLayout.mintAuthority!!.toBase58())
+        assertEquals(1000000000000, mintLayout.supply)
+        assertEquals(mintLayout.decimals, 6)
+        assertTrue(mintLayout.isInitialized == true)
+        assertNull(mintLayout.freezeAuthority)
+    }
 
     @Test
     fun testDecodingAccountInfo() {
