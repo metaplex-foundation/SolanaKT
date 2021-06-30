@@ -2,12 +2,24 @@ package com.solana.api
 
 import com.solana.core.PublicKey
 import com.solana.models.AccountInfo
+import com.solana.models.Buffer.AccountInfoData
+import com.solana.models.Buffer.BufferLayout
+import com.solana.models.BufferInfo
+import com.solana.models.ProgramAccount
+import com.solana.models.RPC
 
-fun Api.getAccountInfo(account: PublicKey, onComplete: ((Result<AccountInfo>) -> Unit)) {
-    return getAccountInfo(account, HashMap(), onComplete)
+fun <T>Api.getAccountInfo(account: PublicKey,
+                          decodeTo: Class<T>,
+                          bufferLayout: BufferLayout,
+                          onComplete: ((Result<BufferInfo<T>>) -> Unit)) {
+    return getAccountInfo(account, HashMap(), decodeTo, bufferLayout, onComplete)
 }
 
-fun Api.getAccountInfo(account: PublicKey, additionalParams: Map<String, Any?>, onComplete: ((Result<AccountInfo>) -> Unit)) {
+fun <T>Api.getAccountInfo(account: PublicKey,
+                          additionalParams: Map<String, Any?>,
+                          decodeTo: Class<T>,
+                          bufferLayout: BufferLayout,
+                          onComplete: ((Result<BufferInfo<T>>) -> Unit)) {
     val params: MutableList<Any> = ArrayList()
     val parameterMap: MutableMap<String, Any?> = HashMap()
     parameterMap["commitment"] = additionalParams.getOrDefault("commitment", "max")
@@ -18,5 +30,22 @@ fun Api.getAccountInfo(account: PublicKey, additionalParams: Map<String, Any?>, 
     }
     params.add(account.toString())
     params.add(parameterMap)
-    router.call("getAccountInfo", params, AccountInfo::class.java, onComplete)
+    router.call("getAccountInfo", params, Map::class.java) { result ->
+        result
+            .map {
+                it as Map<String, Any>
+            }
+            .map {
+                RPC(it, decodeTo, bufferLayout)
+            }
+            .map {
+                it.value as BufferInfo<T>
+            }
+            .onSuccess {
+                onComplete(Result.success(it))
+            }
+            .onFailure {
+                onComplete(Result.failure(it))
+            }
+    }
 }

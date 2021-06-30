@@ -24,8 +24,7 @@ class ProgramAccount<T>(pa: Map<String, Any>, clazz: Class<T>, bufferLayout: Buf
         init {
             val account = acc as Map<String, Any>
             val rawData = account["data"]!!
-            val layout = bufferLayout.layout
-            data = Buffer(rawData, layout, clazz)
+            data = Buffer(rawData, bufferLayout, clazz)
             executable = account["executable"] as Boolean
             lamports = account["lamports"] as Double
             owner = account["owner"] as String?

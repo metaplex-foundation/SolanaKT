@@ -21,18 +21,22 @@ abstract class BufferLayout(open val layout: List<LayoutEntry>) {
 
 class Buffer<T>{
     val value: T?
-    constructor(rawData: Any, layout: List<LayoutEntry>, clazz: Class<T>) {
+    constructor(rawData: Any, bufferLayout: BufferLayout, clazz: Class<T>) {
         if (rawData is String) {
             value = rawData as T
             return
         }
 
         val dataList = rawData as List<String>
+        if(dataList[1].length >= bufferLayout.BUFFER_LENGTH){
+            value = null
+            return
+        }
         val decodedData = decodedData(dataList[0],dataList[1])
         val bytes: ByteArray = decodedData
         val dict = mutableMapOf<String, ByteArray>()
         var from = 0
-        layout.forEach {
+        bufferLayout.layout.forEach {
             val to: Int = from + it.length
             it.key?.let {
                 dict[it] = bytes.slice(IntRange(from, to - 1)).toByteArray()

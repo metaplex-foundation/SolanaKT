@@ -5,7 +5,9 @@ import java.io.ByteArrayInputStream
 import java.io.ObjectInput
 import java.io.ObjectInputStream
 
-class AccountInfo(@Json(name = "value") val value: Value) : RpcResultObject() {
+class AccountInfo(
+    @Json(name = "value") val value: Value
+) : RpcResultObject() {
     class Value (
         @Json(name = "data")
         val data: List<String>,
@@ -23,4 +25,3 @@ class AccountInfo(@Json(name = "value") val value: Value) : RpcResultObject() {
         val rentEpoch: Long,
     )
 }
-

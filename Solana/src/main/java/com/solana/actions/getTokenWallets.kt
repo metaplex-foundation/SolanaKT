@@ -12,7 +12,7 @@ import com.solana.vendor.Result
 
 fun Action.getTokenWallets(
     account: PublicKey,
-    onComplete: ((Result<Any, java.lang.Exception>) -> Unit)
+    onComplete: ((Result<List<Wallet>, Exception>) -> Unit)
 ) {
     val memcmp = listOf(
         Memcmp(32, account.toBase58())
