@@ -5,7 +5,7 @@ import org.bitcoinj.core.Base58
 import java.util.*
 
 data class LayoutEntry(val key: String?, val length: Int)
-abstract class BufferLayout(open val layout: List<LayoutEntry>) {
+abstract class BufferLayout<T>(open val layout: List<LayoutEntry>,open val clazz: Class<T>) {
     val BUFFER_LENGTH: Int get() {
         return this.layout.fold(0, { acc, next ->
             if (next.key == null) {
@@ -21,7 +21,7 @@ abstract class BufferLayout(open val layout: List<LayoutEntry>) {
 
 class Buffer<T>{
     val value: T?
-    constructor(rawData: Any, bufferLayout: BufferLayout, clazz: Class<T>) {
+    constructor(rawData: Any, bufferLayout: BufferLayout<T>) {
         if (rawData is String) {
             value = rawData as T
             return
@@ -43,7 +43,7 @@ class Buffer<T>{
             }
             from = to
         }
-        value = clazz.constructors.first().newInstance(dict) as T
+        value = bufferLayout.clazz.constructors.first().newInstance(dict) as T
     }
 
     private fun decodedData(serializedData: String, encoding: String): ByteArray {

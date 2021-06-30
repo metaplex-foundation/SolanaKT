@@ -2,7 +2,7 @@ package com.solana.rxsolana.api
 
 import com.solana.Solana
 import com.solana.core.PublicKey
-import com.solana.models.Buffer.AccountInfoData
+import com.solana.models.Buffer.AccountInfo
 import com.solana.models.Buffer.AccountInfoLayout
 import com.solana.models.Buffer.TokenSwapInfo
 import com.solana.models.Buffer.TokenSwapInfoLayOut
@@ -79,7 +79,7 @@ class Methods {
     @Test
     fun TestGetAccountInfo() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getAccountInfo(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV"), AccountInfoData::class.java, AccountInfoLayout()).blockingGet()
+        val result = solana.api.getAccountInfo(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV"), AccountInfo::class.java, AccountInfoLayout()).blockingGet()
         Assert.assertNotNull(result)
     }
 

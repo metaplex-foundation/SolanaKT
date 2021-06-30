@@ -4,6 +4,7 @@ import com.solana.core.PublicKey
 import com.solana.vendor.toLong
 
 class TokenSwapInfoLayOut(
+    override val clazz: Class<TokenSwapInfo> = TokenSwapInfo::class.java,
     override val layout: List<LayoutEntry> = listOf(
         LayoutEntry("version", 1),
         LayoutEntry("isInitialized", 1),
@@ -26,7 +27,7 @@ class TokenSwapInfoLayOut(
         LayoutEntry("curveType", 1),
         LayoutEntry("payer", PublicKey.PUBLIC_KEY_LENGTH)
     )
-) : BufferLayout(layout)
+) : BufferLayout<TokenSwapInfo>(layout, clazz)
 
 class TokenSwapInfo(val keys: Map<String, ByteArray>) {
     val version: Int

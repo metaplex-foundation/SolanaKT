@@ -5,6 +5,7 @@ import com.solana.vendor.toInt32
 import com.solana.vendor.toLong
 
 class MintLayOut(
+    override val clazz: Class<Mint> = Mint::class.java,
     override val layout: List<LayoutEntry> = listOf(
         LayoutEntry("mintAuthorityOption", 4),
         LayoutEntry("mintAuthority",  PublicKey.PUBLIC_KEY_LENGTH),
@@ -14,7 +15,7 @@ class MintLayOut(
         LayoutEntry("freezeAuthorityOption", 4),
         LayoutEntry("freezeAuthority", PublicKey.PUBLIC_KEY_LENGTH)
     )
-) : BufferLayout(layout)
+) : BufferLayout<Mint>(layout, clazz)
 
 class Mint(val keys: Map<String, ByteArray>) {
     val mintAuthorityOption: Int
