@@ -24,4 +24,27 @@ class DecodingTests {
         assertNull(accountInfo.rentExemptReserve)
         assertNull(accountInfo.closeAuthority)
     }
+
+    @Test
+    fun testDecodingAccountInfo2() {
+        val string = listOf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAOt6vNDYdevCbaGxgaMzmz7yoxaVu3q9vGeCc7ytzeWq","base64")
+        val buffer = Buffer(string, AccountInfoLayout().layout, AccountInfoData::class.java)
+        assertNotNull(buffer.value)
+        val accountInfo = buffer.value!!
+
+        assertNull(accountInfo.delegate)
+        assertEquals(0, accountInfo.delegatedAmount)
+        assertEquals(false, accountInfo.isInitialized)
+        assertEquals(false, accountInfo.isNative)
+        assertNull(accountInfo.rentExemptReserve)
+
+        assertEquals("GrDMoeqMLFjeXQ24H56S1RLgT4R76jsuWCd6SvXyGPQ5", accountInfo.closeAuthority?.toBase58())
+
+
+        val string2 = listOf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAOt6vNDYdevCbaGxgaMzmz7yoxaVu3q9vGeCc7ytzeWq","base64")
+        val buffer2 = Buffer(string2, AccountInfoLayout().layout, AccountInfoData::class.java)
+        assertNotNull(buffer.value)
+        val accountInfo2 = buffer2.value!!
+        assertEquals(true, accountInfo2.isFrozen)
+    }
 }
