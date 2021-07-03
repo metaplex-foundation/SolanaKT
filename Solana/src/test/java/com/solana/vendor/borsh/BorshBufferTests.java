@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
@@ -63,15 +64,15 @@ public class BorshBufferTests {
   @Test
   public void readF32() {
     newBuffer();
-    assertTrue(0.0f == BorshBuffer.wrap(new byte[] {0, 0, 0, 0}).readF32());
-    assertTrue(1.0f == BorshBuffer.wrap(new byte[] {0, 0, (byte)0x80, (byte)0x3f}).readF32());
+    assertEquals(0.0f, BorshBuffer.wrap(new byte[]{0, 0, 0, 0}).readF32(), 0.0);
+    assertEquals(1.0f, BorshBuffer.wrap(new byte[]{0, 0, (byte) 0x80, (byte) 0x3f}).readF32(), 0.0);
   }
 
   @Test
   public void readF64() {
     newBuffer();
-    assertTrue(0.0 == BorshBuffer.wrap(new byte[] {0, 0, 0, 0, 0, 0, 0, 0}).readF64());
-    assertTrue(1.0 == BorshBuffer.wrap(new byte[] {0, 0, 0, 0, 0, 0, (byte)0xf0, (byte)0x3f}).readF64());
+    assertEquals(0.0, BorshBuffer.wrap(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}).readF64(), 0.0);
+    assertEquals(1.0, BorshBuffer.wrap(new byte[]{0, 0, 0, 0, 0, 0, (byte) 0xf0, (byte) 0x3f}).readF64(), 0.0);
   }
 
   @Test
@@ -104,8 +105,8 @@ public class BorshBufferTests {
   @Test
   public void readBoolean() {
     newBuffer();
-    assertEquals(false, BorshBuffer.wrap(new byte[]{0}).readBoolean());
-    assertEquals(true, BorshBuffer.wrap(new byte[]{1}).readBoolean());
+    assertFalse(BorshBuffer.wrap(new byte[]{0}).readBoolean());
+    assertTrue(BorshBuffer.wrap(new byte[]{1}).readBoolean());
   }
 
   @Test
@@ -229,13 +230,13 @@ public class BorshBufferTests {
   public void testF32() {
     newBuffer();
     final float value = 3.1415f;
-    assertTrue(value == BorshBuffer.wrap(buffer.writeF32(value).toByteArray()).readF32());
+    assertEquals(value, BorshBuffer.wrap(buffer.writeF32(value).toByteArray()).readF32(), 0.0);
   }
 
   @Test
   public void testF64() {
     newBuffer();
     final double value = 3.1415;
-    assertTrue(value == BorshBuffer.wrap(buffer.writeF64(value).toByteArray()).readF64());
+    assertEquals(value, BorshBuffer.wrap(buffer.writeF64(value).toByteArray()).readF64(), 0.0);
   }
 }

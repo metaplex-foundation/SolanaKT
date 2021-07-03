@@ -7,7 +7,8 @@ import java.io.OutputStream
 import java.util.*
 
 class BorshWriter(stream: OutputStream) : BorshOutput<BorshWriter?>, Closeable, Flushable {
-    protected val stream: OutputStream
+    protected val stream: OutputStream = Objects.requireNonNull(stream)
+
     @Throws(IOException::class)
     override fun close() {
         stream.close()
@@ -36,7 +37,4 @@ class BorshWriter(stream: OutputStream) : BorshOutput<BorshWriter?>, Closeable, 
         }
     }
 
-    init {
-        this.stream = Objects.requireNonNull(stream)
-    }
 }

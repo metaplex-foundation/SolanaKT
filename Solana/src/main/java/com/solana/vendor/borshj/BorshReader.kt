@@ -7,7 +7,8 @@ import java.io.InputStream
 import java.util.*
 
 class BorshReader(stream: InputStream) : BorshInput, Closeable {
-    private val stream: InputStream
+    private val stream: InputStream = Objects.requireNonNull(stream)
+
     @Throws(IOException::class)
     override fun close() {
         stream.close()
@@ -43,7 +44,4 @@ class BorshReader(stream: InputStream) : BorshInput, Closeable {
         }
     }
 
-    init {
-        this.stream = Objects.requireNonNull(stream)
-    }
 }
