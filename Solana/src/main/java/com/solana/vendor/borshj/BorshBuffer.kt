@@ -1,11 +1,10 @@
-/* This is free and unencumbered software released into the public domain. */
 package com.solana.vendor.borshj
 
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
 
-class BorshBuffer protected constructor(buffer: ByteBuffer) : BorshInput,
+class BorshBuffer constructor(buffer: ByteBuffer) : BorshInput,
     BorshOutput<BorshBuffer?> {
     protected val buffer: ByteBuffer
     protected fun array(): ByteArray {
