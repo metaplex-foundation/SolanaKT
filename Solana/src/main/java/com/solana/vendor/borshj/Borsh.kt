@@ -8,7 +8,7 @@ interface Borsh {
     companion object {
         @JvmStatic
         fun serialize(`object`: Any): ByteArray {
-            return allocate(4096).write(Objects.requireNonNull(`object`)).toByteArray()
+            return allocate(4096).write(Objects.requireNonNull(`object`))!!.toByteArray()
         }
 
         @JvmStatic
