@@ -1,23 +1,11 @@
 package com.solana.models.Buffer
 
 import com.solana.core.PublicKey
+import com.solana.vendor.borshj.Borsh
 import com.solana.vendor.toInt32
 import com.solana.vendor.toLong
 
-class MintLayOut(
-    override val clazz: Class<Mint> = Mint::class.java,
-    override val layout: List<LayoutEntry> = listOf(
-        LayoutEntry("mintAuthorityOption", 4),
-        LayoutEntry("mintAuthority",  PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("supply", 8),
-        LayoutEntry("decimals", 1),
-        LayoutEntry("isInitialized", 1),
-        LayoutEntry("freezeAuthorityOption", 4),
-        LayoutEntry("freezeAuthority", PublicKey.PUBLIC_KEY_LENGTH)
-    )
-) : BufferLayout<Mint>(layout, clazz)
-
-class Mint(val keys: Map<String, ByteArray>) {
+class Mint(keys: Map<String, ByteArray>) : Borsh {
     val mintAuthorityOption: Int
     var mintAuthority: PublicKey?
     val supply: Long

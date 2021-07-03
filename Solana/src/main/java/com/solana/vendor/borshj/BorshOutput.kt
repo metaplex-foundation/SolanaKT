@@ -1,46 +1,51 @@
 package com.solana.vendor.borshj
 
 import com.solana.vendor.borshj.BorshBuffer.Companion.allocate
+import java.lang.reflect.Modifier
 import java.math.BigInteger
 import java.nio.charset.StandardCharsets
 import java.util.*
 
 interface BorshOutput<Self> {
-    fun write(`object`: Any): Self {
-        Objects.requireNonNull(`object`)
-        if (`object` is Byte) {
-            return this.writeU8(`object`)
-        } else if (`object` is Short) {
-            return this.writeU16(`object`)
-        } else if (`object` is Int) {
-            return writeU32(`object`)
-        } else if (`object` is Long) {
-            return writeU64(`object`)
-        } else if (`object` is Float) {
-            return writeF32(`object`)
-        } else if (`object` is Double) {
-            return writeF64(`object`)
-        } else if (`object` is BigInteger) {
-            return this.writeU128(`object`)
-        } else if (`object` is String) {
-            return writeString(`object`)
-        } else if (`object` is List<*>) {
-            return this.writeArray(`object`) as Self
-        } else if (`object` is Boolean) {
-            return writeBoolean<Any>(`object`)
-        } else if (`object` is Optional<*>) {
-            return writeOptional(`object`)
-        } else if (`object` is Borsh) {
-            return writePOJO(`object`)
+    fun write(obj: Any): Self {
+        if (obj is Byte) {
+            return this.writeU8(obj)
+        } else if (obj is Short) {
+            return this.writeU16(obj)
+        } else if (obj is Int) {
+            return writeU32(obj)
+        } else if (obj is Long) {
+            return writeU64(obj)
+        } else if (obj is Float) {
+            return writeF32(obj)
+        } else if (obj is Double) {
+            return writeF64(obj)
+        } else if (obj is BigInteger) {
+            return this.writeU128(obj)
+        } else if (obj is String) {
+            return writeString(obj)
+        } else if (obj is ByteArray) {
+            return this.writeFixedArray(obj)
+        } else if (obj is List<*>) {
+            return this.writeArray(obj) as Self
+        } else if (obj is Boolean) {
+            return writeBoolean<Any>(obj)
+        } else if (obj is Optional<*>) {
+            return writeOptional(obj)
+        } else if (obj is Borsh) {
+            return writePOJO(obj)
         }
         throw IllegalArgumentException()
     }
 
-    fun writePOJO(`object`: Any): Self {
+    fun writePOJO(obj: Borsh): Self {
         try {
-            for (field in `object`.javaClass.declaredFields) {
+            val fields = obj.javaClass.declaredFields
+                .filter { it.name != "Companion" }
+                .filter { !Modifier.isStatic(it.modifiers) }
+            for (field in fields) {
                 field.isAccessible = true
-                this.write(field[`object`])
+                this.write(field[obj])
             }
         } catch (error: IllegalAccessException) {
             throw RuntimeException(error)

@@ -1,15 +1,29 @@
 package com.solana.models
 
+import com.solana.core.PublicKey
 import com.solana.models.Buffer.*
+import com.solana.vendor.borshj.Borsh
 import org.junit.Test
 import org.junit.Assert.*
 
 class DecodingTests {
 
     @Test
+    fun testDecodingPublicKey() {
+        val bytes = byteArrayOf(3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        val key = PublicKey(bytes)
+        assertEquals("CiDwVBFgWV9E5MvXWoLgnEgn2hK7rJikbvfWavzAQz3", key.toBase58())
+        val serialized = Borsh.serialize(key)
+        assertEquals(serialized.toTypedArray(), bytes.toTypedArray())
+        val newPublickey = Borsh.deserialize(serialized, PublicKey::class.java)
+        assertEquals("CiDwVBFgWV9E5MvXWoLgnEgn2hK7rJikbvfWavzAQz3", newPublickey.toBase58())
+    }
+
+
+    @Test
     fun testDecodingMint() {
         val rawData = listOf("AQAAAAYa2dBThxVIU37ePiYYSaPft/0C+rx1siPI5GrbhT0MABCl1OgAAAAGAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==","base64")
-        val buffer = Buffer(rawData, MintLayOut())
+        val buffer = Buffer(rawData, Mint::class.java)
         assertNotNull(buffer.value)
         val mintLayout = buffer.value!!
 
@@ -23,7 +37,7 @@ class DecodingTests {
     @Test
     fun testDecodingAccountInfo() {
         val rawData: List<String> = listOf("BhrZ0FOHFUhTft4+JhhJo9+3/QL6vHWyI8jkatuFPQwCqmOzhzy1ve5l2AqL0ottCChJZ1XSIW3k3C7TaBQn7aCGAQAAAAAAAQAAAOt6vNDYdevCbaGxgaMzmz7yoxaVu3q9vGeCc7ytzeWqAQAAAAAAAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","base64")
-        val buffer = Buffer(rawData, AccountInfoLayout())
+        val buffer = Buffer(rawData, AccountInfo::class.java)
         assertNotNull(buffer.value)
         val accountInfo = buffer.value!!
         assertEquals("QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo", accountInfo.mint.toBase58())
@@ -40,7 +54,7 @@ class DecodingTests {
     @Test
     fun testDecodingAccountInfo2() {
         val string = listOf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAOt6vNDYdevCbaGxgaMzmz7yoxaVu3q9vGeCc7ytzeWq","base64")
-        val buffer = Buffer(string, AccountInfoLayout())
+        val buffer = Buffer(string, AccountInfo::class.java)
         assertNotNull(buffer.value)
         val accountInfo = buffer.value!!
 
@@ -54,7 +68,7 @@ class DecodingTests {
 
 
         val string2 = listOf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAOt6vNDYdevCbaGxgaMzmz7yoxaVu3q9vGeCc7ytzeWq","base64")
-        val buffer2 = Buffer(string2, AccountInfoLayout())
+        val buffer2 = Buffer(string2, AccountInfo::class.java)
         assertNotNull(buffer.value)
         val accountInfo2 = buffer2.value!!
         assertEquals(true, accountInfo2.isFrozen)

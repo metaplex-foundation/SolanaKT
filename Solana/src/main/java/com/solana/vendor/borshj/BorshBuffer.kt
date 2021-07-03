@@ -4,9 +4,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
 
-class BorshBuffer constructor(buffer: ByteBuffer) : BorshInput,
-    BorshOutput<BorshBuffer?> {
-    protected val buffer: ByteBuffer
+class BorshBuffer constructor(val buffer: ByteBuffer) : BorshInput, BorshOutput<BorshBuffer?> {
     protected fun array(): ByteArray {
         assert(buffer.hasArray())
         return buffer.array()
@@ -110,7 +108,6 @@ class BorshBuffer constructor(buffer: ByteBuffer) : BorshInput,
     }
 
     init {
-        this.buffer = Objects.requireNonNull(buffer)
         this.buffer.order(ByteOrder.LITTLE_ENDIAN)
         this.buffer.mark()
     }

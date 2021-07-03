@@ -1,12 +1,15 @@
 package com.solana.vendor.borshj
 
+import com.solana.core.PublicKey
 import com.solana.vendor.borshj.Borsh.Companion.isSerializable
 import com.solana.vendor.borshj.BorshBuffer.Companion.wrap
 import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.Modifier
 import java.lang.reflect.ParameterizedType
 import java.math.BigInteger
 import java.nio.charset.StandardCharsets
 import java.util.*
+import kotlin.reflect.KClass
 
 interface BorshInput {
     fun <T> read(klass: Class<*>): T {
@@ -28,6 +31,8 @@ interface BorshInput {
             return readString() as T
         } else if (klass == Boolean::class.java) {
             return java.lang.Boolean.valueOf(readBoolean()) as T
+        } else if (klass == PublicKey::class.java) {
+            return PublicKey(readFixedArray(32)) as T
         } else if (klass == Optional::class.java) {
             return this.readOptional<Any>() as T
         } else if (isSerializable(klass)) {
@@ -38,8 +43,11 @@ interface BorshInput {
 
     fun <T> readPOJO(klass: Class<*>): T {
         return try {
-            val `object` = klass.getConstructor().newInstance()
-            for (field in klass.declaredFields) {
+            val obj = klass.getConstructor().newInstance()
+            val declaredFields = klass.declaredFields
+                .filter { it.name != "Companion" }
+                .filter { !Modifier.isStatic(it.modifiers) }
+            for (field in declaredFields) {
                 field.isAccessible = true
                 val fieldClass = field.type
                 if (fieldClass == Optional::class.java) {
@@ -49,12 +57,12 @@ interface BorshInput {
                     val optionalArgs = fieldType.actualTypeArguments
                     assert(optionalArgs.size == 1)
                     val optionalClass = optionalArgs[0] as Class<*>
-                    field[`object`] = this.readOptional<Any>(optionalClass)
+                    field[obj] = this.readOptional<Any>(optionalClass)
                 } else {
-                    field[`object`] = this.read(field.type)
+                    field[obj] = this.read(field.type)
                 }
             }
-            `object` as T
+            obj as T
         } catch (error: NoSuchMethodException) {
             throw RuntimeException(error)
         } catch (error: InstantiationException) {
@@ -64,6 +72,20 @@ interface BorshInput {
         } catch (error: InvocationTargetException) {
             throw RuntimeException(error)
         }
+    }
+
+    fun <T : Any> mapToObject(map: Map<String, Any>, clazz: KClass<T>) : T {
+        //Get default constructor
+        val constructor = clazz.constructors.first()
+
+        //Map constructor parameters to map values
+        val args = constructor
+            .parameters
+            .map { it to map.get(it.name) }
+            .toMap()
+
+        //return object from constructor call
+        return constructor.callBy(args)
     }
 
     fun readU8(): Byte {

@@ -1,44 +1,32 @@
 package com.solana.models.Buffer
 
 import com.solana.core.PublicKey
+import com.solana.plugins.NoArg
+import com.solana.vendor.borshj.Borsh
+import com.solana.vendor.borshj.BorshInput
+import com.solana.vendor.borshj.BorshOutput
 import com.solana.vendor.toInt32
 import com.solana.vendor.toLong
 
-class AccountInfoLayout(
-    override val clazz: Class<AccountInfo> = AccountInfo::class.java,
-    override val layout: List<LayoutEntry> = listOf(
-        LayoutEntry("mint", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("owner", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("lamports", 8),
-        LayoutEntry("delegateOption", 4),
-        LayoutEntry("delegate", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("state", 1),
-        LayoutEntry("isNativeOption", 4),
-        LayoutEntry("isNativeRaw", 8),
-        LayoutEntry("delegatedAmount", 8),
-        LayoutEntry("closeAuthorityOption", 4),
-        LayoutEntry("closeAuthority", PublicKey.PUBLIC_KEY_LENGTH)
-    )
-) : BufferLayout<AccountInfo>(layout, clazz)
-
-class AccountInfo(val keys: Map<String, ByteArray>) {
-    val mint: PublicKey
-    val owner: PublicKey
-    val lamports: Long
-    val delegateOption: Int
-    var delegate: PublicKey?
-    val isInitialized: Boolean
-    val isFrozen: Boolean
-    val state: Int
-    val isNativeOption: Int
-    val rentExemptReserve: Long?
-    val isNativeRaw: Long
-    val isNative: Boolean
-    var delegatedAmount: Long
-    val closeAuthorityOption: Int
+@NoArg
+data class AccountInfo (
+    val mint: PublicKey,
+    val owner: PublicKey,
+    val lamports: Long,
+    val delegateOption: Int,
+    var delegate: PublicKey?,
+    val isInitialized: Boolean,
+    val isFrozen: Boolean,
+    val state: Int,
+    val isNativeOption: Int,
+    val rentExemptReserve: Long?,
+    val isNativeRaw: Long,
+    val isNative: Boolean,
+    var delegatedAmount: Long,
+    val closeAuthorityOption: Int,
     var closeAuthority: PublicKey?
-
-    init {
+): Borsh
+    /*init {
         mint = PublicKey(keys["mint"]!!)
         owner = PublicKey(keys["owner"]!!)
         lamports = keys["lamports"]!!.toLong()
@@ -70,6 +58,4 @@ class AccountInfo(val keys: Map<String, ByteArray>) {
         if(closeAuthorityOption == 0){
             this.closeAuthority = null
         }
-    }
-}
-
+    }*/

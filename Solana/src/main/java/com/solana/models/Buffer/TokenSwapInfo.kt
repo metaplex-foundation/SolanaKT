@@ -1,35 +1,10 @@
 package com.solana.models.Buffer
 
 import com.solana.core.PublicKey
+import com.solana.vendor.borshj.Borsh
 import com.solana.vendor.toLong
 
-class TokenSwapInfoLayOut(
-    override val clazz: Class<TokenSwapInfo> = TokenSwapInfo::class.java,
-    override val layout: List<LayoutEntry> = listOf(
-        LayoutEntry("version", 1),
-        LayoutEntry("isInitialized", 1),
-        LayoutEntry("nonce", 1),
-        LayoutEntry("tokenProgramId", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("tokenAccountA", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("tokenAccountB", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("tokenPool", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("mintA", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("mintB", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("feeAccount", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("tradeFeeNumerator", 8),
-        LayoutEntry("tradeFeeDenominator", 8),
-        LayoutEntry("ownerTradeFeeNumerator", 8),
-        LayoutEntry("ownerTradeFeeDenominator", 8),
-        LayoutEntry("ownerWithdrawFeeNumerator", 8),
-        LayoutEntry("ownerWithdrawFeeDenominator", 8),
-        LayoutEntry("hostFeeNumerator", 8),
-        LayoutEntry("hostFeeDenominator", 8),
-        LayoutEntry("curveType", 1),
-        LayoutEntry("payer", PublicKey.PUBLIC_KEY_LENGTH)
-    )
-) : BufferLayout<TokenSwapInfo>(layout, clazz)
-
-class TokenSwapInfo(val keys: Map<String, ByteArray>) {
+class TokenSwapInfo(keys: Map<String, ByteArray>) : Borsh {
     val version: Int
     val isInitialized: Boolean
     val nonce: Int
