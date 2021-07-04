@@ -1,11 +1,12 @@
 package com.solana.models.Buffer
 
 import com.solana.core.PublicKey
-import com.solana.vendor.borshj.Borsh
+import com.solana.vendor.borshj.*
 import com.solana.vendor.toInt32
 import com.solana.vendor.toLong
+import java.lang.Exception
 
-class Mint(keys: Map<String, ByteArray>) : Borsh {
+class Mint(keys: Map<String, ByteArray>) : BorshCodable {
     val mintAuthorityOption: Int
     var mintAuthority: PublicKey?
     val supply: Long
@@ -29,5 +30,15 @@ class Mint(keys: Map<String, ByteArray>) : Borsh {
         if(freezeAuthorityOption == 0){
             this.freezeAuthority = null
         }
+    }
+}
+
+class MintRule(override val clazz: Class<Mint> = Mint::class.java): BorshRule<Mint> {
+    override fun read(input: BorshInput): Mint {
+        throw Exception("Not implemented Mint")
+    }
+
+    override fun <Self>write(obj: Any, output: BorshOutput<Self>): Self {
+        throw Exception("Not implemented Mint")
     }
 }

@@ -1,10 +1,8 @@
 package com.solana.vendor.borshj
 
-import com.solana.core.PublicKey
-import com.solana.vendor.borshj.Borsh.Companion.isSerializable
+
 import com.solana.vendor.borshj.BorshBuffer.Companion.wrap
 import java.lang.reflect.InvocationTargetException
-import java.lang.reflect.Modifier
 import java.lang.reflect.ParameterizedType
 import java.math.BigInteger
 import java.nio.charset.StandardCharsets
@@ -12,8 +10,11 @@ import java.util.*
 import kotlin.reflect.KClass
 
 interface BorshInput {
-    fun <T> read(klass: Class<*>): T {
-        if (klass == Byte::class.java || klass == Byte::class.javaPrimitiveType || klass == Byte::class.javaObjectType) {
+    fun <T> read(borsh: Borsh, klass: Class<*>): T {
+        val rule = borsh.getRules().firstOrNull { it.clazz == klass }
+        if (rule != null) {
+            return rule.read(this) as T
+        } else if (klass == Byte::class.java || klass == Byte::class.javaPrimitiveType || klass == Byte::class.javaObjectType) {
             return java.lang.Byte.valueOf(readU8()) as T
         } else if (klass == Short::class.java || klass == Short::class.javaPrimitiveType || klass == Short::class.javaObjectType) {
             return readU16() as T
@@ -31,38 +32,45 @@ interface BorshInput {
             return readString() as T
         } else if (klass == Boolean::class.java) {
             return java.lang.Boolean.valueOf(readBoolean()) as T
-        } else if (klass == PublicKey::class.java) {
-            return PublicKey(readFixedArray(32)) as T
         } else if (klass == Optional::class.java) {
             return this.readOptional<Any>() as T
-        } else if (isSerializable(klass)) {
-            return readPOJO<Any>(klass) as T
+        } else if (borsh.isSerializable(klass)) {
+            return readPOJO<Any>(borsh, klass) as T
         }
         throw IllegalArgumentException()
     }
 
-    fun <T> readPOJO(klass: Class<*>): T {
+    fun <T> readPOJO(borsh: Borsh, klass: Class<*>): T {
         return try {
-            val obj = klass.getConstructor().newInstance()
+            val constructor = klass.kotlin.constructors.first()
+            val kotlinParameters = constructor.parameters
+
             val declaredFields = klass.declaredFields
-                .filter { it.name != "Companion" }
-                .filter { !Modifier.isStatic(it.modifiers) }
+                .filter { kotlinParameters.map{ kf -> kf.name }.contains(it.name) }
+
+            val map: MutableMap<String, Any?> = mutableMapOf()
             for (field in declaredFields) {
+                val kfield = kotlinParameters.first { it.name == field.name }
                 field.isAccessible = true
                 val fieldClass = field.type
-                if (fieldClass == Optional::class.java) {
+                if (kfield.isOptional) {
                     val fieldType = field.genericType as? ParameterizedType ?: throw AssertionError(
                         "unsupported Optional type"
                     )
                     val optionalArgs = fieldType.actualTypeArguments
                     assert(optionalArgs.size == 1)
                     val optionalClass = optionalArgs[0] as Class<*>
-                    field[obj] = this.readOptional<Any>(optionalClass)
+                    map[field.name] = this.readOptional<Any>(borsh, optionalClass)
                 } else {
-                    field[obj] = this.read(field.type)
+                    map[field.name] = this.read(borsh, field.type)
                 }
             }
-            obj as T
+
+            val args = constructor
+                .parameters
+                .map { it to map.get(it.name) }
+                .toMap()
+            constructor.callBy(args) as T
         } catch (error: NoSuchMethodException) {
             throw RuntimeException(error)
         } catch (error: InstantiationException) {
@@ -138,11 +146,11 @@ interface BorshInput {
         return bytes
     }
 
-    fun <T> readArray(klass: Class<*>): Array<T> {
+    fun <T> readArray(borsh: Borsh, klass: Class<*>): Array<T> {
         val length = readU32()
         val elements = java.lang.reflect.Array.newInstance(klass, length) as Array<T>
         for (i in 0 until length) {
-            elements[i] = this.read(klass)
+            elements[i] = this.read(borsh, klass)
         }
         return elements
     }
@@ -159,9 +167,9 @@ interface BorshInput {
         throw AssertionError("Optional type has been erased and cannot be reconstructed")
     }
 
-    fun <T> readOptional(klass: Class<*>): Optional<T>? {
+    fun <T> readOptional(borsh: Borsh, klass: Class<*>): Optional<T>? {
         val isPresent = readU8().toInt() != 0
-        return if (isPresent) Optional.of(this.read(klass)) else Optional.empty()
+        return if (isPresent) Optional.of(this.read(borsh, klass)) else Optional.empty()
     }
 
     fun read(): Byte

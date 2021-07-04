@@ -3,9 +3,10 @@ package com.solana.api
 import com.solana.core.PublicKey
 import com.solana.models.*
 import com.solana.vendor.borshj.Borsh
+import com.solana.vendor.borshj.BorshCodable
 import java.util.function.Consumer
 
-fun <T: Borsh>Api.getProgramAccounts(
+fun <T: BorshCodable>Api.getProgramAccounts(
     account: PublicKey,
     offset: Long,
     bytes: String,
@@ -18,14 +19,14 @@ fun <T: Borsh>Api.getProgramAccounts(
     return getProgramAccounts(account, programAccountConfig, decodeTo, onComplete)
 }
 
-fun <T: Borsh> Api.getProgramAccounts(account: PublicKey,
+fun <T: BorshCodable> Api.getProgramAccounts(account: PublicKey,
                                decodeTo: Class<T>,
                                onComplete: (Result<List<ProgramAccount<T>>>) -> Unit
 ) {
     return getProgramAccounts(account, ProgramAccountConfig(RpcSendTransactionConfig.Encoding.base64), decodeTo, onComplete)
 }
 
-private fun <T: Borsh> Api.getProgramAccounts(
+private fun <T: BorshCodable> Api.getProgramAccounts(
     account: PublicKey,
     programAccountConfig: ProgramAccountConfig?,
     decodeTo: Class<T>,
@@ -56,7 +57,7 @@ private fun <T: Borsh> Api.getProgramAccounts(
     }
 }
 
-fun <T :Borsh> Api.getProgramAccounts(
+fun <T :BorshCodable> Api.getProgramAccounts(
     account: PublicKey,
     memcmpList: List<Memcmp>,
     dataSize: Int,
@@ -96,7 +97,7 @@ fun <T :Borsh> Api.getProgramAccounts(
     }
 }
 
-fun <T :Borsh>Api.getProgramAccounts(account: PublicKey,
+fun <T :BorshCodable>Api.getProgramAccounts(account: PublicKey,
                                             memcmpList: List<Memcmp>,
                                             decodeTo: Class<T>,
                                             onComplete: (Result<List<ProgramAccount<T>>>) -> Unit

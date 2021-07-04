@@ -2,12 +2,13 @@ package com.solana.models.Buffer
 
 import com.solana.models.RpcSendTransactionConfig
 import com.solana.vendor.borshj.Borsh
+import com.solana.vendor.borshj.BorshCodable
 import org.bitcoinj.core.Base58
 import java.util.*
 
-class Buffer<T: Borsh>{
+class Buffer<T: BorshCodable>{
     val value: T?
-    constructor(rawData: Any, clazz: Class<T>) {
+    constructor(borsh: Borsh, rawData: Any, clazz: Class<T>) {
         if (rawData is String) {
             value = rawData as T
             return
@@ -20,7 +21,7 @@ class Buffer<T: Borsh>{
         }
 
         val decodedBytes = decodedData(dataList[0],dataList[1])
-        value = Borsh.deserialize(decodedBytes, clazz)
+        value = borsh.deserialize(decodedBytes, clazz)
     }
 
     private fun decodedData(serializedData: String, encoding: String): ByteArray {

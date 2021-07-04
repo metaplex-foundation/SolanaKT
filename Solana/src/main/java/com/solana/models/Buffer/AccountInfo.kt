@@ -1,14 +1,13 @@
 package com.solana.models.Buffer
 
 import com.solana.core.PublicKey
-import com.solana.plugins.NoArg
-import com.solana.vendor.borshj.Borsh
+import com.solana.core.PublicKeyRule
+import com.solana.vendor.borshj.BorshCodable
 import com.solana.vendor.borshj.BorshInput
 import com.solana.vendor.borshj.BorshOutput
-import com.solana.vendor.toInt32
-import com.solana.vendor.toLong
+import com.solana.vendor.borshj.BorshRule
+import java.lang.Exception
 
-@NoArg
 data class AccountInfo (
     val mint: PublicKey,
     val owner: PublicKey,
@@ -25,37 +24,89 @@ data class AccountInfo (
     var delegatedAmount: Long,
     val closeAuthorityOption: Int,
     var closeAuthority: PublicKey?
-): Borsh
-    /*init {
-        mint = PublicKey(keys["mint"]!!)
-        owner = PublicKey(keys["owner"]!!)
-        lamports = keys["lamports"]!!.toLong()
-        delegateOption = keys["delegateOption"]!!.toInt32()
-        delegate = PublicKey(keys["delegate"]!!)
-        state = keys["state"]!!.first().toInt()
-        isNativeOption = keys["isNativeOption"]!!.toInt32()
-        isNativeRaw = keys["isNativeRaw"]!!.toLong()
-        delegatedAmount = keys["delegatedAmount"]!!.toLong()
-        closeAuthorityOption = keys["closeAuthorityOption"]!!.toInt32()
-        closeAuthority = PublicKey(keys["closeAuthority"]!!)
+): BorshCodable
 
-        if(delegateOption == 0) {
-            this.delegate = null
-            this.delegatedAmount = 0
+class AccountInfoRule(override val clazz: Class<AccountInfo> = AccountInfo::class.java):
+    BorshRule<AccountInfo> {
+    override fun read(input: BorshInput): AccountInfo {
+        val mint: PublicKey = PublicKeyRule().read(input)
+        val owner: PublicKey = PublicKeyRule().read(input)
+        val lamports: Long = input.readU64()
+        val delegateOption: Int = input.readU32()
+        val tempdelegate: PublicKey? = try {  PublicKeyRule().read(input)  } catch (e : Exception) { null }
+        val state: Int = input.read().toInt()
+        val isNativeOption: Int = input.readU32()
+        val isNativeRaw: Long = input.readU64()
+        var delegatedAmount: Long = input.readU64()
+        val closeAuthorityOption: Int = input.readU32()
+        var closeAuthority: PublicKey? = try {  PublicKeyRule().read(input) } catch (e : Exception) { null }
+
+        val delegate: PublicKey?
+        if(delegateOption == 0){
+            delegate = null
+            delegatedAmount = 0
+        } else {
+            delegate = tempdelegate
         }
 
-        this.isInitialized = state != 0
-        this.isFrozen = state == 2
+        val isInitialized = state != 0
+        val isFrozen = state == 2
 
-        if(isNativeOption == 1){
-            this.rentExemptReserve = isNativeRaw
-            this.isNative = true
+        val isNative: Boolean?
+        val rentExemptReserve: Long?
+        if (isNativeOption == 1) {
+            rentExemptReserve = isNativeRaw
+            isNative = true
         } else {
-            this.rentExemptReserve = null
+            rentExemptReserve = null
             isNative = false
         }
 
         if(closeAuthorityOption == 0){
-            this.closeAuthority = null
+            closeAuthority = null
         }
-    }*/
+
+
+        return AccountInfo(
+            mint,
+            owner,
+            lamports,
+            delegateOption,
+            delegate,
+            isInitialized,
+            isFrozen,
+            state,
+            isNativeOption,
+            rentExemptReserve,
+            isNativeRaw,
+            isNative,
+            delegatedAmount,
+            closeAuthorityOption,
+            closeAuthority
+        )
+    }
+
+
+    override fun <Self>write(obj: Any, output: BorshOutput<Self>): Self {
+        val accountInfo = obj as AccountInfo
+        PublicKeyRule().write(accountInfo.mint, output)
+        PublicKeyRule().write(accountInfo.owner, output)
+        output.writeU64(accountInfo.lamports)
+        output.writeU32(accountInfo.delegateOption)
+        accountInfo.delegate?.let {
+            PublicKeyRule().write(it, output)
+        }?: run {
+            PublicKeyRule().writeZeros(output)
+        }
+        output.write(accountInfo.state.toByte())
+        output.writeU32(accountInfo.isNativeOption)
+        output.writeU64(accountInfo.isNativeRaw)
+        output.writeU64(accountInfo.delegatedAmount)
+        output.writeU32(accountInfo.closeAuthorityOption)
+        return accountInfo.closeAuthority?.let {
+            PublicKeyRule().write(it, output)
+        }?: run {
+            PublicKeyRule().writeZeros(output)
+        }
+    }
+}

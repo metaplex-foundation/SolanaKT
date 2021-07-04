@@ -2,9 +2,10 @@ package com.solana.models.Buffer
 
 import com.solana.core.PublicKey
 import com.solana.vendor.borshj.Borsh
+import com.solana.vendor.borshj.BorshCodable
 import com.solana.vendor.toLong
 
-class TokenSwapInfo(keys: Map<String, ByteArray>) : Borsh {
+class TokenSwapInfo(keys: Map<String, ByteArray>) : BorshCodable {
     val version: Int
     val isInitialized: Boolean
     val nonce: Int

@@ -4,14 +4,15 @@ import com.solana.core.PublicKey
 import com.solana.models.BufferInfo
 import com.solana.models.RPC
 import com.solana.vendor.borshj.Borsh
+import com.solana.vendor.borshj.BorshCodable
 
-fun <T: Borsh>Api.getAccountInfo(account: PublicKey,
-                                  decodeTo: Class<T>,
-                                  onComplete: ((Result<BufferInfo<T>>) -> Unit)) {
+fun <T: BorshCodable>Api.getAccountInfo(account: PublicKey,
+                                        decodeTo: Class<T>,
+                                        onComplete: ((Result<BufferInfo<T>>) -> Unit)) {
     return getAccountInfo(account, HashMap(), decodeTo, onComplete)
 }
 
-fun <T: Borsh> Api.getAccountInfo(account: PublicKey,
+fun <T: BorshCodable> Api.getAccountInfo(account: PublicKey,
                           additionalParams: Map<String, Any?>,
                           decodeTo: Class<T>,
                           onComplete: ((Result<BufferInfo<T>>) -> Unit)) {
