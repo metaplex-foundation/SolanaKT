@@ -8,7 +8,7 @@ import com.solana.vendor.borshj.BorshOutput
 import com.solana.vendor.borshj.BorshRule
 import java.lang.Exception
 
-data class AccountInfo (
+data class AccountInfo(
     val mint: PublicKey,
     val owner: PublicKey,
     val lamports: Long,
@@ -24,25 +24,34 @@ data class AccountInfo (
     var delegatedAmount: Long,
     val closeAuthorityOption: Int,
     var closeAuthority: PublicKey?
-): BorshCodable
+) : BorshCodable
 
-class AccountInfoRule(override val clazz: Class<AccountInfo> = AccountInfo::class.java):
-    BorshRule<AccountInfo> {
+class AccountInfoRule(
+    override val clazz: Class<AccountInfo> = AccountInfo::class.java
+) : BorshRule<AccountInfo> {
     override fun read(input: BorshInput): AccountInfo {
         val mint: PublicKey = PublicKeyRule().read(input)
         val owner: PublicKey = PublicKeyRule().read(input)
         val lamports: Long = input.readU64()
         val delegateOption: Int = input.readU32()
-        val tempdelegate: PublicKey? = try {  PublicKeyRule().read(input)  } catch (e : Exception) { null }
+        val tempdelegate: PublicKey? = try {
+            PublicKeyRule().read(input)
+        } catch (e: Exception) {
+            null
+        }
         val state: Int = input.read().toInt()
         val isNativeOption: Int = input.readU32()
         val isNativeRaw: Long = input.readU64()
         var delegatedAmount: Long = input.readU64()
         val closeAuthorityOption: Int = input.readU32()
-        var closeAuthority: PublicKey? = try {  PublicKeyRule().read(input) } catch (e : Exception) { null }
+        var closeAuthority: PublicKey? = try {
+            PublicKeyRule().read(input)
+        } catch (e: Exception) {
+            null
+        }
 
         val delegate: PublicKey?
-        if(delegateOption == 0){
+        if (delegateOption == 0) {
             delegate = null
             delegatedAmount = 0
         } else {
@@ -62,10 +71,9 @@ class AccountInfoRule(override val clazz: Class<AccountInfo> = AccountInfo::clas
             isNative = false
         }
 
-        if(closeAuthorityOption == 0){
+        if (closeAuthorityOption == 0) {
             closeAuthority = null
         }
-
 
         return AccountInfo(
             mint,
@@ -87,7 +95,7 @@ class AccountInfoRule(override val clazz: Class<AccountInfo> = AccountInfo::clas
     }
 
 
-    override fun <Self>write(obj: Any, output: BorshOutput<Self>): Self {
+    override fun <Self> write(obj: Any, output: BorshOutput<Self>): Self {
         val accountInfo = obj as AccountInfo
         PublicKeyRule().write(accountInfo.mint, output)
         PublicKeyRule().write(accountInfo.owner, output)
@@ -95,7 +103,7 @@ class AccountInfoRule(override val clazz: Class<AccountInfo> = AccountInfo::clas
         output.writeU32(accountInfo.delegateOption)
         accountInfo.delegate?.let {
             PublicKeyRule().write(it, output)
-        }?: run {
+        } ?: run {
             PublicKeyRule().writeZeros(output)
         }
         output.write(accountInfo.state.toByte())
@@ -105,7 +113,7 @@ class AccountInfoRule(override val clazz: Class<AccountInfo> = AccountInfo::clas
         output.writeU32(accountInfo.closeAuthorityOption)
         return accountInfo.closeAuthority?.let {
             PublicKeyRule().write(it, output)
-        }?: run {
+        } ?: run {
             PublicKeyRule().writeZeros(output)
         }
     }

@@ -2,10 +2,7 @@ package com.solana.vendor.borshj
 
 import com.solana.core.PublicKey
 import com.solana.core.PublicKeyRule
-import com.solana.models.Buffer.AccountInfo
-import com.solana.models.Buffer.AccountInfoRule
-import com.solana.models.Buffer.Mint
-import com.solana.models.Buffer.MintRule
+import com.solana.models.Buffer.*
 import com.solana.vendor.borshj.BorshBuffer.Companion.allocate
 import com.solana.vendor.borshj.BorshBuffer.Companion.wrap
 import java.lang.Exception
@@ -20,7 +17,7 @@ interface BorshRule<T> {
 }
 
 class Borsh {
-    private var rules : List<BorshRule<*>> = listOf(PublicKeyRule(), AccountInfoRule(), MintRule())
+    private var rules : List<BorshRule<*>> = listOf(PublicKeyRule(), AccountInfoRule(), MintRule(), TokenSwapInfoRule())
 
     fun setRules(rules: List<BorshRule<*>>) {
         this.rules = rules

@@ -21,7 +21,7 @@ interface BorshOutput<Self> {
             obj is BigInteger -> writeU128(obj)
             obj is String -> writeString(obj)
             obj is ByteArray -> writeFixedArray(obj)
-            obj is List<*> -> writeArray(borsh, obj) as Self
+            obj is List<*> -> writeArray(borsh, obj)
             obj is Boolean -> writeBoolean<Any>(obj)
             obj is Optional<*> -> writeOptional(borsh, obj)
             obj is BorshCodable -> writePOJO(borsh, obj)
@@ -128,6 +128,10 @@ interface BorshOutput<Self> {
 
     fun <T> writeBoolean(value: Boolean): Self {
         return this.writeU8(if (value) 1 else 0)
+    }
+
+    fun writeNothing(): Self {
+        return this.writeFixedArray(ByteArray(0))
     }
 
     fun <T> writeOptional(borsh: Borsh, optional: Optional<T>): Self {

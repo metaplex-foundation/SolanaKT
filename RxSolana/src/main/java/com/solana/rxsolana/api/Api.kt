@@ -5,7 +5,7 @@ import com.solana.core.Account
 import com.solana.core.PublicKey
 import com.solana.core.Transaction
 import com.solana.models.*
-import com.solana.models.Buffer.BufferLayout
+import com.solana.vendor.borshj.BorshCodable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposables
 
@@ -99,12 +99,11 @@ fun Api.getStakeActivation(publicKey: PublicKey, epoch: Long): Single<StakeActiv
     }
 }
 
-fun <T>Api.getAccountInfo(publicKey: PublicKey,
-                       decodeTo: Class<T>,
-                       bufferLayout: BufferLayout<T>
+fun <T: BorshCodable>Api.getAccountInfo(publicKey: PublicKey,
+                                        decodeTo: Class<T>,
 ): Single<BufferInfo<T>> {
     return Single.create { emitter ->
-        this.getAccountInfo(publicKey, decodeTo, bufferLayout) { result ->
+        this.getAccountInfo(publicKey, decodeTo) { result ->
             result.onSuccess {
                 emitter.onSuccess(it)
             }.onFailure {
@@ -591,12 +590,11 @@ fun Api.simulateTransaction(transaction: String,
     }
 }
 
-fun <T>Api.getProgramAccounts(address: PublicKey,
+fun <T: BorshCodable>Api.getProgramAccounts(address: PublicKey,
                            decodeTo: Class<T>,
-                           bufferLayout: BufferLayout<T>
 ): Single<List<ProgramAccount<T>>> {
     return Single.create { emitter ->
-        this.getProgramAccounts(address, decodeTo, bufferLayout) { result ->
+        this.getProgramAccounts(address, decodeTo) { result ->
             result.onSuccess {
                 emitter.onSuccess(it)
             }.onFailure {

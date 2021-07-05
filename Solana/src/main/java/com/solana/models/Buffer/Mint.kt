@@ -1,44 +1,74 @@
 package com.solana.models.Buffer
 
 import com.solana.core.PublicKey
+import com.solana.core.PublicKeyRule
 import com.solana.vendor.borshj.*
 import com.solana.vendor.toInt32
 import com.solana.vendor.toLong
 import java.lang.Exception
 
-class Mint(keys: Map<String, ByteArray>) : BorshCodable {
-    val mintAuthorityOption: Int
-    var mintAuthority: PublicKey?
-    val supply: Long
-    val decimals: Int
-    val isInitialized: Boolean
-    val freezeAuthorityOption: Int
+class Mint(
+    val mintAuthorityOption: Int,
+    var mintAuthority: PublicKey?,
+    val supply: Long,
+    val decimals: Int,
+    val isInitialized: Boolean,
+    val freezeAuthorityOption: Int,
     var freezeAuthority: PublicKey?
-
-    init {
-        mintAuthorityOption = keys["mintAuthorityOption"]!!.toInt32()
-        mintAuthority = PublicKey(keys["mintAuthority"]!!)
-        supply = keys["supply"]!!.toLong()
-        decimals = keys["decimals"]!!.first().toInt()
-        isInitialized = decimals != 1
-        freezeAuthorityOption = keys["freezeAuthorityOption"]!!.toInt32()
-        freezeAuthority = PublicKey(keys["freezeAuthority"]!!)
-
-        if(mintAuthorityOption == 0){
-            this.mintAuthority = null
-        }
-        if(freezeAuthorityOption == 0){
-            this.freezeAuthority = null
-        }
-    }
-}
+) : BorshCodable
 
 class MintRule(override val clazz: Class<Mint> = Mint::class.java): BorshRule<Mint> {
     override fun read(input: BorshInput): Mint {
-        throw Exception("Not implemented Mint")
+        val mintAuthorityOption: Int = input.readU32()
+        var mintAuthority: PublicKey? = try { PublicKeyRule().read(input) } catch (e : Exception) { null }
+        val supply: Long = input.readU64()
+        val decimals: Int = input.read().toInt()
+        val isInitialized: Boolean = decimals != 1
+        val freezeAuthorityOption: Int = input.readU32()
+        var freezeAuthority: PublicKey? = try {
+            if(input.readFixedArray(32).contentEquals(ByteArray(32))){
+                null
+            } else {
+                PublicKeyRule().read(input)
+            }
+        } catch (e : Exception) {
+            null
+        }
+
+        if(mintAuthorityOption == 0){
+            mintAuthority = null
+        }
+
+        if(freezeAuthorityOption == 0){
+            freezeAuthority = null
+        }
+
+        return Mint(
+            mintAuthorityOption,
+            mintAuthority,
+            supply,
+            decimals,
+            isInitialized,
+            freezeAuthorityOption,
+            freezeAuthority
+        )
     }
 
     override fun <Self>write(obj: Any, output: BorshOutput<Self>): Self {
-        throw Exception("Not implemented Mint")
+        val mint = obj as Mint
+        output.writeU32(mint.mintAuthorityOption)
+        mint.mintAuthority?.let {
+            PublicKeyRule().write(it, output)
+        } ?: run {
+            PublicKeyRule().writeZeros(output)
+        }
+        output.writeU64(mint.supply)
+        output.write(mint.decimals.toByte())
+        output.writeU32(mint.freezeAuthorityOption)
+        return mint.freezeAuthority?.let {
+            PublicKeyRule().write(it, output)
+        } ?: run {
+            PublicKeyRule().writeZeros(output)
+        }
     }
 }

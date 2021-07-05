@@ -3,9 +3,7 @@ package com.solana.rxsolana.api
 import com.solana.Solana
 import com.solana.core.PublicKey
 import com.solana.models.Buffer.AccountInfo
-import com.solana.models.Buffer.AccountInfoLayout
 import com.solana.models.Buffer.TokenSwapInfo
-import com.solana.models.Buffer.TokenSwapInfoLayOut
 import com.solana.networking.NetworkingRouter
 import com.solana.networking.RPCEndpoint
 import org.junit.Assert
@@ -79,7 +77,7 @@ class Methods {
     @Test
     fun TestGetAccountInfo() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getAccountInfo(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV"), AccountInfo::class.java, AccountInfoLayout()).blockingGet()
+        val result = solana.api.getAccountInfo(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV"), AccountInfo::class.java).blockingGet()
         Assert.assertNotNull(result)
     }
 
@@ -284,7 +282,7 @@ class Methods {
     @Test
     fun TestGetSlotLeaders() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getSlotLeaders(64203570, 10).blockingGet()
+        val result = solana.api.getSlotLeaders(66372704, 10).blockingGet()
         Assert.assertNotNull(result)
     }
 
@@ -305,7 +303,7 @@ class Methods {
     @Test
     fun TestGetProgramAccounts() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getProgramAccounts(PublicKey("SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8"), TokenSwapInfo::class.java, TokenSwapInfoLayOut()).blockingGet()
+        val result = solana.api.getProgramAccounts(PublicKey("SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8"), TokenSwapInfo::class.java).blockingGet()
         Assert.assertNotNull(result)
     }
 

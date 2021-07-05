@@ -30,9 +30,17 @@ class DecodingTests {
 
         assertEquals("QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo", mintLayout.mintAuthority!!.toBase58())
         assertEquals(1000000000000, mintLayout.supply)
-        assertEquals(mintLayout.decimals, 6)
+        assertEquals(6, mintLayout.decimals, )
         assertTrue(mintLayout.isInitialized == true)
         assertNull(mintLayout.freezeAuthority)
+
+        val serialized = borsh.serialize(mintLayout)
+        val deserialized = borsh.deserialize(serialized, Mint::class.java)
+        assertEquals(deserialized.mintAuthority!!.toBase58(), mintLayout.mintAuthority!!.toBase58())
+        assertEquals(deserialized.supply, mintLayout.supply)
+        assertEquals(deserialized.decimals, mintLayout.decimals)
+        assertTrue(deserialized.isInitialized == mintLayout.isInitialized == true)
+        assertEquals(deserialized.freezeAuthority, mintLayout.freezeAuthority)
     }
 
     @Test
@@ -90,5 +98,31 @@ class DecodingTests {
         assertNotNull(buffer.value)
         val accountInfo2 = buffer2.value!!
         assertEquals(true, accountInfo2.isFrozen)
+    }
+
+    @Test
+    fun testDecodingTokenSwap() {
+        val string = listOf("AQH/Bt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKnPPnmVdf8VefedpPOl3xy2V/o+YvTT+f/dj/1blp9D9lI+9w67aLlO5X6dSFPB7WkhvyP+71AxESXk7Qw9nyYEYH7t0UamkBlPrllRfjnQ9h+sx/GQHoBS4AbWPpi2+m5dBuymmuZeydiI91aVN//6kR8bk4czKnvSXu1WXNW4hwabiFf+q4GE+2h/Y0YYwDXaxDncGus7VZig8AAAAAAB1UBY8wcrypvzuco4dv7UUURt8t9MOpnq7YnffB1OovkZAAAAAAAAABAnAAAAAAAABQAAAAAAAAAQJwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","base64")
+        val tokenSwapInfoBorsh = Buffer(borsh, string, TokenSwapInfo::class.java)
+        assertNotNull(tokenSwapInfoBorsh.value)
+        val tokenSwapInfo = tokenSwapInfoBorsh.value!!
+        assertEquals(1, tokenSwapInfo.version)
+        assertEquals("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", tokenSwapInfo.tokenProgramId.toBase58())
+        assertEquals("7G93KAMR8bLq5TvgLHmpACLXCYwDcdtXVBKsN5Fx41iN", tokenSwapInfo.mintA.toBase58())
+        assertEquals("So11111111111111111111111111111111111111112", tokenSwapInfo.mintB.toBase58())
+        assertEquals(0, tokenSwapInfo.curveType)
+        assertEquals(tokenSwapInfo.isInitialized, true)
+        assertEquals("11111111111111111111111111111111", tokenSwapInfo.payer.toBase58())
+
+        val serialized = borsh.serialize(tokenSwapInfo)
+        val deserialized = borsh.deserialize(serialized, TokenSwapInfo::class.java)
+
+        assertEquals(deserialized.version, tokenSwapInfo.version)
+        assertEquals(deserialized.tokenProgramId.toBase58(), tokenSwapInfo.tokenProgramId.toBase58())
+        assertEquals(deserialized.mintA.toBase58(), tokenSwapInfo.mintA.toBase58())
+        assertEquals(deserialized.mintB.toBase58(), tokenSwapInfo.mintB.toBase58())
+        assertEquals(deserialized.curveType, tokenSwapInfo.curveType)
+        assertEquals(deserialized.isInitialized, tokenSwapInfo.isInitialized)
+        assertEquals(deserialized.payer.toBase58(), tokenSwapInfo.payer.toBase58())
     }
 }
