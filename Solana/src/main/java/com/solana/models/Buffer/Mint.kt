@@ -7,7 +7,7 @@ import com.solana.vendor.toInt32
 import com.solana.vendor.toLong
 import java.lang.Exception
 
-class Mint(
+data class Mint(
     val mintAuthorityOption: Int,
     var mintAuthority: PublicKey?,
     val supply: Long,

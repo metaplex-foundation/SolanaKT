@@ -1,5 +1,9 @@
 package com.solana.vendor.borsh
 
+import com.solana.core.PublicKeyRule
+import com.solana.models.Buffer.AccountInfoRule
+import com.solana.models.Buffer.MintRule
+import com.solana.models.Buffer.TokenSwapInfoRule
 import com.solana.vendor.borshj.Borsh
 import com.solana.vendor.borshj.BorshCodable
 import org.junit.Assert

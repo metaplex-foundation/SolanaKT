@@ -6,7 +6,7 @@ import com.solana.vendor.borshj.*
 import com.solana.vendor.toLong
 import java.lang.Exception
 
-class TokenSwapInfo(
+data class TokenSwapInfo(
     val version: Int,
     val isInitialized: Boolean,
     val nonce: Int,

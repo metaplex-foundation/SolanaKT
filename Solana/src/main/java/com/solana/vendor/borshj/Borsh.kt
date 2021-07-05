@@ -17,8 +17,7 @@ interface BorshRule<T> {
 }
 
 class Borsh {
-    private var rules : List<BorshRule<*>> = listOf(PublicKeyRule(), AccountInfoRule(), MintRule(), TokenSwapInfoRule())
-
+    private var rules : List<BorshRule<*>> = listOf()
     fun setRules(rules: List<BorshRule<*>>) {
         this.rules = rules
     }
