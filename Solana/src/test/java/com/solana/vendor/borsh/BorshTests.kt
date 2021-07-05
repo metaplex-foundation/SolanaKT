@@ -1,16 +1,16 @@
 package com.solana.vendor.borsh
 
 import com.solana.vendor.borshj.Borsh
-import com.solana.vendor.borshj.Borsh.Companion.deserialize
-import com.solana.vendor.borshj.Borsh.Companion.serialize
+import com.solana.vendor.borshj.BorshCodable
 import org.junit.Assert
 import org.junit.Test
 
 class BorshTests {
+    private val borsh = Borsh()
     @Test
     fun roundtripPoint2Df() {
         val point = Point2Df(123f, 456f)
-        Assert.assertEquals(point, deserialize(serialize(point), Point2Df::class.java))
+        Assert.assertEquals(point, borsh.deserialize(borsh.serialize(point), Point2Df::class.java))
     }
 
     @Test
@@ -18,14 +18,13 @@ class BorshTests {
         val topLeft = Point2Df(-123f, -456f)
         val bottomRight = Point2Df(123f, 456f)
         val rect = Rect2Df(topLeft, bottomRight)
-        Assert.assertEquals(rect, deserialize(serialize(rect), Rect2Df::class.java))
+        Assert.assertEquals(rect, borsh.deserialize(borsh.serialize(rect), Rect2Df::class.java))
     }
 
-    class Point2Df : Borsh {
+    class Point2Df : BorshCodable {
         private var x = 0f
         private var y = 0f
 
-        constructor() {}
         constructor(x: Float, y: Float) {
             this.x = x
             this.y = y
@@ -35,18 +34,17 @@ class BorshTests {
             return String.format("Point2Df(%f, %f)", x, y)
         }
 
-        override fun equals(`object`: Any?): Boolean {
-            if (`object` == null || `object`.javaClass != this.javaClass) return false
-            val other = `object` as Point2Df
+        override fun equals(obj: Any?): Boolean {
+            if (obj == null || obj.javaClass != this.javaClass) return false
+            val other = obj as Point2Df
             return x == other.x && y == other.y
         }
     }
 
-    class Rect2Df : Borsh {
+    class Rect2Df : BorshCodable {
         private var topLeft: Point2Df? = null
         private var bottomRight: Point2Df? = null
 
-        constructor() {}
         constructor(topLeft: Point2Df?, bottomRight: Point2Df?) {
             this.topLeft = topLeft
             this.bottomRight = bottomRight

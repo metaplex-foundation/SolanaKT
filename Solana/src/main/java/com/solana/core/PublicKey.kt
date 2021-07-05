@@ -2,26 +2,43 @@ package com.solana.core
 
 import com.solana.vendor.ByteUtils
 import com.solana.vendor.TweetNaclFast
+import com.solana.vendor.borshj.BorshCodable
+import com.solana.vendor.borshj.BorshInput
+import com.solana.vendor.borshj.BorshOutput
+import com.solana.vendor.borshj.BorshRule
 import org.bitcoinj.core.Base58
 import org.bitcoinj.core.Sha256Hash
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
 
-class PublicKey {
-    private var pubkey: ByteArray?
+class PublicKeyRule(
+    override val clazz: Class<PublicKey> = PublicKey::class.java
+): BorshRule<PublicKey> {
 
-    constructor(pubkey: String) {
-        require(pubkey.length >= PUBLIC_KEY_LENGTH) { "Invalid public key input" }
-        this.pubkey = Base58.decode(pubkey)
+    fun <Self>writeZeros(output: BorshOutput<Self>): Self{
+        return output.writeFixedArray(ByteArray(size = 32))
     }
 
-    constructor(pubkey: ByteArray) {
+    override fun read(input: BorshInput): PublicKey {
+        return PublicKey(input.readFixedArray(32))
+    }
+
+    override fun <Self>write(obj: Any, output: BorshOutput<Self>): Self {
+        val  publicKey = obj as PublicKey
+        return output.writeFixedArray(publicKey.toByteArray())
+    }
+}
+
+class PublicKey : BorshCodable {
+    private var pubkey: ByteArray
+    constructor(pubkey: ByteArray){
         require(pubkey.size <= PUBLIC_KEY_LENGTH) { "Invalid public key input" }
         this.pubkey = pubkey
     }
+    constructor(pubkeyString: String) : this(Base58.decode(pubkeyString))
 
-    fun toByteArray(): ByteArray? {
+    fun toByteArray(): ByteArray {
         return pubkey
     }
 
@@ -56,6 +73,7 @@ class PublicKey {
     class ProgramDerivedAddress(val address: PublicKey, val nonce: Int)
     companion object {
         const val PUBLIC_KEY_LENGTH = 32
+
         fun readPubkey(bytes: ByteArray?, offset: Int): PublicKey {
             val buf = ByteUtils.readBytes(bytes, offset, PUBLIC_KEY_LENGTH)
             return PublicKey(buf)

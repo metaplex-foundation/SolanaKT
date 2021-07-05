@@ -1,46 +1,45 @@
 package com.solana.vendor.borshj
 
+import com.solana.core.PublicKey
 import com.solana.vendor.borshj.BorshBuffer.Companion.allocate
+import java.lang.reflect.Modifier
 import java.math.BigInteger
 import java.nio.charset.StandardCharsets
 import java.util.*
 
 interface BorshOutput<Self> {
-    fun write(`object`: Any): Self {
-        Objects.requireNonNull(`object`)
-        if (`object` is Byte) {
-            return this.writeU8(`object`)
-        } else if (`object` is Short) {
-            return this.writeU16(`object`)
-        } else if (`object` is Int) {
-            return writeU32(`object`)
-        } else if (`object` is Long) {
-            return writeU64(`object`)
-        } else if (`object` is Float) {
-            return writeF32(`object`)
-        } else if (`object` is Double) {
-            return writeF64(`object`)
-        } else if (`object` is BigInteger) {
-            return this.writeU128(`object`)
-        } else if (`object` is String) {
-            return writeString(`object`)
-        } else if (`object` is List<*>) {
-            return this.writeArray(`object`) as Self
-        } else if (`object` is Boolean) {
-            return writeBoolean<Any>(`object`)
-        } else if (`object` is Optional<*>) {
-            return writeOptional(`object`)
-        } else if (`object` is Borsh) {
-            return writePOJO(`object`)
+    fun write(borsh: Borsh, obj: Any): Self {
+        val rule: BorshRule<*>? = borsh.getRules().firstOrNull { it.clazz == obj.javaClass }
+        return when {
+            rule != null -> rule.write(obj, this)
+            obj is Byte -> writeU8(obj)
+            obj is Short -> writeU16(obj)
+            obj is Int -> writeU32(obj)
+            obj is Long -> writeU64(obj)
+            obj is Float -> writeF32(obj)
+            obj is Double -> writeF64(obj)
+            obj is BigInteger -> writeU128(obj)
+            obj is String -> writeString(obj)
+            obj is ByteArray -> writeFixedArray(obj)
+            obj is List<*> -> writeArray(borsh, obj)
+            obj is Boolean -> writeBoolean<Any>(obj)
+            obj is Optional<*> -> writeOptional(borsh, obj)
+            obj is BorshCodable -> writePOJO(borsh, obj)
+            else -> throw IllegalArgumentException()
         }
-        throw IllegalArgumentException()
     }
 
-    fun writePOJO(`object`: Any): Self {
+    fun writePOJO(borsh: Borsh, obj: BorshCodable): Self {
         try {
-            for (field in `object`.javaClass.declaredFields) {
+            val constructor = obj.javaClass.kotlin.constructors.first()
+            val kotlinParameters = constructor.parameters
+
+            val fields = obj.javaClass.declaredFields
+                .filter { kotlinParameters.map { kf -> kf.name }.contains(it.name) }
+
+            for (field in fields) {
                 field.isAccessible = true
-                this.write(field[`object`])
+                this.write(borsh, field[obj])
             }
         } catch (error: IllegalAccessException) {
             throw RuntimeException(error)
@@ -111,18 +110,18 @@ interface BorshOutput<Self> {
         return this.write(array)
     }
 
-    fun <T> writeArray(array: Array<T>): Self {
+    fun <T> writeArray(borsh: Borsh, array: Array<T>): Self {
         writeU32(array.size)
         for (element in array) {
-            this.write(element!!)
+            this.write(borsh, element!!)
         }
         return this as Self
     }
 
-    fun <T> writeArray(list: List<T>): Self {
+    fun <T> writeArray(borsh: Borsh, list: List<T>): Self {
         writeU32(list.size)
         for (element in list) {
-            this.write(element!!)
+            this.write(borsh, element!!)
         }
         return this as Self
     }
@@ -131,10 +130,14 @@ interface BorshOutput<Self> {
         return this.writeU8(if (value) 1 else 0)
     }
 
-    fun <T> writeOptional(optional: Optional<T>): Self {
+    fun writeNothing(): Self {
+        return this.writeFixedArray(ByteArray(0))
+    }
+
+    fun <T> writeOptional(borsh: Borsh, optional: Optional<T>): Self {
         return if (optional.isPresent) {
             this.writeU8(1)
-            this.write(optional.get()!!)
+            this.write(borsh, optional.get()!!)
         } else {
             this.writeU8(0)
         }

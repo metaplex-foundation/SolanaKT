@@ -1,21 +1,20 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.models.Buffer.BufferLayout
 import com.solana.models.BufferInfo
 import com.solana.models.RPC
+import com.solana.vendor.borshj.Borsh
+import com.solana.vendor.borshj.BorshCodable
 
-fun <T>Api.getAccountInfo(account: PublicKey,
-                          decodeTo: Class<T>,
-                          bufferLayout: BufferLayout<T>,
-                          onComplete: ((Result<BufferInfo<T>>) -> Unit)) {
-    return getAccountInfo(account, HashMap(), decodeTo, bufferLayout, onComplete)
+fun <T: BorshCodable>Api.getAccountInfo(account: PublicKey,
+                                        decodeTo: Class<T>,
+                                        onComplete: ((Result<BufferInfo<T>>) -> Unit)) {
+    return getAccountInfo(account, HashMap(), decodeTo, onComplete)
 }
 
-fun <T>Api.getAccountInfo(account: PublicKey,
+fun <T: BorshCodable> Api.getAccountInfo(account: PublicKey,
                           additionalParams: Map<String, Any?>,
                           decodeTo: Class<T>,
-                          bufferLayout: BufferLayout<T>,
                           onComplete: ((Result<BufferInfo<T>>) -> Unit)) {
     val params: MutableList<Any> = ArrayList()
     val parameterMap: MutableMap<String, Any?> = HashMap()
@@ -33,7 +32,7 @@ fun <T>Api.getAccountInfo(account: PublicKey,
                 it as Map<String, Any>
             }
             .map {
-                RPC(it, decodeTo, bufferLayout)
+                RPC(it, decodeTo)
             }
             .map {
                 it.value as BufferInfo<T>

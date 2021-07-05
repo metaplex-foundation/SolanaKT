@@ -1,76 +1,105 @@
 package com.solana.models.Buffer
 
 import com.solana.core.PublicKey
+import com.solana.core.PublicKeyRule
+import com.solana.vendor.borshj.*
 import com.solana.vendor.toLong
+import java.lang.Exception
 
-class TokenSwapInfoLayOut(
-    override val clazz: Class<TokenSwapInfo> = TokenSwapInfo::class.java,
-    override val layout: List<LayoutEntry> = listOf(
-        LayoutEntry("version", 1),
-        LayoutEntry("isInitialized", 1),
-        LayoutEntry("nonce", 1),
-        LayoutEntry("tokenProgramId", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("tokenAccountA", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("tokenAccountB", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("tokenPool", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("mintA", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("mintB", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("feeAccount", PublicKey.PUBLIC_KEY_LENGTH),
-        LayoutEntry("tradeFeeNumerator", 8),
-        LayoutEntry("tradeFeeDenominator", 8),
-        LayoutEntry("ownerTradeFeeNumerator", 8),
-        LayoutEntry("ownerTradeFeeDenominator", 8),
-        LayoutEntry("ownerWithdrawFeeNumerator", 8),
-        LayoutEntry("ownerWithdrawFeeDenominator", 8),
-        LayoutEntry("hostFeeNumerator", 8),
-        LayoutEntry("hostFeeDenominator", 8),
-        LayoutEntry("curveType", 1),
-        LayoutEntry("payer", PublicKey.PUBLIC_KEY_LENGTH)
-    )
-) : BufferLayout<TokenSwapInfo>(layout, clazz)
-
-class TokenSwapInfo(val keys: Map<String, ByteArray>) {
-    val version: Int
-    val isInitialized: Boolean
-    val nonce: Int
-    val tokenProgramId: PublicKey
-    var tokenAccountA: PublicKey
-    var tokenAccountB: PublicKey
-    val tokenPool: PublicKey
-    var mintA: PublicKey
-    var mintB: PublicKey
-    val feeAccount: PublicKey
-    val tradeFeeNumerator: Long
-    val tradeFeeDenominator: Long
-    val ownerTradeFeeNumerator: Long
-    val ownerTradeFeeDenominator: Long
-    val ownerWithdrawFeeNumerator: Long
-    val ownerWithdrawFeeDenominator: Long
-    val hostFeeNumerator: Long
-    val hostFeeDenominator: Long
-    val curveType: Int
+class TokenSwapInfo(
+    val version: Int,
+    val isInitialized: Boolean,
+    val nonce: Int,
+    val tokenProgramId: PublicKey,
+    val tokenAccountA: PublicKey,
+    val tokenAccountB: PublicKey,
+    val tokenPool: PublicKey,
+    val mintA: PublicKey,
+    val mintB: PublicKey,
+    val feeAccount: PublicKey,
+    val tradeFeeNumerator: Long,
+    val tradeFeeDenominator: Long,
+    val ownerTradeFeeNumerator: Long,
+    val ownerTradeFeeDenominator: Long,
+    val ownerWithdrawFeeNumerator: Long,
+    val ownerWithdrawFeeDenominator: Long,
+    val hostFeeNumerator: Long,
+    val hostFeeDenominator: Long,
+    val curveType: Int,
     val payer: PublicKey
+) : BorshCodable
 
-    init {
-        version = keys["version"]!!.first().toInt()
-        isInitialized = keys["isInitialized"]!!.first().toInt() == 1
-        nonce = keys["nonce"]!!.first().toInt()
-        tokenProgramId = PublicKey(keys["tokenProgramId"]!!)
-        tokenAccountA = PublicKey(keys["tokenAccountA"]!!)
-        tokenAccountB = PublicKey(keys["tokenAccountB"]!!)
-        tokenPool = PublicKey(keys["tokenPool"]!!)
-        mintA = PublicKey(keys["mintA"]!!)
-        mintB = PublicKey(keys["mintB"]!!)
-        feeAccount = PublicKey(keys["feeAccount"]!!)
-        tradeFeeNumerator = keys["tradeFeeNumerator"]!!.toLong()
-        tradeFeeDenominator = keys["tradeFeeDenominator"]!!.toLong()
-        ownerTradeFeeNumerator = keys["ownerTradeFeeNumerator"]!!.toLong()
-        ownerTradeFeeDenominator = keys["ownerTradeFeeDenominator"]!!.toLong()
-        ownerWithdrawFeeNumerator = keys["ownerWithdrawFeeNumerator"]!!.toLong()
-        ownerWithdrawFeeDenominator = keys["ownerWithdrawFeeDenominator"]!!.toLong()
-        hostFeeNumerator = keys["hostFeeNumerator"]!!.toLong()
-        hostFeeDenominator = keys["hostFeeDenominator"]!!.toLong()
-        curveType = keys["curveType"]!!.first().toInt()
-        payer = PublicKey(keys["payer"]!!)
+class TokenSwapInfoRule(override val clazz: Class<TokenSwapInfo> = TokenSwapInfo::class.java): BorshRule<TokenSwapInfo> {
+    override fun read(input: BorshInput): TokenSwapInfo {
+        val version: Int = input.readU8().toInt()
+        val isInitialized: Boolean = input.read().toInt() == 1
+        val nonce: Int = input.readU8().toInt()
+        val tokenProgramId: PublicKey = PublicKeyRule().read(input)
+        val tokenAccountA: PublicKey = PublicKeyRule().read(input)
+        val tokenAccountB: PublicKey = PublicKeyRule().read(input)
+        val tokenPool: PublicKey =  PublicKeyRule().read(input)
+        val mintA: PublicKey = PublicKeyRule().read(input)
+        val mintB: PublicKey = PublicKeyRule().read(input)
+        val feeAccount: PublicKey = PublicKeyRule().read(input)
+        val tradeFeeNumerator: Long = input.readU64()
+        val tradeFeeDenominator: Long = input.readU64()
+        val ownerTradeFeeNumerator: Long = input.readU64()
+        val ownerTradeFeeDenominator: Long = input.readU64()
+        val ownerWithdrawFeeNumerator: Long = input.readU64()
+        val ownerWithdrawFeeDenominator: Long = input.readU64()
+        val hostFeeNumerator: Long = input.readU64()
+        val hostFeeDenominator: Long = input.readU64()
+        val curveType: Int = input.readU8().toInt()
+        val payer: PublicKey = PublicKeyRule().read(input)
+        return TokenSwapInfo(
+            version,
+            isInitialized,
+            nonce,
+            tokenProgramId,
+            tokenAccountA,
+            tokenAccountB,
+            tokenPool,
+            mintA,
+            mintB,
+            feeAccount,
+            tradeFeeNumerator,
+            tradeFeeDenominator,
+            ownerTradeFeeNumerator,
+            ownerTradeFeeDenominator,
+            ownerWithdrawFeeNumerator,
+            ownerWithdrawFeeDenominator,
+            hostFeeNumerator,
+            hostFeeDenominator,
+            curveType,
+            payer
+        )
+    }
+
+    override fun <Self>write(obj: Any, output: BorshOutput<Self>): Self {
+        val tokenSwapInfo = obj as TokenSwapInfo
+        output.writeU8(tokenSwapInfo.version)
+        if(tokenSwapInfo.isInitialized){
+            output.write(1)
+        } else {
+            output.write(0)
+        }
+        output.writeU8(tokenSwapInfo.nonce)
+        PublicKeyRule().write(tokenSwapInfo.tokenProgramId, output)
+        PublicKeyRule().write(tokenSwapInfo.tokenAccountA, output)
+        PublicKeyRule().write(tokenSwapInfo.tokenAccountB, output)
+        PublicKeyRule().write(tokenSwapInfo.tokenPool, output)
+        PublicKeyRule().write(tokenSwapInfo.mintA, output)
+        PublicKeyRule().write(tokenSwapInfo.mintB, output)
+        PublicKeyRule().write(tokenSwapInfo.feeAccount, output)
+        output.writeU64(tokenSwapInfo.tradeFeeNumerator)
+        output.writeU64(tokenSwapInfo.tradeFeeDenominator)
+        output.writeU64(tokenSwapInfo.ownerTradeFeeNumerator)
+        output.writeU64(tokenSwapInfo.ownerTradeFeeDenominator)
+        output.writeU64(tokenSwapInfo.ownerWithdrawFeeNumerator)
+        output.writeU64(tokenSwapInfo.ownerWithdrawFeeDenominator)
+        output.writeU64(tokenSwapInfo.hostFeeNumerator)
+        output.writeU64(tokenSwapInfo.hostFeeDenominator)
+        output.writeU8(tokenSwapInfo.curveType)
+        return PublicKeyRule().write(tokenSwapInfo.payer, output)
     }
 }

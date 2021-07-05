@@ -1,30 +1,47 @@
 package com.solana.vendor.borshj
 
+import com.solana.core.PublicKey
+import com.solana.core.PublicKeyRule
+import com.solana.models.Buffer.*
 import com.solana.vendor.borshj.BorshBuffer.Companion.allocate
 import com.solana.vendor.borshj.BorshBuffer.Companion.wrap
+import java.lang.Exception
 import java.util.*
 
-interface Borsh {
-    companion object {
-        @JvmStatic
-        fun serialize(`object`: Any): ByteArray {
-            return allocate(4096).write(Objects.requireNonNull(`object`))!!.toByteArray()
-        }
+interface BorshCodable
 
-        @JvmStatic
-        fun <T> deserialize(bytes: ByteArray, klass: Class<*>): T {
-            return deserialize(wrap(Objects.requireNonNull(bytes)), klass)
-        }
+interface BorshRule<T> {
+    val clazz: Class<T>
+    fun read(input: BorshInput): T?
+    fun <Self>write(obj: Any, output: BorshOutput<Self>): Self
+}
 
-        private fun <T> deserialize(buffer: BorshBuffer, klass: Class<*>): T {
-            return buffer.read(Objects.requireNonNull(klass))
-        }
+class Borsh {
+    private var rules : List<BorshRule<*>> = listOf(PublicKeyRule(), AccountInfoRule(), MintRule(), TokenSwapInfoRule())
 
-        @JvmStatic
-        fun isSerializable(klass: Class<*>?): Boolean {
-            return if (klass == null) false else Arrays.stream(klass.interfaces)
-                .anyMatch { iface: Class<*> -> iface == Borsh::class.java } ||
-                    isSerializable(klass.superclass)
-        }
+    fun setRules(rules: List<BorshRule<*>>) {
+        this.rules = rules
+    }
+
+    fun getRules() : List<BorshRule<*>> {
+        return rules
+    }
+
+    fun <T> isSerializable(klass: Class<T>?): Boolean {
+        return if (klass == null) false else Arrays.stream(klass.interfaces)
+            .anyMatch { iface: Class<*> -> iface == BorshCodable::class.java } ||
+                isSerializable(klass.superclass)
+    }
+
+    fun serialize(obj: Any): ByteArray {
+        return allocate(4096).write(this, obj)!!.toByteArray()
+    }
+
+    fun <T> deserialize(bytes: ByteArray, klass: Class<T>): T {
+        return deserialize(wrap(bytes), klass)
+    }
+
+    private fun <T> deserialize(buffer: BorshBuffer, klass: Class<*>): T {
+        return buffer.read(this, klass)
     }
 }

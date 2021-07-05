@@ -1,49 +1,27 @@
 package com.solana.models.Buffer
 
 import com.solana.models.RpcSendTransactionConfig
+import com.solana.vendor.borshj.Borsh
+import com.solana.vendor.borshj.BorshCodable
 import org.bitcoinj.core.Base58
 import java.util.*
 
-data class LayoutEntry(val key: String?, val length: Int)
-abstract class BufferLayout<T>(open val layout: List<LayoutEntry>,open val clazz: Class<T>) {
-    val BUFFER_LENGTH: Int get() {
-        return this.layout.fold(0, { acc, next ->
-            if (next.key == null) {
-                acc + 0
-            } else {
-                acc + next.length
-            }
-        })
-    }
-
-    val span: Long get() { return this.layout.fold(0, { acc, next -> acc + next.length }).toLong() }
-}
-
-class Buffer<T>{
+class Buffer<T: BorshCodable>{
     val value: T?
-    constructor(rawData: Any, bufferLayout: BufferLayout<T>) {
+    constructor(borsh: Borsh, rawData: Any, clazz: Class<T>) {
         if (rawData is String) {
             value = rawData as T
             return
         }
 
         val dataList = rawData as List<String>
-        if(dataList[0].isBlank() || dataList[0].length < bufferLayout.BUFFER_LENGTH){
+        if(dataList[0].isBlank() || dataList[0].length <= 0){
             value = null
             return
         }
-        val decodedData = decodedData(dataList[0],dataList[1])
-        val bytes: ByteArray = decodedData
-        val dict = mutableMapOf<String, ByteArray>()
-        var from = 0
-        bufferLayout.layout.forEach {
-            val to: Int = from + it.length
-            it.key?.let {
-                dict[it] = bytes.slice(IntRange(from, to - 1)).toByteArray()
-            }
-            from = to
-        }
-        value = bufferLayout.clazz.constructors.first().newInstance(dict) as T
+
+        val decodedBytes = decodedData(dataList[0],dataList[1])
+        value = borsh.deserialize(decodedBytes, clazz)
     }
 
     private fun decodedData(serializedData: String, encoding: String): ByteArray {

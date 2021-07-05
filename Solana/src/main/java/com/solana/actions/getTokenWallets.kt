@@ -3,7 +3,6 @@ package com.solana.actions
 import com.solana.api.getProgramAccounts
 import com.solana.core.PublicKey
 import com.solana.models.*
-import com.solana.models.Buffer.AccountInfoLayout
 import com.solana.models.Buffer.AccountInfo
 import com.solana.programs.TokenProgram
 import com.solana.vendor.ContResult
@@ -18,7 +17,7 @@ fun Action.getTokenWallets(
         Memcmp(32, account.toBase58())
     )
     ContResult<List<ProgramAccount<AccountInfo>>, Exception> { cb ->
-        api.getProgramAccounts(TokenProgram.PROGRAM_ID, memcmp, 165, AccountInfo::class.java, AccountInfoLayout()) { result ->
+        api.getProgramAccounts(TokenProgram.PROGRAM_ID, memcmp, 165, AccountInfo::class.java) { result ->
             result.onSuccess {
                 cb(Result.success(it))
             }.onFailure {
