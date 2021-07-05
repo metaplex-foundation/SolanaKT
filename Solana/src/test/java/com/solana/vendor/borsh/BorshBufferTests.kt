@@ -1,5 +1,9 @@
 package com.solana.vendor.borsh
 
+import com.solana.core.PublicKeyRule
+import com.solana.models.Buffer.AccountInfoRule
+import com.solana.models.Buffer.MintRule
+import com.solana.models.Buffer.TokenSwapInfoRule
 import com.solana.vendor.borshj.Borsh
 import com.solana.vendor.borshj.BorshBuffer
 import com.solana.vendor.borshj.BorshBuffer.Companion.allocate
@@ -10,7 +14,12 @@ import java.math.BigInteger
 import java.util.*
 
 class BorshBufferTests {
-    private val borsh = Borsh()
+
+    fun borsh(): Borsh {
+        val borsh = Borsh()
+        return borsh
+    }
+
     private var buffer: BorshBuffer? = null
     fun newBuffer() {
         buffer = allocate(256)
@@ -113,7 +122,7 @@ class BorshBufferTests {
         buffer = wrap(input)
         Assert.assertArrayEquals(
             arrayOf<Short>(1, 2, 3), buffer!!.readArray(
-                borsh,
+                borsh(),
                 Short::class.javaObjectType
             )
         )
@@ -132,7 +141,7 @@ class BorshBufferTests {
         Assert.assertEquals(Optional.empty<Any>(), wrap(byteArrayOf(0)).readOptional<Any>())
         Assert.assertEquals(
             Optional.of(42), wrap(byteArrayOf(1, 42, 0, 0, 0)).readOptional<Any>(
-                borsh,
+                borsh(),
                 Int::class.java
             )
         )
@@ -229,7 +238,7 @@ class BorshBufferTests {
     @Test
     fun writeArray() {
         newBuffer()
-        buffer!!.writeArray(borsh, arrayOf<Short>(1, 2, 3))
+        buffer!!.writeArray(borsh(), arrayOf<Short>(1, 2, 3))
         val expected = byteArrayOf(3, 0, 0, 0, 1, 0, 2, 0, 3, 0)
         val actual = buffer!!.toByteArray()
         Assert.assertArrayEquals(expected, actual)
@@ -238,7 +247,7 @@ class BorshBufferTests {
     @Test
     fun writeArrayOfList() {
         newBuffer()
-        buffer!!.writeArray(borsh, listOf(*arrayOf<Short>(1, 2, 3)))
+        buffer!!.writeArray(borsh(), listOf(*arrayOf<Short>(1, 2, 3)))
         val expected = byteArrayOf(3, 0, 0, 0, 1, 0, 2, 0, 3, 0)
         val actual = buffer!!.toByteArray()
         Assert.assertArrayEquals(expected, actual)
@@ -261,12 +270,12 @@ class BorshBufferTests {
     fun writeOptional() {
         newBuffer()
         Assert.assertArrayEquals(
-            byteArrayOf(0), buffer!!.reset().writeOptional(borsh, Optional.empty<Any>())!!
+            byteArrayOf(0), buffer!!.reset().writeOptional(borsh(), Optional.empty<Any>())!!
                 .toByteArray()
         )
         Assert.assertArrayEquals(
             byteArrayOf(1, 42, 0, 0, 0), buffer!!.reset().writeOptional(
-                borsh,
+                borsh(),
                 Optional.of(42)
             )!!
                 .toByteArray()
