@@ -12,6 +12,7 @@ import kotlin.reflect.KClass
 interface BorshInput {
     fun <T> read(borsh: Borsh, klass: Class<*>): T {
         val rule = borsh.getRules().firstOrNull { it.clazz == klass }
+
         if (rule != null) {
             return rule.read(this) as T
         } else if (klass == Byte::class.java || klass == Byte::class.javaPrimitiveType || klass == Byte::class.javaObjectType) {
@@ -46,13 +47,15 @@ interface BorshInput {
             val kotlinParameters = constructor.parameters
 
             val declaredFields = klass.declaredFields
-                .filter { kotlinParameters.map{ kf -> kf.name }.contains(it.name) }
+                .filter { kotlinParameters.map { kf -> kf.name }.contains(it.name) }
+                .sortedBy { field -> field.getAnnotation(PropertyOrdinal::class.java).order }
 
             val map: MutableMap<String, Any?> = mutableMapOf()
             for (field in declaredFields) {
                 val kfield = kotlinParameters.first { it.name == field.name }
                 field.isAccessible = true
                 val fieldClass = field.type
+
                 if (kfield.isOptional) {
                     val fieldType = field.genericType as? ParameterizedType ?: throw AssertionError(
                         "unsupported Optional type"
@@ -70,6 +73,7 @@ interface BorshInput {
                 .parameters
                 .map { it to map.get(it.name) }
                 .toMap()
+
             constructor.callBy(args) as T
         } catch (error: NoSuchMethodException) {
             throw RuntimeException(error)
@@ -82,7 +86,7 @@ interface BorshInput {
         }
     }
 
-    fun <T : Any> mapToObject(map: Map<String, Any>, clazz: KClass<T>) : T {
+    fun <T : Any> mapToObject(map: Map<String, Any>, clazz: KClass<T>): T {
         //Get default constructor
         val constructor = clazz.constructors.first()
 

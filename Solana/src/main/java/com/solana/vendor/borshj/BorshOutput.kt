@@ -1,8 +1,6 @@
 package com.solana.vendor.borshj
 
-import com.solana.core.PublicKey
 import com.solana.vendor.borshj.BorshBuffer.Companion.allocate
-import java.lang.reflect.Modifier
 import java.math.BigInteger
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -10,6 +8,7 @@ import java.util.*
 interface BorshOutput<Self> {
     fun write(borsh: Borsh, obj: Any): Self {
         val rule: BorshRule<*>? = borsh.getRules().firstOrNull { it.clazz == obj.javaClass }
+
         return when {
             rule != null -> rule.write(obj, this)
             obj is Byte -> writeU8(obj)
@@ -44,6 +43,7 @@ interface BorshOutput<Self> {
         } catch (error: IllegalAccessException) {
             throw RuntimeException(error)
         }
+
         return this as Self
     }
 
