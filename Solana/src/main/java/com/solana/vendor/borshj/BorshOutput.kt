@@ -35,6 +35,7 @@ interface BorshOutput<Self> {
 
             val fields = obj.javaClass.declaredFields
                 .filter { kotlinParameters.map { kf -> kf.name }.contains(it.name) }
+                .sortedBy { field -> field.getAnnotation(FieldOrder::class.java).order }
 
             for (field in fields) {
                 field.isAccessible = true

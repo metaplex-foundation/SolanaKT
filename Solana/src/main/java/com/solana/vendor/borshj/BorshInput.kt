@@ -48,18 +48,18 @@ interface BorshInput {
 
             val declaredFields = klass.declaredFields
                 .filter { kotlinParameters.map { kf -> kf.name }.contains(it.name) }
-                .sortedBy { field -> field.getAnnotation(PropertyOrdinal::class.java).order }
+                .sortedBy { field -> field.getAnnotation(FieldOrder::class.java).order }
 
             val map: MutableMap<String, Any?> = mutableMapOf()
             for (field in declaredFields) {
                 val kfield = kotlinParameters.first { it.name == field.name }
                 field.isAccessible = true
-                val fieldClass = field.type
 
                 if (kfield.isOptional) {
                     val fieldType = field.genericType as? ParameterizedType ?: throw AssertionError(
                         "unsupported Optional type"
                     )
+
                     val optionalArgs = fieldType.actualTypeArguments
                     assert(optionalArgs.size == 1)
                     val optionalClass = optionalArgs[0] as Class<*>

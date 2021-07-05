@@ -24,10 +24,35 @@ class DecodingTests {
         val byteArray = Base64.getDecoder().decode(blobSrc)
 
         val data = borsh.deserialize(byteArray, MetaplexMeta::class.java)
-        assertEquals(data, data)
+        assertEquals("5Fc7Zy7HgRatL8XhX5uqsUFEjGPop1uJXKrp3Ws7m1Tn", data.update_authority.toBase58())
+        assertEquals("26r3GfgqbjMTjZahNgnwa9AtbDg8x2E5AGwzw17KWRC4", data.mint.toBase58())
+        assertEquals("Solanimal #1962 - Cat", data.data.name)
+        assertEquals("https://arweave.net/4DVSaR56WTkWV8Nyoge4-tPX-p9raIBRpyY4KqeVeP4", data.data.uri)
     }
 
-//    @Test
+    @Test
+    fun testMoreDecodingMetaplexMeta() {
+        val borsh = borsh()
+
+        val plexData = MetaplexData("NFT", "BORSH", "www.solana.com")
+        val plexMeta = MetaplexMeta(
+            key = 1,
+            update_authority = PublicKey("CiDwVBFgWV9E5MvXWoLgnEgn2hK7rJikbvfWavzAQz3"),
+            mint = PublicKey("BQWWFhzBdw2vKKBUX17NHeFbCoFQHfRARpdztPE2tDJ"),
+            data = plexData
+        )
+
+        val serialized = borsh.serialize(plexMeta)
+        val out = borsh.deserialize(serialized, MetaplexMeta::class.java)
+
+        assertEquals("CiDwVBFgWV9E5MvXWoLgnEgn2hK7rJikbvfWavzAQz3", out.update_authority.toBase58())
+        assertEquals("BQWWFhzBdw2vKKBUX17NHeFbCoFQHfRARpdztPE2tDJ", out.mint.toBase58())
+        assertEquals("NFT", out.data.name)
+        assertEquals("BORSH", out.data.symbol)
+        assertEquals("www.solana.com", out.data.uri)
+    }
+
+    @Test
     fun testDecodingPublicKey() {
         val borsh = borsh()
         val bytes = byteArrayOf( 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -40,7 +65,7 @@ class DecodingTests {
     }
 
 
-//    @Test
+    @Test
     fun testDecodingMint() {
         val borsh = borsh()
         val rawData = listOf(
@@ -69,7 +94,7 @@ class DecodingTests {
         assertEquals(deserialized.freezeAuthority, mintLayout.freezeAuthority)
     }
 
-//    @Test
+    @Test
     fun testDecodingAccountInfo() {
         val borsh = borsh()
         val rawData: List<String> = listOf(
@@ -111,7 +136,7 @@ class DecodingTests {
         assertEquals(deserialized.closeAuthority, accountInfo.closeAuthority)
     }
 
-//    @Test
+    @Test
     fun testDecodingAccountInfo2() {
         val borsh = borsh()
         val string = listOf(
@@ -143,7 +168,7 @@ class DecodingTests {
         assertEquals(true, accountInfo2.isFrozen)
     }
 
-//    @Test
+    @Test
     fun testDecodingTokenSwap() {
         val borsh = borsh()
         val string = listOf(
