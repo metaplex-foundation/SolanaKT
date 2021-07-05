@@ -4,15 +4,27 @@ import com.solana.core.PublicKey
 import com.solana.core.PublicKeyRule
 import com.solana.models.Buffer.*
 import com.solana.vendor.borshj.Borsh
-import org.junit.Test
 import org.junit.Assert.*
+import org.junit.Test
+import java.util.*
 
 class DecodingTests {
 
     fun borsh(): Borsh {
         val borsh = Borsh()
-        borsh.setRules(listOf(PublicKeyRule(), AccountInfoRule(), MintRule(), TokenSwapInfoRule()))
+        borsh.setRules(listOf(PublicKeyRule(), AccountInfoRule(), MintRule(), TokenSwapInfoRule(), MetaplexDataRule(), MetaplexMetaRule()))
         return borsh
+    }
+
+    @Test
+    fun testDecodingMetaplexMeta() {
+        val blobSrc = "BD8slOrgPZpL+5iD8MJBsTGY+esK0dZd8tlCX14LRmfREFsKKgyOBm9TbEDjhj2CcT+KPJFJ3acbYRLIqSsfsUkVAAAAU29sYW5pbWFsICMxOTYyIC0gQ2F0AAAAAD8AAABodHRwczovL2Fyd2VhdmUubmV0LzREVlNhUjU2V1RrV1Y4TnlvZ2U0LXRQWC1wOXJhSUJScHlZNEtxZVZlUDQAAAEBAAAAPyyU6uA9mkv7mIPwwkGxMZj56wrR1l3y2UJfXgtGZ9EBZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+
+        val borsh = borsh()
+        val byteArray = Base64.getDecoder().decode(blobSrc)
+
+        val data = borsh.deserialize(byteArray, MetaplexMeta::class.java)
+        assertEquals(data, data)
     }
 
     @Test
