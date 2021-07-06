@@ -3,6 +3,9 @@ package com.solana.models
 import com.solana.core.PublicKey
 import com.solana.core.PublicKeyRule
 import com.solana.models.Buffer.*
+import com.solana.models.Buffer.moshi.AccountInfoJsonAdapter
+import com.solana.models.Buffer.moshi.MintJsonAdapter
+import com.solana.models.Buffer.moshi.TokenSwapInfoJsonAdapter
 import com.solana.vendor.borshj.Borsh
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -222,7 +225,7 @@ class DecodingTests {
                     "owner":"SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8",
                     "rentEpoch":153
                 }
-            }"""
+            }""".trimIndent()
         val adapter: JsonAdapter<RPC2<AccountInfo>> = moshi.adapter(
             Types.newParameterizedType(
                 RPC2::class.java,
@@ -266,7 +269,7 @@ class DecodingTests {
                     "owner":"SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8",
                     "rentEpoch":153
                 }
-            }"""
+            }""".trimIndent()
         val adapter: JsonAdapter<RPC2<Mint>> = moshi.adapter(
             Types.newParameterizedType(
                 RPC2::class.java,

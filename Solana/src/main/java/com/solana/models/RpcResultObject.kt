@@ -71,24 +71,3 @@ data class BufferInfo2<T: BorshCodable>(
     val owner: String?,
     val rentEpoch: Double
 )
-
-class AccountInfoJsonAdapter(val borsh: Borsh) {
-    @FromJson
-    fun fromJson(rawData: Any): Buffer2<AccountInfo> {
-        return Buffer2.create(borsh, rawData, AccountInfo::class.java)
-    }
-}
-
-class MintJsonAdapter(val borsh: Borsh) {
-    @FromJson
-    fun fromJson(rawData: Any): Buffer2<Mint> {
-        return Buffer2.create(borsh, rawData, Mint::class.java)
-    }
-}
-
-class TokenSwapInfoJsonAdapter(val borsh: Borsh) {
-    @FromJson
-    fun fromJson(rawData: Any): Buffer2<TokenSwapInfo> {
-        return Buffer2.create(borsh, rawData, TokenSwapInfo::class.java)
-    }
-}

@@ -33,7 +33,7 @@ class Buffer<T: BorshCodable>{
     }
 }
 
-data class Buffer2<T: BorshCodable>(val value: T?){
+data class Buffer2<T>(val value: T?){
     companion object {
         fun <T: BorshCodable>create(borsh: Borsh, rawData: Any, clazz: Class<T>): Buffer2<T> {
             if (rawData is String) {
