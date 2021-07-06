@@ -3,7 +3,6 @@ package com.solana.api
 import com.solana.core.PublicKey
 import com.solana.models.BufferInfo
 import com.solana.models.RPC
-import com.solana.vendor.borshj.Borsh
 import com.solana.vendor.borshj.BorshCodable
 
 fun <T: BorshCodable>Api.getAccountInfo(account: PublicKey,

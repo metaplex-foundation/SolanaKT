@@ -23,7 +23,7 @@ class NetworkingRouter(
     private val endpoint: RPCEndpoint,
     private val httpClient: OkHttpClient = OkHttpClient()
 ) {
-    private val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    private val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
 
     companion object {
         private val JSON: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()

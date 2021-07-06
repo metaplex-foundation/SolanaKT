@@ -4,6 +4,10 @@ import com.solana.core.PublicKey
 import com.solana.core.PublicKeyRule
 import com.solana.models.Buffer.*
 import com.solana.vendor.borshj.Borsh
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import org.junit.Test
 import org.junit.Assert.*
 
@@ -165,5 +169,36 @@ class DecodingTests {
         assertEquals(deserialized.curveType, tokenSwapInfo.curveType)
         assertEquals(deserialized.isInitialized, tokenSwapInfo.isInitialized)
         assertEquals(deserialized.payer.toBase58(), tokenSwapInfo.payer.toBase58())
+    }
+
+    @Test
+    fun testDecodingRPCAccountInfo() {
+        val moshi: Moshi = Moshi.Builder()
+            .add(AccountInfoJsonAdapter(borsh()))
+            .addLast(KotlinJsonAdapterFactory()).build()
+        val response = """
+            {
+                "context":{
+                    "slot":66581317
+                },
+                "value":{
+                    "data":[
+                        "AQH/Bt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkQr0Ypa909a9ivbANnFa97v5sZX6SSw4RMjz25SJneJ7hVdfVvF2ulbUZ+sO8PdxmtEPwI3BDoM2BQJbwTgVECe7TnDMVGigX6Vwtmg8zNO42b0cOn5KCeZPFrz9b5cCo17xfXx1Y0fo+QMstbwrkKVfDprS2WS51UTI9eIZO+Ofo/EG/xTzvdcalkpCBEoNMWI8a2DFYSzHvAv3PVjJbtj+vrRV0pqYlEY7ZMtzrhD/hCWfFbBga4DFrJLlEeFTUZAAAAAAAAABAnAAAAAAAABQAAAAAAAAAQJwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAGQAAAAAAAAAAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                        "base64"
+                    ],
+                    "executable":false,
+                    "lamports":3145920,
+                    "owner":"SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8",
+                    "rentEpoch":153
+                }
+            }"""
+        val adapter: JsonAdapter<RPC2<AccountInfo>> = moshi.adapter(
+            Types.newParameterizedType(
+                RPC2::class.java,
+                AccountInfo::class.java
+            )
+        )
+        val obj = adapter.fromJson(response)
+        assertNotNull(obj)
     }
 }

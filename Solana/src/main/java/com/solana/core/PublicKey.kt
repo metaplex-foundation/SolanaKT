@@ -6,6 +6,8 @@ import com.solana.vendor.borshj.BorshCodable
 import com.solana.vendor.borshj.BorshInput
 import com.solana.vendor.borshj.BorshOutput
 import com.solana.vendor.borshj.BorshRule
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import org.bitcoinj.core.Base58
 import org.bitcoinj.core.Sha256Hash
 import java.io.ByteArrayOutputStream
@@ -30,11 +32,12 @@ class PublicKeyRule(
     }
 }
 
-class PublicKey : BorshCodable {
-    private var pubkey: ByteArray
-    constructor(pubkey: ByteArray){
-        require(pubkey.size <= PUBLIC_KEY_LENGTH) { "Invalid public key input" }
-        this.pubkey = pubkey
+@JsonClass(generateAdapter = true)
+data class PublicKey(val tempKey: ByteArray) : BorshCodable {
+    val pubkey: ByteArray
+    init{
+        require(tempKey.size <= PUBLIC_KEY_LENGTH) { "Invalid public key input" }
+        this.pubkey = tempKey
     }
     constructor(pubkeyString: String) : this(Base58.decode(pubkeyString))
 

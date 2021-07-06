@@ -6,8 +6,10 @@ import com.solana.vendor.borshj.BorshCodable
 import com.solana.vendor.borshj.BorshInput
 import com.solana.vendor.borshj.BorshOutput
 import com.solana.vendor.borshj.BorshRule
+import com.squareup.moshi.JsonClass
 import java.lang.Exception
 
+@JsonClass(generateAdapter = true)
 data class AccountInfo(
     val mint: PublicKey,
     val owner: PublicKey,
