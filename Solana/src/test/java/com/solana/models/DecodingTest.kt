@@ -201,4 +201,131 @@ class DecodingTests {
         val obj = adapter.fromJson(response)
         assertNotNull(obj)
     }
+
+    @Test
+    fun testDecodingRPCAccountInfo2() {
+        val moshi: Moshi = Moshi.Builder()
+            .add(AccountInfoJsonAdapter(borsh()))
+            .addLast(KotlinJsonAdapterFactory()).build()
+        val response = """
+            {
+                "context":{
+                    "slot":66581317
+                },
+                "value":{
+                    "data":[
+                        "BhrZ0FOHFUhTft4+JhhJo9+3/QL6vHWyI8jkatuFPQwCqmOzhzy1ve5l2AqL0ottCChJZ1XSIW3k3C7TaBQn7aCGAQAAAAAAAQAAAOt6vNDYdevCbaGxgaMzmz7yoxaVu3q9vGeCc7ytzeWqAQAAAAAAAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                        "base64"
+                    ],
+                    "executable":false,
+                    "lamports":3145920,
+                    "owner":"SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8",
+                    "rentEpoch":153
+                }
+            }"""
+        val adapter: JsonAdapter<RPC2<AccountInfo>> = moshi.adapter(
+            Types.newParameterizedType(
+                RPC2::class.java,
+                AccountInfo::class.java
+            )
+        )
+        val obj = adapter.fromJson(response)!!
+        assertNotNull(obj)
+        val accountInfo = obj.value!!.data!!.value!!
+        assertEquals("QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo", accountInfo.mint.toBase58())
+        assertEquals("BQWWFhzBdw2vKKBUX17NHeFbCoFQHfRARpdztPE2tDJ", accountInfo.owner.toBase58())
+        assertEquals(
+            "GrDMoeqMLFjeXQ24H56S1RLgT4R76jsuWCd6SvXyGPQ5",
+            accountInfo.delegate?.toBase58()
+        )
+        assertEquals(100, accountInfo.delegatedAmount)
+        assertEquals(false, accountInfo.isNative)
+        assertEquals(true, accountInfo.isInitialized)
+        assertEquals(false, accountInfo.isFrozen)
+        assertNull(accountInfo.rentExemptReserve)
+        assertNull(accountInfo.closeAuthority)
+    }
+
+    @Test
+    fun testDecodingRPCMint() {
+        val moshi: Moshi = Moshi.Builder()
+            .add(MintJsonAdapter(borsh()))
+            .addLast(KotlinJsonAdapterFactory()).build()
+        val response = """
+            {
+                "context":{
+                    "slot":66581317
+                },
+                "value":{
+                    "data":[
+                        "AQAAAAYa2dBThxVIU37ePiYYSaPft/0C+rx1siPI5GrbhT0MABCl1OgAAAAGAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+                        "base64"
+                    ],
+                    "executable":false,
+                    "lamports":3145920,
+                    "owner":"SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8",
+                    "rentEpoch":153
+                }
+            }"""
+        val adapter: JsonAdapter<RPC2<Mint>> = moshi.adapter(
+            Types.newParameterizedType(
+                RPC2::class.java,
+                Mint::class.java
+            )
+        )
+        val obj = adapter.fromJson(response)!!
+        assertNotNull(obj)
+        val mintLayout = obj.value!!.data!!.value!!
+        assertEquals(
+            "QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo",
+            mintLayout.mintAuthority!!.toBase58()
+        )
+        assertEquals(1000000000000, mintLayout.supply)
+        assertEquals(6, mintLayout.decimals)
+        assertTrue(mintLayout.isInitialized == true)
+        assertNull(mintLayout.freezeAuthority)
+    }
+
+    @Test
+    fun testDecodingRPCTokenSwap() {
+        val moshi: Moshi = Moshi.Builder()
+            .add(TokenSwapInfoJsonAdapter(borsh()))
+            .addLast(KotlinJsonAdapterFactory()).build()
+        val response = """
+            {
+                "context":{
+                    "slot":66581317
+                },
+                "value":{
+                    "data":[
+                        "AQH/Bt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKnPPnmVdf8VefedpPOl3xy2V/o+YvTT+f/dj/1blp9D9lI+9w67aLlO5X6dSFPB7WkhvyP+71AxESXk7Qw9nyYEYH7t0UamkBlPrllRfjnQ9h+sx/GQHoBS4AbWPpi2+m5dBuymmuZeydiI91aVN//6kR8bk4czKnvSXu1WXNW4hwabiFf+q4GE+2h/Y0YYwDXaxDncGus7VZig8AAAAAAB1UBY8wcrypvzuco4dv7UUURt8t9MOpnq7YnffB1OovkZAAAAAAAAABAnAAAAAAAABQAAAAAAAAAQJwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                        "base64"
+                    ],
+                    "executable":false,
+                    "lamports":3145920,
+                    "owner":"SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8",
+                    "rentEpoch":153
+                }
+            }"""
+        val adapter: JsonAdapter<RPC2<TokenSwapInfo>> = moshi.adapter(
+            Types.newParameterizedType(
+                RPC2::class.java,
+                TokenSwapInfo::class.java
+            )
+        )
+        val obj = adapter.fromJson(response)!!
+        assertNotNull(obj)
+
+        val tokenSwapInfo = obj.value!!.data!!.value!!
+        assertEquals(1, tokenSwapInfo.version)
+        assertEquals(
+            "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+            tokenSwapInfo.tokenProgramId.toBase58()
+        )
+        assertEquals("7G93KAMR8bLq5TvgLHmpACLXCYwDcdtXVBKsN5Fx41iN", tokenSwapInfo.mintA.toBase58())
+        assertEquals("So11111111111111111111111111111111111111112", tokenSwapInfo.mintB.toBase58())
+        assertEquals(0, tokenSwapInfo.curveType)
+        assertEquals(tokenSwapInfo.isInitialized, true)
+        assertEquals("11111111111111111111111111111111", tokenSwapInfo.payer.toBase58())
+    }
 }
