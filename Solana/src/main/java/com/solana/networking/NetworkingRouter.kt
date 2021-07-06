@@ -1,8 +1,19 @@
 package com.solana.networking
 
+import com.solana.core.PublicKeyRule
+import com.solana.models.Buffer.AccountInfoRule
+import com.solana.models.Buffer.MintRule
+import com.solana.models.Buffer.TokenSwapInfoRule
+import com.solana.models.Buffer.moshi.AccountInfoJsonAdapter
+import com.solana.models.Buffer.moshi.MintJsonAdapter
+import com.solana.models.Buffer.moshi.TokenSwapInfoJsonAdapter
+import com.solana.models.BufferInfo2
+import com.solana.models.RPC2
+import com.solana.models.RPC3
 import com.solana.networking.models.RPCError
 import com.solana.networking.models.RpcRequest
 import com.solana.networking.models.RpcResponse
+import com.solana.vendor.borshj.Borsh
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -16,17 +27,85 @@ sealed class NetworkingError(override val message: String?) : Exception(message)
     object invalidResponseNoData : NetworkingError("No data was returned.")
     data class invalidResponse(val rpcError: RPCError) : NetworkingError(rpcError.message)
     data class decodingError(val rpcError: java.lang.Exception) : NetworkingError(rpcError.message)
-    data class encodingError(val rpcError: java.lang.Exception) : NetworkingError(rpcError.message)
 }
 
 class NetworkingRouter(
     private val endpoint: RPCEndpoint,
     private val httpClient: OkHttpClient = OkHttpClient()
 ) {
-    private val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
+
+    private fun borsh(): Borsh {
+        val borsh = Borsh()
+        borsh.setRules(listOf(PublicKeyRule(), AccountInfoRule(), MintRule(), TokenSwapInfoRule()))
+        return borsh
+    }
+
+    private val moshi: Moshi by lazy{
+        Moshi.Builder()
+            .add(MintJsonAdapter(borsh()))
+            .add(TokenSwapInfoJsonAdapter(borsh()))
+            .add(AccountInfoJsonAdapter(borsh()))
+            .addLast(KotlinJsonAdapterFactory()).build()
+    }
 
     companion object {
         private val JSON: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()
+    }
+
+    fun <T> requestRPC(
+        method: String,
+        params: List<Any>?,
+        clazz: Class<T>?,
+        onComplete: (Result<RPC3<T>>) -> Unit,
+    ) {
+        val url = endpoint.url
+        val rpcRequest = RpcRequest(method, params)
+        val rpcRequestJsonAdapter: JsonAdapter<RpcRequest> = moshi.adapter(RpcRequest::class.java)
+        val resultAdapter: JsonAdapter<RpcResponse<RPC3<T>>> = moshi.adapter(
+            Types.newParameterizedType(
+                RpcResponse::class.java,
+                Types.newParameterizedType(
+                    RPC3::class.java,
+                    Type::class.java.cast(clazz)
+                )
+            )
+        )
+        val request: Request = Request.Builder().url(url)
+            .post(RequestBody.create(JSON, rpcRequestJsonAdapter.toJson(rpcRequest))).build()
+
+        callRPC(request, onComplete, resultAdapter)
+    }
+
+    private fun <T> callRPC(
+        request: Request,
+        onComplete: (Result<RPC3<T>>) -> Unit,
+        resultAdapter: JsonAdapter<RpcResponse<RPC3<T>>>
+    ) {
+        httpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                onComplete(Result.failure(RuntimeException(e)))
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.body?.let { body ->
+                    val responses = body.string()
+                    fromJsonToResult(resultAdapter, responses).map { rpcResult ->
+                        rpcResult.error?.let { error ->
+                            onComplete(Result.failure(NetworkingError.invalidResponse(error)))
+                            return
+                        }
+                        rpcResult.result?.let {
+                            onComplete(Result.success(it))
+                            return
+                        }
+                    }.onFailure {
+                        onComplete(Result.failure(it))
+                    }
+                }.run {
+                    onComplete(Result.failure(NetworkingError.invalidResponseNoData))
+                }
+            }
+        })
     }
 
     fun <T> request(
@@ -48,6 +127,14 @@ class NetworkingRouter(
         val request: Request = Request.Builder().url(url)
             .post(RequestBody.create(JSON, rpcRequestJsonAdapter.toJson(rpcRequest))).build()
 
+        call(request, onComplete, resultAdapter)
+    }
+
+    private fun <T> call(
+        request: Request,
+        onComplete: (Result<T>) -> Unit,
+        resultAdapter: JsonAdapter<RpcResponse<T>>
+    ) {
         httpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 onComplete(Result.failure(RuntimeException(e)))

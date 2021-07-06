@@ -6,6 +6,7 @@ import com.solana.models.Buffer.*
 import com.solana.models.Buffer.moshi.AccountInfoJsonAdapter
 import com.solana.models.Buffer.moshi.MintJsonAdapter
 import com.solana.models.Buffer.moshi.TokenSwapInfoJsonAdapter
+import com.solana.networking.models.RpcResponse
 import com.solana.vendor.borshj.Borsh
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -195,9 +196,9 @@ class DecodingTests {
                     "rentEpoch":153
                 }
             }"""
-        val adapter: JsonAdapter<RPC2<AccountInfo>> = moshi.adapter(
+        val adapter: JsonAdapter<RPC3<AccountInfo>> = moshi.adapter(
             Types.newParameterizedType(
-                RPC2::class.java,
+                RPC3::class.java,
                 AccountInfo::class.java
             )
         )
@@ -226,9 +227,9 @@ class DecodingTests {
                     "rentEpoch":153
                 }
             }""".trimIndent()
-        val adapter: JsonAdapter<RPC2<AccountInfo>> = moshi.adapter(
+        val adapter: JsonAdapter<RPC3<AccountInfo>> = moshi.adapter(
             Types.newParameterizedType(
-                RPC2::class.java,
+                RPC3::class.java,
                 AccountInfo::class.java
             )
         )
@@ -270,9 +271,9 @@ class DecodingTests {
                     "rentEpoch":153
                 }
             }""".trimIndent()
-        val adapter: JsonAdapter<RPC2<Mint>> = moshi.adapter(
+        val adapter: JsonAdapter<RPC3<Mint>> = moshi.adapter(
             Types.newParameterizedType(
-                RPC2::class.java,
+                RPC3::class.java,
                 Mint::class.java
             )
         )
@@ -310,9 +311,9 @@ class DecodingTests {
                     "rentEpoch":153
                 }
             }"""
-        val adapter: JsonAdapter<RPC2<TokenSwapInfo>> = moshi.adapter(
+        val adapter: JsonAdapter<RPC3<TokenSwapInfo>> = moshi.adapter(
             Types.newParameterizedType(
-                RPC2::class.java,
+                RPC3::class.java,
                 TokenSwapInfo::class.java
             )
         )
@@ -330,5 +331,43 @@ class DecodingTests {
         assertEquals(0, tokenSwapInfo.curveType)
         assertEquals(tokenSwapInfo.isInitialized, true)
         assertEquals("11111111111111111111111111111111", tokenSwapInfo.payer.toBase58())
+    }
+
+    @Test
+    fun testDecodingRPCResponse() {
+        val moshi: Moshi = Moshi.Builder()
+            .add(AccountInfoJsonAdapter(borsh()))
+            .addLast(KotlinJsonAdapterFactory()).build()
+        val response = """
+            {
+               "jsonrpc":"2.0",
+               "result":{
+                  "context":{
+                     "slot":66669000
+                  },
+                  "value":{
+                     "data":[
+                        "",
+                        "base64"
+                     ],
+                     "executable":false,
+                     "lamports":161169886,
+                     "owner":"11111111111111111111111111111111",
+                     "rentEpoch":154
+                  }
+               },
+               "id":"3618d086-1562-41b6-ad5e-f387b67d4bf9"
+            }""".trimIndent()
+        val adapter: JsonAdapter<RpcResponse<RPC3<AccountInfo>>> = moshi.adapter(
+            Types.newParameterizedType(
+                RpcResponse::class.java,
+                Types.newParameterizedType(
+                    RPC3::class.java,
+                    AccountInfo::class.java
+                )
+            )
+        )
+        val obj = adapter.fromJson(response)!!
+        assertNotNull(obj)
     }
 }

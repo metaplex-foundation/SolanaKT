@@ -101,7 +101,7 @@ fun Api.getStakeActivation(publicKey: PublicKey, epoch: Long): Single<StakeActiv
 
 fun <T: BorshCodable>Api.getAccountInfo(publicKey: PublicKey,
                                         decodeTo: Class<T>,
-): Single<BufferInfo<T>> {
+): Single<BufferInfo2<T>> {
     return Single.create { emitter ->
         this.getAccountInfo(publicKey, decodeTo) { result ->
             result.onSuccess {
