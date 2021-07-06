@@ -46,6 +46,10 @@ interface BorshInput {
             val constructor = klass.kotlin.constructors.first()
             val kotlinParameters = constructor.parameters
 
+            if (klass.declaredFields.firstOrNull { !it.isAnnotationPresent(FieldOrder::class.java) } != null) {
+                throw java.lang.IllegalArgumentException("Deserializing borsh data requires all fields to be annotated with @FieldOrder")
+            }
+
             val declaredFields = klass.declaredFields
                 .filter { kotlinParameters.map { kf -> kf.name }.contains(it.name) }
                 .sortedBy { field -> field.getAnnotation(FieldOrder::class.java).order }
