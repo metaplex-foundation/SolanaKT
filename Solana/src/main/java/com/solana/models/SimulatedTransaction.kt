@@ -1,32 +1,31 @@
 package com.solana.models
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class SimulatedTransaction(@Json(name = "value") val value: Value) : RpcResultObject() {
+@JsonClass(generateAdapter = true)
+class SimulatedTransaction(
+    override val value: Value
+) : RpcResultObject<SimulatedTransaction.Value>(null, value) {
+
+    @JsonClass(generateAdapter = true)
     class Value (
-        @Json(name = "accounts") val accounts: List<SimulatedAccount.Value>,
-
-        @Json(name = "logs")
+        val accounts: List<SimulatedAccount.Value>,
         val logs: List<String>,
     )
 }
+
+@JsonClass(generateAdapter = true)
 class SimulatedAccount(
-    @Json(name = "value") val value: Value
-) : RpcResultObject() {
+    override val value: Value
+) : RpcResultObject<SimulatedAccount.Value>(null, value) {
+
+    @JsonClass(generateAdapter = true)
     class Value (
-        @Json(name = "data")
         val data: List<String>,
-
-        @Json(name = "executable")
         val executable:Boolean,
-
-        @Json(name = "lamports")
         val lamports: Long,
-
-        @Json(name = "owner")
         val owner: String?,
-
-        @Json(name = "rentEpoch")
         val rentEpoch: Long,
     )
 }

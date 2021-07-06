@@ -21,14 +21,15 @@ class Methods {
     fun TestGetBalance() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getBalance(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV")).blockingGet()
-        Assert.assertNotNull(result)
+        Assert.assertTrue(result > 0)
     }
 
     @Test
     fun TestGetConfirmedTransaction() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getConfirmedTransaction("7Zk9yyJCXHapoKyHwd8AzPeW9fJWCvszR6VAcHUhvitN5W9QG9JRnoYXR8SBQPTh27piWEmdybchDt5j7xxoUth").blockingGet()
-        Assert.assertNotNull(result)
+        Assert.assertTrue(result.slot!! > 0)
+        Assert.assertEquals(result.transaction!!.signatures[0], "7Zk9yyJCXHapoKyHwd8AzPeW9fJWCvszR6VAcHUhvitN5W9QG9JRnoYXR8SBQPTh27piWEmdybchDt5j7xxoUth")
     }
 
     @Test

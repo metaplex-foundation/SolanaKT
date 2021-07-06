@@ -10,12 +10,7 @@ import com.squareup.moshi.JsonClass
 import com.squareup.moshi.ToJson
 import org.bitcoinj.core.Base58
 import java.util.*
-
-open class RpcResultObject(@Json(name = "context") var context: Context? = null) {
-    class Context (
-        @Json(name = "slot") val slot: Long
-    )
-}
+typealias RpcResultObject<T> = RPC2<T>
 
 class BufferInfo<T: BorshCodable>(acc: Any?, clazz: Class<T>){
     @Json(name = "data") var data: Buffer<T>? = null
@@ -55,9 +50,9 @@ class RPC<T: BorshCodable>(pa: Map<String, Any>, clazz: Class<T>){
 }
 
 @JsonClass(generateAdapter = true)
-data class RPC2<T: BorshCodable>(
+open class RPC2<T>(
     var context: Context?,
-    val value: BufferInfo2<T>?
+    open val value: T? = null
 ) {
     @JsonClass(generateAdapter = true)
     class Context (val slot: Long)
