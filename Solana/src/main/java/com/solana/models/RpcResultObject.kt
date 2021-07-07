@@ -20,7 +20,7 @@ class RPCBuffer<T>(
 ) : RPC<BufferInfo<T>>(context, value)
 
 open class BufferInfo<T>(
-    var data: Buffer2<T>? = null,
+    var data: Buffer<T>? = null,
     val executable: Boolean,
     val lamports: Double,
     val owner: String?,
