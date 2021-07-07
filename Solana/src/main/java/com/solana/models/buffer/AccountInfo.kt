@@ -1,4 +1,4 @@
-package com.solana.models.Buffer
+package com.solana.models.buffer
 
 import com.solana.core.PublicKey
 import com.solana.core.PublicKeyRule

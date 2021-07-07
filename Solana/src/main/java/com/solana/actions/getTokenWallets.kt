@@ -3,7 +3,7 @@ package com.solana.actions
 import com.solana.api.getProgramAccounts
 import com.solana.core.PublicKey
 import com.solana.models.*
-import com.solana.models.Buffer.AccountInfo
+import com.solana.models.buffer.AccountInfo
 import com.solana.programs.TokenProgram
 import com.solana.vendor.ContResult
 import com.solana.vendor.Result

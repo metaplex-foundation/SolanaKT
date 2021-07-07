@@ -1,7 +1,7 @@
-package com.solana.models.Buffer.moshi
+package com.solana.models.buffer.moshi
 
-import com.solana.models.Buffer.Buffer
-import com.solana.models.Buffer.Mint
+import com.solana.models.buffer.Buffer
+import com.solana.models.buffer.Mint
 import com.solana.vendor.borshj.Borsh
 import com.squareup.moshi.FromJson
 

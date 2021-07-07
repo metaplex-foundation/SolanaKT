@@ -2,10 +2,10 @@ package com.solana.models
 
 import com.solana.core.PublicKey
 import com.solana.core.PublicKeyRule
-import com.solana.models.Buffer.*
-import com.solana.models.Buffer.moshi.AccountInfoJsonAdapter
-import com.solana.models.Buffer.moshi.MintJsonAdapter
-import com.solana.models.Buffer.moshi.TokenSwapInfoJsonAdapter
+import com.solana.models.buffer.*
+import com.solana.models.buffer.moshi.AccountInfoJsonAdapter
+import com.solana.models.buffer.moshi.MintJsonAdapter
+import com.solana.models.buffer.moshi.TokenSwapInfoJsonAdapter
 import com.solana.networking.models.RpcResponse
 import com.solana.vendor.borshj.Borsh
 import com.squareup.moshi.JsonAdapter
@@ -43,7 +43,7 @@ class DecodingTests {
             "AQAAAAYa2dBThxVIU37ePiYYSaPft/0C+rx1siPI5GrbhT0MABCl1OgAAAAGAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
             "base64"
         )
-        val buffer = Buffer(borsh, rawData, Mint::class.java)
+        val buffer = Buffer.create(borsh, rawData, Mint::class.java)
         assertNotNull(buffer.value)
         val mintLayout = buffer.value!!
 
@@ -72,7 +72,7 @@ class DecodingTests {
             "BhrZ0FOHFUhTft4+JhhJo9+3/QL6vHWyI8jkatuFPQwCqmOzhzy1ve5l2AqL0ottCChJZ1XSIW3k3C7TaBQn7aCGAQAAAAAAAQAAAOt6vNDYdevCbaGxgaMzmz7yoxaVu3q9vGeCc7ytzeWqAQAAAAAAAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
             "base64"
         )
-        val buffer = Buffer(borsh, rawData, AccountInfo::class.java)
+        val buffer = Buffer.create(borsh, rawData, AccountInfo::class.java)
         assertNotNull(buffer.value)
         val accountInfo = buffer.value!!
         assertEquals("QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo", accountInfo.mint.toBase58())
@@ -114,7 +114,7 @@ class DecodingTests {
             "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAOt6vNDYdevCbaGxgaMzmz7yoxaVu3q9vGeCc7ytzeWq",
             "base64"
         )
-        val buffer = Buffer(borsh, string, AccountInfo::class.java)
+        val buffer = Buffer.create(borsh, string, AccountInfo::class.java)
         assertNotNull(buffer.value)
         val accountInfo = buffer.value!!
 
@@ -133,7 +133,7 @@ class DecodingTests {
             "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAOt6vNDYdevCbaGxgaMzmz7yoxaVu3q9vGeCc7ytzeWq",
             "base64"
         )
-        val buffer2 = Buffer(borsh, string2, AccountInfo::class.java)
+        val buffer2 = Buffer.create(borsh, string2, AccountInfo::class.java)
         assertNotNull(buffer.value)
         val accountInfo2 = buffer2.value!!
         assertEquals(true, accountInfo2.isFrozen)
@@ -146,7 +146,7 @@ class DecodingTests {
             "AQH/Bt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKnPPnmVdf8VefedpPOl3xy2V/o+YvTT+f/dj/1blp9D9lI+9w67aLlO5X6dSFPB7WkhvyP+71AxESXk7Qw9nyYEYH7t0UamkBlPrllRfjnQ9h+sx/GQHoBS4AbWPpi2+m5dBuymmuZeydiI91aVN//6kR8bk4czKnvSXu1WXNW4hwabiFf+q4GE+2h/Y0YYwDXaxDncGus7VZig8AAAAAAB1UBY8wcrypvzuco4dv7UUURt8t9MOpnq7YnffB1OovkZAAAAAAAAABAnAAAAAAAABQAAAAAAAAAQJwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
             "base64"
         )
-        val tokenSwapInfoBorsh = Buffer(borsh, string, TokenSwapInfo::class.java)
+        val tokenSwapInfoBorsh = Buffer.create(borsh, string, TokenSwapInfo::class.java)
         assertNotNull(tokenSwapInfoBorsh.value)
         val tokenSwapInfo = tokenSwapInfoBorsh.value!!
         assertEquals(1, tokenSwapInfo.version)

@@ -1,10 +1,8 @@
-package com.solana.models.Buffer
+package com.solana.models.buffer
 
 import com.solana.core.PublicKey
 import com.solana.core.PublicKeyRule
 import com.solana.vendor.borshj.*
-import com.solana.vendor.toInt32
-import com.solana.vendor.toLong
 import java.lang.Exception
 
 data class Mint(

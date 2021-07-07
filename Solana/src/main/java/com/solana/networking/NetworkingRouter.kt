@@ -1,12 +1,12 @@
 package com.solana.networking
 
 import com.solana.core.PublicKeyRule
-import com.solana.models.Buffer.AccountInfoRule
-import com.solana.models.Buffer.MintRule
-import com.solana.models.Buffer.TokenSwapInfoRule
-import com.solana.models.Buffer.moshi.AccountInfoJsonAdapter
-import com.solana.models.Buffer.moshi.MintJsonAdapter
-import com.solana.models.Buffer.moshi.TokenSwapInfoJsonAdapter
+import com.solana.models.buffer.AccountInfoRule
+import com.solana.models.buffer.MintRule
+import com.solana.models.buffer.TokenSwapInfoRule
+import com.solana.models.buffer.moshi.AccountInfoJsonAdapter
+import com.solana.models.buffer.moshi.MintJsonAdapter
+import com.solana.models.buffer.moshi.TokenSwapInfoJsonAdapter
 import com.solana.models.RPCBuffer
 import com.solana.networking.models.RPCError
 import com.solana.networking.models.RpcRequest
@@ -63,12 +63,12 @@ class NetworkingRouter(
         val request: Request = Request.Builder().url(url)
             .post(RequestBody.create(JSON, rpcRequestJsonAdapter.toJson(rpcRequest))).build()
 
-        call(clazz, request, onComplete)
+        call(request, clazz, onComplete)
     }
 
     private fun <T> call(
-        clazz: Class<T>?,
         request: Request,
+        clazz: Class<T>?,
         onComplete: (Result<T>) -> Unit
     ) {
         httpClient.newCall(request).enqueue(object : Callback {
@@ -78,18 +78,19 @@ class NetworkingRouter(
             override fun onResponse(call: Call, response: Response) {
                 response.body?.let { body ->
                     val responses = body.string()
-                    fromJsonToResult(clazz, responses).map { rpcResult ->
-                        rpcResult.error?.let { error ->
-                            onComplete(Result.failure(NetworkingError.invalidResponse(error)))
-                            return
+                    fromJsonToResult(responses, clazz)
+                        .map { rpcResult ->
+                            rpcResult.error?.let { error ->
+                                onComplete(Result.failure(NetworkingError.invalidResponse(error)))
+                                return
+                            }
+                            rpcResult.result?.let { result ->
+                                onComplete(Result.success(result))
+                                return
+                            }
+                        }.onFailure {
+                            onComplete(Result.failure(it))
                         }
-                        rpcResult.result?.let { result ->
-                            onComplete(Result.success(result))
-                            return
-                        }
-                    }.onFailure {
-                        onComplete(Result.failure(it))
-                    }
                 }.run {
                     onComplete(Result.failure(NetworkingError.invalidResponseNoData))
                 }
@@ -97,7 +98,8 @@ class NetworkingRouter(
         })
     }
 
-    private fun <T> fromJsonToResult(clazz: Class<T>?, string: String): Result<RpcResponse<T>> {
+    private fun <T> fromJsonToResult(string: String, clazz: Class<T>?): Result<RpcResponse<T>> {
+        val i = clazz!!.interfaces
         return try {
             val adapter: JsonAdapter<RpcResponse<T>> = moshi.adapter(
                 Types.newParameterizedType(
@@ -108,7 +110,7 @@ class NetworkingRouter(
             val result = adapter.fromJson(string)!!
             Result.success(result)
         } catch (e: Exception) {
-            // This is a work arround for the kotlin and moshi unable to parse generics. this  requires work
+            // This is a work around for the kotlin and moshi unable to parse generics. this  requires work
             return try {
                 val adapter2: JsonAdapter<RpcResponse<T>> = moshi.adapter(
                     Types.newParameterizedType(

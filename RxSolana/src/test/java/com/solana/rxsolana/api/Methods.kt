@@ -2,8 +2,8 @@ package com.solana.rxsolana.api
 
 import com.solana.Solana
 import com.solana.core.PublicKey
-import com.solana.models.Buffer.AccountInfo
-import com.solana.models.Buffer.TokenSwapInfo
+import com.solana.models.buffer.AccountInfo
+import com.solana.models.buffer.TokenSwapInfo
 import com.solana.networking.NetworkingRouter
 import com.solana.networking.RPCEndpoint
 import org.junit.Assert

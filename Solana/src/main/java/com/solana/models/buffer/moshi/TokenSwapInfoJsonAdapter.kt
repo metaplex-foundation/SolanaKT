@@ -1,7 +1,7 @@
-package com.solana.models.Buffer.moshi
+package com.solana.models.buffer.moshi
 
-import com.solana.models.Buffer.Buffer
-import com.solana.models.Buffer.TokenSwapInfo
+import com.solana.models.buffer.Buffer
+import com.solana.models.buffer.TokenSwapInfo
 import com.solana.vendor.borshj.Borsh
 import com.squareup.moshi.FromJson
 

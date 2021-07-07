@@ -1,4 +1,4 @@
-package com.solana.models.Buffer
+package com.solana.models.buffer
 
 import com.solana.vendor.borshj.BorshCodable
 import com.solana.vendor.borshj.BorshInput

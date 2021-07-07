@@ -30,10 +30,10 @@ fun <T> Api.getAccountInfo(account: PublicKey,
     router.request("getAccountInfo", params, decodeTo) { result ->
         result
             .map {
-                it as RPCBuffer<*>
+                it as RPCBuffer<T>
             }
             .map {
-                it.value as BufferInfo<T>
+                it.value as BufferInfo
             }
             .onSuccess {
                 onComplete(Result.success(it))

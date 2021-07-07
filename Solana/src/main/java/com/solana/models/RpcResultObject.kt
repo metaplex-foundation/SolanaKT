@@ -1,8 +1,7 @@
 package com.solana.models
 
-import com.solana.models.Buffer.*
+import com.solana.models.buffer.*
 import com.squareup.moshi.JsonClass
-
 
 @JsonClass(generateAdapter = true)
 open class RPC<T>(
