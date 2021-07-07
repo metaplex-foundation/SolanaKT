@@ -7,9 +7,7 @@ import com.solana.models.Buffer.TokenSwapInfoRule
 import com.solana.models.Buffer.moshi.AccountInfoJsonAdapter
 import com.solana.models.Buffer.moshi.MintJsonAdapter
 import com.solana.models.Buffer.moshi.TokenSwapInfoJsonAdapter
-import com.solana.models.BufferInfo2
-import com.solana.models.RPC2
-import com.solana.models.RPC3
+import com.solana.models.RPCBuffer
 import com.solana.networking.models.RPCError
 import com.solana.networking.models.RpcRequest
 import com.solana.networking.models.RpcResponse
@@ -52,98 +50,35 @@ class NetworkingRouter(
         private val JSON: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()
     }
 
-    fun <T> requestRPC(
-        method: String,
-        params: List<Any>?,
-        clazz: Class<T>?,
-        onComplete: (Result<RPC3<T>>) -> Unit,
-    ) {
-        val url = endpoint.url
-        val rpcRequest = RpcRequest(method, params)
-        val rpcRequestJsonAdapter: JsonAdapter<RpcRequest> = moshi.adapter(RpcRequest::class.java)
-        val resultAdapter: JsonAdapter<RpcResponse<RPC3<T>>> = moshi.adapter(
-            Types.newParameterizedType(
-                RpcResponse::class.java,
-                Types.newParameterizedType(
-                    RPC3::class.java,
-                    Type::class.java.cast(clazz)
-                )
-            )
-        )
-        val request: Request = Request.Builder().url(url)
-            .post(RequestBody.create(JSON, rpcRequestJsonAdapter.toJson(rpcRequest))).build()
-
-        callRPC(request, onComplete, resultAdapter)
-    }
-
-    private fun <T> callRPC(
-        request: Request,
-        onComplete: (Result<RPC3<T>>) -> Unit,
-        resultAdapter: JsonAdapter<RpcResponse<RPC3<T>>>
-    ) {
-        httpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                onComplete(Result.failure(RuntimeException(e)))
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                response.body?.let { body ->
-                    val responses = body.string()
-                    fromJsonToResult(resultAdapter, responses).map { rpcResult ->
-                        rpcResult.error?.let { error ->
-                            onComplete(Result.failure(NetworkingError.invalidResponse(error)))
-                            return
-                        }
-                        rpcResult.result?.let {
-                            onComplete(Result.success(it))
-                            return
-                        }
-                    }.onFailure {
-                        onComplete(Result.failure(it))
-                    }
-                }.run {
-                    onComplete(Result.failure(NetworkingError.invalidResponseNoData))
-                }
-            }
-        })
-    }
-
     fun <T> request(
         method: String,
         params: List<Any>?,
         clazz: Class<T>?,
         onComplete: (Result<T>) -> Unit
     ) {
-
         val url = endpoint.url
         val rpcRequest = RpcRequest(method, params)
         val rpcRequestJsonAdapter: JsonAdapter<RpcRequest> = moshi.adapter(RpcRequest::class.java)
-        val resultAdapter: JsonAdapter<RpcResponse<T>> = moshi.adapter(
-            Types.newParameterizedType(
-                    RpcResponse::class.java,
-                    Type::class.java.cast(clazz)
-                )
-            )
+
         val request: Request = Request.Builder().url(url)
             .post(RequestBody.create(JSON, rpcRequestJsonAdapter.toJson(rpcRequest))).build()
 
-        call(request, onComplete, resultAdapter)
+        call(clazz, request, onComplete)
     }
 
     private fun <T> call(
+        clazz: Class<T>?,
         request: Request,
-        onComplete: (Result<T>) -> Unit,
-        resultAdapter: JsonAdapter<RpcResponse<T>>
+        onComplete: (Result<T>) -> Unit
     ) {
         httpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 onComplete(Result.failure(RuntimeException(e)))
             }
-
             override fun onResponse(call: Call, response: Response) {
                 response.body?.let { body ->
                     val responses = body.string()
-                    fromJsonToResult(resultAdapter, responses).map { rpcResult ->
+                    fromJsonToResult(clazz, responses).map { rpcResult ->
                         rpcResult.error?.let { error ->
                             onComplete(Result.failure(NetworkingError.invalidResponse(error)))
                             return
@@ -162,12 +97,33 @@ class NetworkingRouter(
         })
     }
 
-    private fun <T> fromJsonToResult(adapter: JsonAdapter<T>, string: String): Result<T> {
+    private fun <T> fromJsonToResult(clazz: Class<T>?, string: String): Result<RpcResponse<T>> {
         return try {
+            val adapter: JsonAdapter<RpcResponse<T>> = moshi.adapter(
+                Types.newParameterizedType(
+                    RpcResponse::class.java,
+                    Type::class.java.cast(clazz)
+                )
+            )
             val result = adapter.fromJson(string)!!
             Result.success(result)
         } catch (e: Exception) {
-            Result.failure(NetworkingError.decodingError(e))
+            // This is a work arround for the kotlin and moshi unable to parse generics. this  requires work
+            return try {
+                val adapter2: JsonAdapter<RpcResponse<T>> = moshi.adapter(
+                    Types.newParameterizedType(
+                        RpcResponse::class.java,
+                        Types.newParameterizedType(
+                            RPCBuffer::class.java,
+                            Type::class.java.cast(clazz)
+                        )
+                    )
+                )
+                val result = adapter2.fromJson(string)!!
+                Result.success(result)
+            } catch (e: Exception) {
+                Result.failure(NetworkingError.decodingError(e))
+            }
         }
     }
 }

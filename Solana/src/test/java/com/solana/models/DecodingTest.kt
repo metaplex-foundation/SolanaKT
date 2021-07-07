@@ -196,9 +196,9 @@ class DecodingTests {
                     "rentEpoch":153
                 }
             }"""
-        val adapter: JsonAdapter<RPC3<AccountInfo>> = moshi.adapter(
+        val adapter: JsonAdapter<RPCBuffer<AccountInfo>> = moshi.adapter(
             Types.newParameterizedType(
-                RPC3::class.java,
+                RPCBuffer::class.java,
                 AccountInfo::class.java
             )
         )
@@ -227,9 +227,9 @@ class DecodingTests {
                     "rentEpoch":153
                 }
             }""".trimIndent()
-        val adapter: JsonAdapter<RPC3<AccountInfo>> = moshi.adapter(
+        val adapter: JsonAdapter<RPCBuffer<AccountInfo>> = moshi.adapter(
             Types.newParameterizedType(
-                RPC3::class.java,
+                RPCBuffer::class.java,
                 AccountInfo::class.java
             )
         )
@@ -271,9 +271,9 @@ class DecodingTests {
                     "rentEpoch":153
                 }
             }""".trimIndent()
-        val adapter: JsonAdapter<RPC3<Mint>> = moshi.adapter(
+        val adapter: JsonAdapter<RPCBuffer<Mint>> = moshi.adapter(
             Types.newParameterizedType(
-                RPC3::class.java,
+                RPCBuffer::class.java,
                 Mint::class.java
             )
         )
@@ -311,9 +311,9 @@ class DecodingTests {
                     "rentEpoch":153
                 }
             }"""
-        val adapter: JsonAdapter<RPC3<TokenSwapInfo>> = moshi.adapter(
+        val adapter: JsonAdapter<RPCBuffer<TokenSwapInfo>> = moshi.adapter(
             Types.newParameterizedType(
-                RPC3::class.java,
+                RPCBuffer::class.java,
                 TokenSwapInfo::class.java
             )
         )
@@ -358,11 +358,11 @@ class DecodingTests {
                },
                "id":"3618d086-1562-41b6-ad5e-f387b67d4bf9"
             }""".trimIndent()
-        val adapter: JsonAdapter<RpcResponse<RPC3<AccountInfo>>> = moshi.adapter(
+        val adapter: JsonAdapter<RpcResponse<RPCBuffer<AccountInfo>>> = moshi.adapter(
             Types.newParameterizedType(
                 RpcResponse::class.java,
                 Types.newParameterizedType(
-                    RPC3::class.java,
+                    RPCBuffer::class.java,
                     AccountInfo::class.java
                 )
             )

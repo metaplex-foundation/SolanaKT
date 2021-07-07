@@ -6,7 +6,7 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 class SimulatedTransaction(
     override val value: Value
-) : RpcResultObject<SimulatedTransaction.Value>(null, value) {
+) : RPC<SimulatedTransaction.Value>(null, value) {
 
     @JsonClass(generateAdapter = true)
     class Value (
@@ -18,7 +18,7 @@ class SimulatedTransaction(
 @JsonClass(generateAdapter = true)
 class SimulatedAccount(
     override val value: Value
-) : RpcResultObject<SimulatedAccount.Value>(null, value) {
+) : RPC<SimulatedAccount.Value>(null, value) {
 
     @JsonClass(generateAdapter = true)
     class Value (

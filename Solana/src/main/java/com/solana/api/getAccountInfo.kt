@@ -1,20 +1,21 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.models.Buffer.AccountInfo
-import com.solana.models.BufferInfo2
-import com.solana.vendor.borshj.BorshCodable
+import com.solana.models.BufferInfo
+import com.solana.models.RPCBuffer
 
-fun <T: BorshCodable>Api.getAccountInfo(account: PublicKey,
+fun <T>Api.getAccountInfo(account: PublicKey,
                                         decodeTo: Class<T>,
-                                        onComplete: ((Result<BufferInfo2<T>>) -> Unit)) {
+                                        onComplete: ((Result<BufferInfo<T>>) -> Unit)) {
     return getAccountInfo(account, HashMap(), decodeTo, onComplete)
 }
 
 fun <T> Api.getAccountInfo(account: PublicKey,
                           additionalParams: Map<String, Any?>,
                           decodeTo: Class<T>,
-                          onComplete: ((Result<BufferInfo2<T>>) -> Unit)) {
+                          onComplete: ((Result<BufferInfo<T>>) -> Unit)) {
+
+
     val params: MutableList<Any> = ArrayList()
     val parameterMap: MutableMap<String, Any?> = HashMap()
     parameterMap["commitment"] = additionalParams.getOrDefault("commitment", "max")
@@ -26,10 +27,13 @@ fun <T> Api.getAccountInfo(account: PublicKey,
     params.add(account.toString())
     params.add(parameterMap)
 
-    router.requestRPC("getAccountInfo", params, AccountInfo::class.java) { result ->
+    router.request("getAccountInfo", params, decodeTo) { result ->
         result
             .map {
-                it.value as BufferInfo2<T>
+                it as RPCBuffer<*>
+            }
+            .map {
+                it.value as BufferInfo<T>
             }
             .onSuccess {
                 onComplete(Result.success(it))
@@ -39,3 +43,4 @@ fun <T> Api.getAccountInfo(account: PublicKey,
             }
     }
 }
+

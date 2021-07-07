@@ -6,7 +6,7 @@ import com.solana.vendor.borshj.BorshCodable
 import org.bitcoinj.core.Base58
 import java.util.*
 
-class Buffer<T: BorshCodable>{
+/*class Buffer<T: BorshCodable>{
     val value: T?
     constructor(borsh: Borsh, rawData: Any, clazz: Class<T>) {
         if (rawData is String) {
@@ -31,7 +31,7 @@ class Buffer<T: BorshCodable>{
             Base58.decode(serializedData)
         }
     }
-}
+}*/
 
 data class Buffer2<T>(val value: T?){
     companion object {

@@ -2,7 +2,7 @@ package com.solana.models
 
 import com.squareup.moshi.Json
 
-class FeeRateGovernorInfo(@Json(name = "value") override val value: Value) : RpcResultObject<FeeRateGovernorInfo.Value>(null, value) {
+class FeeRateGovernorInfo(@Json(name = "value") override val value: Value) : RPC<FeeRateGovernorInfo.Value>(null, value) {
     class FeeRateGovernor (
         @Json(name = "burnPercent")
         val burnPercent: Long,

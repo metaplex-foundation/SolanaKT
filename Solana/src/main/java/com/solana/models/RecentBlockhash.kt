@@ -6,7 +6,7 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 class RecentBlockhash(
     override val value: Value
-) : RpcResultObject<RecentBlockhash.Value>(null, value) {
+) : RPC<RecentBlockhash.Value>(null, value) {
     @JsonClass(generateAdapter = true)
     class FeeCalculator (
         val lamportsPerSignature: Long = 0

@@ -1,6 +1,6 @@
 package com.solana.networking.models
 
-import com.solana.models.RpcResultObject
+import com.solana.models.RPC
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -9,7 +9,7 @@ class RpcNotificationResult {
     @JsonClass(generateAdapter = true)
     class Result(
         override val value: Any? = null
-    ) : RpcResultObject<Any>(null, value)
+    ) : RPC<Any>(null, value)
 
     class Params {
         @Json(name = "result")

@@ -5,7 +5,7 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 class Supply(
     override val value: Value
-) : RpcResultObject<Supply.Value>(null, value) {
+) : RPC<Supply.Value>(null, value) {
     @JsonClass(generateAdapter = true)
     class Value (
         val total: Long,
