@@ -12,11 +12,3 @@ open class RPC<T>(
     class Context (val slot: Long)
 }
 
-@JsonClass(generateAdapter = true)
-class BufferInfo<T>(
-    var data: Buffer<T>? = null,
-    val executable: Boolean,
-    val lamports: Double,
-    val owner: String?,
-    val rentEpoch: Double
-)

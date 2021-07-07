@@ -1,8 +1,8 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.models.BufferInfo
 import com.solana.models.RPC
+import com.solana.models.buffer.BufferInfo
 
 fun <T>Api.getAccountInfo(account: PublicKey,
                                         decodeTo: Class<T>,

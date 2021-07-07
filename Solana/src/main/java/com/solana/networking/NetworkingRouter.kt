@@ -1,10 +1,9 @@
 package com.solana.networking
 
 import com.solana.core.PublicKeyRule
-import com.solana.models.BufferInfo
 import com.solana.models.RPC
-import com.solana.models.buffer.AccountInfo
 import com.solana.models.buffer.AccountInfoRule
+import com.solana.models.buffer.BufferInfo
 import com.solana.models.buffer.MintRule
 import com.solana.models.buffer.TokenSwapInfoRule
 import com.solana.models.buffer.moshi.AccountInfoJsonAdapter
@@ -112,6 +111,8 @@ class NetworkingRouter(
             Result.success(result)
         } catch (e: Exception) {
             return try {
+                // A hack for recreating and adapter that supports Generics.
+                // I wanted to pass RPC<BufferInfo<T>>::class.java but I have no idea how to creat it.
                 val adapter: JsonAdapter<RpcResponse<T>> = moshi.adapter(
                     Types.newParameterizedType(
                         RpcResponse::class.java,

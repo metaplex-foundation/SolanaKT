@@ -5,6 +5,7 @@ import com.solana.core.Account
 import com.solana.core.PublicKey
 import com.solana.core.Transaction
 import com.solana.models.*
+import com.solana.models.buffer.BufferInfo
 import com.solana.vendor.borshj.BorshCodable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposables
