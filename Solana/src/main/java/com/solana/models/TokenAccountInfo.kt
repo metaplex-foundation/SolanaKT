@@ -1,12 +1,14 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class TokenAccountInfo(@Json(name = "value") val value: List<Value>? = null) : RpcResultObject() {
+@JsonClass(generateAdapter = true)
+class TokenAccountInfo(
+    override val value: List<Value>? = null
+) : RPC<List<TokenAccountInfo.Value>>(null, value) {
+    @JsonClass(generateAdapter = true)
     class Value(
-        @Json(name = "account")
         val account: TokenResultObjects.Value? = null,
-        @Json(name = "pubkey")
         val pubkey: String? = null
     )
 }

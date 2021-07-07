@@ -1,10 +1,10 @@
 package com.solana.models
 
 import com.solana.core.PublicKeyRule
-import com.solana.models.Buffer.AccountInfoRule
-import com.solana.models.Buffer.Buffer
-import com.solana.models.Buffer.MintRule
-import com.solana.models.Buffer.TokenSwapInfoRule
+import com.solana.models.buffer.AccountInfoRule
+import com.solana.models.buffer.Buffer
+import com.solana.models.buffer.MintRule
+import com.solana.models.buffer.TokenSwapInfoRule
 import com.solana.vendor.borshj.Borsh
 import com.solana.vendor.borshj.BorshCodable
 import com.squareup.moshi.Json
@@ -31,7 +31,7 @@ class ProgramAccount<T: BorshCodable>(pa: Map<String, Any>, clazz: Class<T>) {
             borsh.setRules(listOf(PublicKeyRule(), AccountInfoRule(), MintRule(), TokenSwapInfoRule()))
             val account = acc as Map<String, Any>
             val rawData = account["data"]!!
-            data = Buffer(borsh, rawData, clazz)
+            data = Buffer.create(borsh, rawData, clazz)
             executable = account["executable"] as Boolean
             lamports = account["lamports"] as Double
             owner = account["owner"] as String?

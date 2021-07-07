@@ -1,13 +1,15 @@
 package com.solana.networking.models
 
-import com.solana.models.RpcResultObject
+import com.solana.models.RPC
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 class RpcNotificationResult {
-    class Result : RpcResultObject() {
-        @Json(name = "value")
-        val value: Any? = null
-    }
+
+    @JsonClass(generateAdapter = true)
+    class Result(
+        override val value: Any? = null
+    ) : RPC<Any>(null, value)
 
     class Params {
         @Json(name = "result")

@@ -2,10 +2,12 @@ package com.solana.models
 
 import com.solana.models.RecentBlockhash.FeeCalculator
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-
-class FeeCalculatorInfo(@Json(name = "value") val value: Value?) : RpcResultObject(){
-    class Value (
-        @Json(name = "feeCalculator") val feeCalculator: FeeCalculator
-    )
+@JsonClass(generateAdapter = true)
+data class FeeCalculatorInfo(
+    @Json(name = "value") override val value: Value?
+) : RPC<FeeCalculatorInfo.Value>(null, value){
+    @JsonClass(generateAdapter = true)
+    data class Value (val feeCalculator: FeeCalculator)
 }

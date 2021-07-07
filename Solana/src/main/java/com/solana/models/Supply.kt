@@ -1,19 +1,16 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class Supply(@Json(name = "value") val value: Value) : RpcResultObject() {
+@JsonClass(generateAdapter = true)
+class Supply(
+    override val value: Value
+) : RPC<Supply.Value>(null, value) {
+    @JsonClass(generateAdapter = true)
     class Value (
-        @Json(name = "total")
-        private val total: Long,
-
-        @Json(name = "circulating")
-        private val circulating: Long,
-
-        @Json(name = "nonCirculating")
-        private val nonCirculating: Long,
-
-        @Json(name = "nonCirculatingAccounts")
-        private val nonCirculatingAccounts: List<String>
+        val total: Long,
+        val circulating: Long,
+        val nonCirculating: Long,
+        val nonCirculatingAccounts: List<String>
     )
 }

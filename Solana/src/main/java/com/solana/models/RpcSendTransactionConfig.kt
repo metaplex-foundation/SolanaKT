@@ -9,7 +9,8 @@ class RpcSendTransactionConfig(
     @Json(name = "skipPreflight") val skipPreFlight: Boolean = true
 ){
     enum class Encoding(private val enc: String) {
-        base64("base64");
+        base64("base64"),
+        base58("base58");
         fun getEncoding(): String {
             return enc
         }

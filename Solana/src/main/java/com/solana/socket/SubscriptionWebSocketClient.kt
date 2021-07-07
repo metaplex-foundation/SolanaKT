@@ -74,12 +74,12 @@ class SubscriptionWebSocketClient(serverURI: URI?) : WebSocketClient(serverURI) 
                 val listener = subscriptionLinsteners[result!!.params!!.subscription]
                 val value = result.params!!.result!!.value as Map<*, *>
                 when (result.method) {
-                    "signatureNotification" -> listener!!.onNotifiacationEvent(
+                    "signatureNotification" -> listener!!.onNotificationEvent(
                         SignatureNotification(
                             value["err"]
                         )
                     )
-                    "accountNotification" -> listener!!.onNotifiacationEvent(value)
+                    "accountNotification" -> listener!!.onNotificationEvent(value)
                 }
             }
         } catch (ex: Exception) {
