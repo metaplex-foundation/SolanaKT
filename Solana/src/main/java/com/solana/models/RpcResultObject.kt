@@ -13,12 +13,7 @@ open class RPC<T>(
 }
 
 @JsonClass(generateAdapter = true)
-class RPCBuffer<T>(
-    override var context: Context?,
-    override val value: BufferInfo<T>? = null
-) : RPC<BufferInfo<T>>(context, value)
-
-open class BufferInfo<T>(
+class BufferInfo<T>(
     var data: Buffer<T>? = null,
     val executable: Boolean,
     val lamports: Double,

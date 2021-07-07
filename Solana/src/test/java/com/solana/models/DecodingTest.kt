@@ -14,6 +14,7 @@ import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import org.junit.Test
 import org.junit.Assert.*
+import java.lang.reflect.Type
 
 class DecodingTests {
 
@@ -196,10 +197,13 @@ class DecodingTests {
                     "rentEpoch":153
                 }
             }"""
-        val adapter: JsonAdapter<RPCBuffer<AccountInfo>> = moshi.adapter(
+        val adapter: JsonAdapter<RPC<BufferInfo<AccountInfo>>> = moshi.adapter(
             Types.newParameterizedType(
-                RPCBuffer::class.java,
-                AccountInfo::class.java
+                RPC::class.java,
+                Types.newParameterizedType(
+                    BufferInfo::class.java,
+                    AccountInfo::class.java
+                )
             )
         )
         val obj = adapter.fromJson(response)
@@ -227,10 +231,13 @@ class DecodingTests {
                     "rentEpoch":153
                 }
             }""".trimIndent()
-        val adapter: JsonAdapter<RPCBuffer<AccountInfo>> = moshi.adapter(
+        val adapter: JsonAdapter<RPC<BufferInfo<AccountInfo>>> = moshi.adapter(
             Types.newParameterizedType(
-                RPCBuffer::class.java,
-                AccountInfo::class.java
+                RPC::class.java,
+                Types.newParameterizedType(
+                    BufferInfo::class.java,
+                    AccountInfo::class.java
+                )
             )
         )
         val obj = adapter.fromJson(response)!!
@@ -271,10 +278,14 @@ class DecodingTests {
                     "rentEpoch":153
                 }
             }""".trimIndent()
-        val adapter: JsonAdapter<RPCBuffer<Mint>> = moshi.adapter(
+
+        val adapter: JsonAdapter<RPC<BufferInfo<Mint>>> = moshi.adapter(
             Types.newParameterizedType(
-                RPCBuffer::class.java,
-                Mint::class.java
+                RPC::class.java,
+                Types.newParameterizedType(
+                    BufferInfo::class.java,
+                    Mint::class.java
+                )
             )
         )
         val obj = adapter.fromJson(response)!!
@@ -311,10 +322,13 @@ class DecodingTests {
                     "rentEpoch":153
                 }
             }"""
-        val adapter: JsonAdapter<RPCBuffer<TokenSwapInfo>> = moshi.adapter(
+        val adapter: JsonAdapter<RPC<BufferInfo<TokenSwapInfo>>> = moshi.adapter(
             Types.newParameterizedType(
-                RPCBuffer::class.java,
-                TokenSwapInfo::class.java
+                RPC::class.java,
+                Types.newParameterizedType(
+                    BufferInfo::class.java,
+                    TokenSwapInfo::class.java
+                )
             )
         )
         val obj = adapter.fromJson(response)!!
@@ -358,12 +372,15 @@ class DecodingTests {
                },
                "id":"3618d086-1562-41b6-ad5e-f387b67d4bf9"
             }""".trimIndent()
-        val adapter: JsonAdapter<RpcResponse<RPCBuffer<AccountInfo>>> = moshi.adapter(
+        val adapter: JsonAdapter<RpcResponse<RPC<BufferInfo<AccountInfo>>>> = moshi.adapter(
             Types.newParameterizedType(
                 RpcResponse::class.java,
                 Types.newParameterizedType(
-                    RPCBuffer::class.java,
-                    AccountInfo::class.java
+                    RPC::class.java,
+                    Types.newParameterizedType(
+                        BufferInfo::class.java,
+                        AccountInfo::class.java
+                    )
                 )
             )
         )

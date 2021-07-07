@@ -2,7 +2,7 @@ package com.solana.api
 
 import com.solana.core.PublicKey
 import com.solana.models.BufferInfo
-import com.solana.models.RPCBuffer
+import com.solana.models.RPC
 
 fun <T>Api.getAccountInfo(account: PublicKey,
                                         decodeTo: Class<T>,
@@ -26,14 +26,13 @@ fun <T> Api.getAccountInfo(account: PublicKey,
     }
     params.add(account.toString())
     params.add(parameterMap)
-
     router.request("getAccountInfo", params, decodeTo) { result ->
         result
             .map {
-                it as RPCBuffer<T>
+                it as RPC<BufferInfo<*>>
             }
             .map {
-                it.value as BufferInfo
+                it.value as BufferInfo<T>
             }
             .onSuccess {
                 onComplete(Result.success(it))

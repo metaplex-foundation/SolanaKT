@@ -1,13 +1,15 @@
 package com.solana.networking
 
 import com.solana.core.PublicKeyRule
+import com.solana.models.BufferInfo
+import com.solana.models.RPC
+import com.solana.models.buffer.AccountInfo
 import com.solana.models.buffer.AccountInfoRule
 import com.solana.models.buffer.MintRule
 import com.solana.models.buffer.TokenSwapInfoRule
 import com.solana.models.buffer.moshi.AccountInfoJsonAdapter
 import com.solana.models.buffer.moshi.MintJsonAdapter
 import com.solana.models.buffer.moshi.TokenSwapInfoJsonAdapter
-import com.solana.models.RPCBuffer
 import com.solana.networking.models.RPCError
 import com.solana.networking.models.RpcRequest
 import com.solana.networking.models.RpcResponse
@@ -99,7 +101,6 @@ class NetworkingRouter(
     }
 
     private fun <T> fromJsonToResult(string: String, clazz: Class<T>?): Result<RpcResponse<T>> {
-        val i = clazz!!.interfaces
         return try {
             val adapter: JsonAdapter<RpcResponse<T>> = moshi.adapter(
                 Types.newParameterizedType(
@@ -110,18 +111,20 @@ class NetworkingRouter(
             val result = adapter.fromJson(string)!!
             Result.success(result)
         } catch (e: Exception) {
-            // This is a work around for the kotlin and moshi unable to parse generics. this  requires work
             return try {
-                val adapter2: JsonAdapter<RpcResponse<T>> = moshi.adapter(
+                val adapter: JsonAdapter<RpcResponse<T>> = moshi.adapter(
                     Types.newParameterizedType(
                         RpcResponse::class.java,
                         Types.newParameterizedType(
-                            RPCBuffer::class.java,
-                            Type::class.java.cast(clazz)
+                            RPC::class.java,
+                            Types.newParameterizedType(
+                                BufferInfo::class.java,
+                                Type::class.java.cast(clazz)
+                            )
                         )
                     )
                 )
-                val result = adapter2.fromJson(string)!!
+                val result = adapter.fromJson(string)!!
                 Result.success(result)
             } catch (e: Exception) {
                 Result.failure(NetworkingError.decodingError(e))
