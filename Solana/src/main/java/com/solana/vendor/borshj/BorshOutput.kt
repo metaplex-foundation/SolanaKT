@@ -1,8 +1,6 @@
 package com.solana.vendor.borshj
 
-import com.solana.core.PublicKey
 import com.solana.vendor.borshj.BorshBuffer.Companion.allocate
-import java.lang.reflect.Modifier
 import java.math.BigInteger
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -10,6 +8,7 @@ import java.util.*
 interface BorshOutput<Self> {
     fun write(borsh: Borsh, obj: Any): Self {
         val rule: BorshRule<*>? = borsh.getRules().firstOrNull { it.clazz == obj.javaClass }
+
         return when {
             rule != null -> rule.write(obj, this)
             obj is Byte -> writeU8(obj)
@@ -34,8 +33,13 @@ interface BorshOutput<Self> {
             val constructor = obj.javaClass.kotlin.constructors.first()
             val kotlinParameters = constructor.parameters
 
+            if (obj.javaClass.declaredFields.firstOrNull { !it.isAnnotationPresent(FieldOrder::class.java) } != null) {
+                throw java.lang.IllegalArgumentException("Serializing borsh data requires all fields to be annotated with @FieldOrder")
+            }
+
             val fields = obj.javaClass.declaredFields
                 .filter { kotlinParameters.map { kf -> kf.name }.contains(it.name) }
+                .sortedBy { field -> field.getAnnotation(FieldOrder::class.java).order }
 
             for (field in fields) {
                 field.isAccessible = true
@@ -44,6 +48,7 @@ interface BorshOutput<Self> {
         } catch (error: IllegalAccessException) {
             throw RuntimeException(error)
         }
+
         return this as Self
     }
 

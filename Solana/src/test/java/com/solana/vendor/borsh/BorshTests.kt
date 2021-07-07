@@ -2,6 +2,7 @@ package com.solana.vendor.borsh
 
 import com.solana.vendor.borshj.Borsh
 import com.solana.vendor.borshj.BorshCodable
+import com.solana.vendor.borshj.FieldOrder
 import org.junit.Assert
 import org.junit.Test
 
@@ -22,7 +23,9 @@ class BorshTests {
     }
 
     class Point2Df : BorshCodable {
+        @FieldOrder(0)
         private var x = 0f
+        @FieldOrder(1)
         private var y = 0f
 
         constructor(x: Float, y: Float) {
@@ -42,7 +45,9 @@ class BorshTests {
     }
 
     class Rect2Df : BorshCodable {
+        @FieldOrder(0)
         private var topLeft: Point2Df? = null
+        @FieldOrder(1)
         private var bottomRight: Point2Df? = null
 
         constructor(topLeft: Point2Df?, bottomRight: Point2Df?) {

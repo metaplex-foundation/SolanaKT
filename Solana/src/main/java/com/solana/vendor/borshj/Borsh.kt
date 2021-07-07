@@ -9,23 +9,29 @@ interface BorshCodable
 interface BorshRule<T> {
     val clazz: Class<T>
     fun read(input: BorshInput): T?
-    fun <Self>write(obj: Any, output: BorshOutput<Self>): Self
+    fun <Self> write(obj: Any, output: BorshOutput<Self>): Self
 }
 
 class Borsh {
-    private var rules : List<BorshRule<*>> = listOf()
+    private var rules: List<BorshRule<*>> = listOf()
+
     fun setRules(rules: List<BorshRule<*>>) {
         this.rules = rules
     }
 
-    fun getRules() : List<BorshRule<*>> {
+    fun getRules(): List<BorshRule<*>> {
         return rules
     }
 
     fun <T> isSerializable(klass: Class<T>?): Boolean {
-        return if (klass == null) false else Arrays.stream(klass.interfaces)
-            .anyMatch { iface: Class<*> -> iface == BorshCodable::class.java } ||
-                isSerializable(klass.superclass)
+        return if (klass == null) {
+            false
+        } else {
+            Arrays.stream(klass.interfaces)
+                .anyMatch {
+                        iface: Class<*> -> iface == BorshCodable::class.java
+                } || isSerializable(klass.superclass)
+        }
     }
 
     fun serialize(obj: Any): ByteArray {

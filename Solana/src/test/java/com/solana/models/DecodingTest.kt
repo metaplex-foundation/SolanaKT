@@ -14,7 +14,7 @@ import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import org.junit.Test
 import org.junit.Assert.*
-import java.lang.reflect.Type
+import java.util.*
 
 class DecodingTests {
 
@@ -22,6 +22,42 @@ class DecodingTests {
         val borsh = Borsh()
         borsh.setRules(listOf(PublicKeyRule(), AccountInfoRule(), MintRule(), TokenSwapInfoRule()))
         return borsh
+    }
+
+    @Test
+    fun testDecodingMetaplexMeta() {
+        val blobSrc = "BD8slOrgPZpL+5iD8MJBsTGY+esK0dZd8tlCX14LRmfREFsKKgyOBm9TbEDjhj2CcT+KPJFJ3acbYRLIqSsfsUkVAAAAU29sYW5pbWFsICMxOTYyIC0gQ2F0AAAAAD8AAABodHRwczovL2Fyd2VhdmUubmV0LzREVlNhUjU2V1RrV1Y4TnlvZ2U0LXRQWC1wOXJhSUJScHlZNEtxZVZlUDQAAAEBAAAAPyyU6uA9mkv7mIPwwkGxMZj56wrR1l3y2UJfXgtGZ9EBZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+
+        val borsh = borsh()
+        val byteArray = Base64.getDecoder().decode(blobSrc)
+
+        val data = borsh.deserialize(byteArray, MetaplexMeta::class.java)
+        assertEquals("5Fc7Zy7HgRatL8XhX5uqsUFEjGPop1uJXKrp3Ws7m1Tn", data.update_authority.toBase58())
+        assertEquals("26r3GfgqbjMTjZahNgnwa9AtbDg8x2E5AGwzw17KWRC4", data.mint.toBase58())
+        assertEquals("Solanimal #1962 - Cat", data.data.name)
+        assertEquals("https://arweave.net/4DVSaR56WTkWV8Nyoge4-tPX-p9raIBRpyY4KqeVeP4", data.data.uri)
+    }
+
+    @Test
+    fun testMoreDecodingMetaplexMeta() {
+        val borsh = borsh()
+
+        val plexData = MetaplexData("NFT", "BORSH", "www.solana.com")
+        val plexMeta = MetaplexMeta(
+            key = 1,
+            update_authority = PublicKey("CiDwVBFgWV9E5MvXWoLgnEgn2hK7rJikbvfWavzAQz3"),
+            mint = PublicKey("BQWWFhzBdw2vKKBUX17NHeFbCoFQHfRARpdztPE2tDJ"),
+            data = plexData
+        )
+
+        val serialized = borsh.serialize(plexMeta)
+        val out = borsh.deserialize(serialized, MetaplexMeta::class.java)
+
+        assertEquals("CiDwVBFgWV9E5MvXWoLgnEgn2hK7rJikbvfWavzAQz3", out.update_authority.toBase58())
+        assertEquals("BQWWFhzBdw2vKKBUX17NHeFbCoFQHfRARpdztPE2tDJ", out.mint.toBase58())
+        assertEquals("NFT", out.data.name)
+        assertEquals("BORSH", out.data.symbol)
+        assertEquals("www.solana.com", out.data.uri)
     }
 
     @Test
