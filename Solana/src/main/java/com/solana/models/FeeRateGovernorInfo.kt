@@ -1,26 +1,23 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class FeeRateGovernorInfo(@Json(name = "value") override val value: Value) : RPC<FeeRateGovernorInfo.Value>(null, value) {
-    class FeeRateGovernor (
-        @Json(name = "burnPercent")
+@JsonClass(generateAdapter = true)
+data class FeeRateGovernorInfo(
+    override val value: Value
+) : RPC<FeeRateGovernorInfo.Value>(null, value) {
+
+    @JsonClass(generateAdapter = true)
+    data class FeeRateGovernor (
         val burnPercent: Long,
-
-        @Json(name = "maxLamportsPerSignature")
         val maxLamportsPerSignature: Long,
-
-        @Json(name = "minLamportsPerSignature")
         val minLamportsPerSignature: Long,
-
-        @Json(name = "targetLamportsPerSignature")
         val targetLamportsPerSignature: Long,
-
-        @Json(name = "targetSignaturesPerSlot")
         val targetSignaturesPerSlot: Long
     )
 
-    class Value (
-        @Json(name = "feeRateGovernor") val feeRateGovernor: FeeRateGovernor
+    @JsonClass(generateAdapter = true)
+    data class Value (
+        val feeRateGovernor: FeeRateGovernor
     )
 }

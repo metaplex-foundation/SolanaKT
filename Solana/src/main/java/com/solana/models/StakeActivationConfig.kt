@@ -1,7 +1,8 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class StakeActivationConfig (
-    @Json(name = "epoch") val epoch: Long
+@JsonClass(generateAdapter = true)
+data class StakeActivationConfig (
+    val epoch: Long
 )

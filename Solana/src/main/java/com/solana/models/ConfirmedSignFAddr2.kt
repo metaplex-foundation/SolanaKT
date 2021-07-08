@@ -1,9 +1,10 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class ConfirmedSignFAddr2 (
-    @Json(name = "limit") val limit: Long?,
-    @Json(name = "before") val before: String?,
-    @Json(name = "until") val until: String?,
+@JsonClass(generateAdapter = true)
+data class ConfirmedSignFAddr2 (
+    val limit: Long?,
+    val before: String?,
+    val until: String?,
 )

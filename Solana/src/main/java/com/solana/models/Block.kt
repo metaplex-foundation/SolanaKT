@@ -1,13 +1,14 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class Block (
-    @Json(name = "blockTime") val blockTime: Long,
-    @Json(name = "blockHeight") val blockHeight: String?,
-    @Json(name = "blockhash") val blockhash: String?,
-    @Json(name = "parentSlot") val parentSlot: Long,
-    @Json(name = "previousBlockhash") val previousBlockhash: String?,
-    @Json(name = "transactions") val transactions: List<ConfirmedTransaction>? ,
-    @Json(name = "rewards") val rewards: List<Reward>?,
+    val blockTime: Long,
+    val blockHeight: String?,
+    val blockhash: String?,
+    val parentSlot: Long,
+    val previousBlockhash: String?,
+    val transactions: List<ConfirmedTransaction>? ,
+    val rewards: List<Reward>?,
 )

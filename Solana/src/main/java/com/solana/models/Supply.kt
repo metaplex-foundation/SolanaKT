@@ -3,7 +3,7 @@ package com.solana.models
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-class Supply(
+data class Supply(
     override val value: Value
 ) : RPC<Supply.Value>(null, value) {
     @JsonClass(generateAdapter = true)

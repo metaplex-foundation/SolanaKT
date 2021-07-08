@@ -1,7 +1,8 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class VoteAccountConfig (
-    @Json(name = "votePubkey") val votePubkey: String? = null
+@JsonClass(generateAdapter = true)
+data class VoteAccountConfig (
+    val votePubkey: String? = null
 )

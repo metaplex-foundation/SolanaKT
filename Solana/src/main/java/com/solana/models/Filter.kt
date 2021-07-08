@@ -1,7 +1,8 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class Filter (
-    @Json(name = "memcmp") val memcmp: Memcmp
+@JsonClass(generateAdapter = true)
+data class Filter (
+    val memcmp: Memcmp
 )

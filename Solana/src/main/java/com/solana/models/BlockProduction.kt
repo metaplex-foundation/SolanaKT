@@ -1,20 +1,16 @@
 package com.solana.models
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class BlockProduction(@Json(name = "value") val value: BlockProductionValue) {
+@JsonClass(generateAdapter = true)
+data class BlockProduction(val value: BlockProductionValue) {
     class BlockProductionRange (
-        @Json(name = "firstSlot")
         val firstSlot: Long,
-
-        @Json(name = "lastSlot")
         val lastSlot: Long
     )
-
     class BlockProductionValue (
-        @Json(name = "byIdentity")
         val byIdentity: Map<String, List<Double>>?,
-        @Json(name = "range")
         val blockProductionRange: BlockProductionRange?
     )
 }

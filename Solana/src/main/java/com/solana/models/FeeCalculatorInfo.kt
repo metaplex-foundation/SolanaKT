@@ -6,7 +6,7 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class FeeCalculatorInfo(
-    @Json(name = "value") override val value: Value?
+    override val value: Value?
 ) : RPC<FeeCalculatorInfo.Value>(null, value){
     @JsonClass(generateAdapter = true)
     data class Value (val feeCalculator: FeeCalculator)

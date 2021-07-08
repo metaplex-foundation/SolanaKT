@@ -1,7 +1,8 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class DataSize (
-    @Json(name = "dataSize")  val dataSize: Long
+    val dataSize: Long
 )

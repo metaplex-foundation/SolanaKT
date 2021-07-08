@@ -1,8 +1,9 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class Memcmp(
-    @Json(name = "offset") val offset: Long,
-    @Json(name = "bytes") val bytes: String
+@JsonClass(generateAdapter = true)
+data class Memcmp(
+    val offset: Long,
+    val bytes: String
 )

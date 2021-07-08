@@ -1,8 +1,10 @@
 package com.solana.models
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class EpochInfo (
+@JsonClass(generateAdapter = true)
+data class EpochInfo (
     @Json(name = "absoluteSlot")
     val absoluteSlot: Long,
 

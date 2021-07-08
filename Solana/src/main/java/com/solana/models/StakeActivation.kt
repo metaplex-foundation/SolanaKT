@@ -1,14 +1,11 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class StakeActivation (
-    @Json(name = "active")
-    private val active: Long,
+@JsonClass(generateAdapter = true)
+data class StakeActivation (
+    val active: Long,
+    val inactive: Long,
 
-    @Json(name = "inactive")
-    private val inactive: Long,
-
-    @Json(name = "state")
-    private val state: String
+    val state: String
 )

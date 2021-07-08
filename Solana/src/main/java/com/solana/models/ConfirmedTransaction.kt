@@ -2,11 +2,13 @@ package com.solana.models
 
 import com.solana.models.TokenResultObjects.TokenAmountInfo
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class ConfirmedTransaction(
-    @Json(name = "meta") val meta: Meta?,
-    @Json(name = "slot") val slot: Long?,
-    @Json(name = "transaction") val transaction: Transaction?,
+@JsonClass(generateAdapter = true)
+data class ConfirmedTransaction(
+    val meta: Meta?,
+    val slot: Long?,
+    val transaction: Transaction?,
 ) {
     class Header (
         @Json(name = "numReadonlySignedAccounts")
