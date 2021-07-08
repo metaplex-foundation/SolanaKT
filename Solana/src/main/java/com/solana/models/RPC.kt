@@ -1,6 +1,5 @@
 package com.solana.models
 
-import com.solana.models.buffer.*
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)

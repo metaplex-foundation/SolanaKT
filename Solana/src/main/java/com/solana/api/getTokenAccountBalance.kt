@@ -1,21 +1,25 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
+import com.solana.models.RPC
 import com.solana.models.TokenResultObjects
+import com.squareup.moshi.Types
 
 fun Api.getTokenAccountBalance(tokenAccount: PublicKey,
                            onComplete: (Result<TokenResultObjects.TokenAmountInfo>) -> Unit)  {
     val params: MutableList<Any> = ArrayList()
     params.add(tokenAccount.toString())
-    router.request<Map<String, Any>>(
+    val type = Types.newParameterizedType(
+        RPC::class.java,
+        TokenResultObjects.TokenAmountInfo::class.java
+    )
+    router.request<RPC<TokenResultObjects.TokenAmountInfo>>(
         "getTokenAccountBalance",
         params,
-        Map::class.java
+        type
     ){ result ->
         result.map {
-            it["value"] as Map<String, Any>
-        }.map {
-            TokenResultObjects.TokenAmountInfo(it)
+            it.value!!
         }.onSuccess {
             onComplete(Result.success(it))
         }.onFailure {
