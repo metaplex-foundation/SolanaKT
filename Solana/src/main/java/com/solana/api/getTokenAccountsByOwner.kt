@@ -1,7 +1,10 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
+import com.solana.models.RPC
 import com.solana.models.TokenAccountInfo
+import com.solana.models.TokenResultObjects
+import com.squareup.moshi.Types
 
 fun Api.getTokenAccountsByOwner(owner: PublicKey, tokenMint: PublicKey, onComplete: (Result<PublicKey>) -> Unit) {
     val params: MutableList<Any> = ArrayList()
@@ -9,18 +12,25 @@ fun Api.getTokenAccountsByOwner(owner: PublicKey, tokenMint: PublicKey, onComple
     val parameterMap: MutableMap<String, Any> = HashMap()
     parameterMap["mint"] = tokenMint.toBase58()
     params.add(parameterMap)
-    router.request<Map<String, Any>>(
+
+    val type = Types.newParameterizedType(
+        RPC::class.java,
+        Types.newParameterizedType(
+            List::class.java,
+            Types.newParameterizedType(
+                Map::class.java,
+                String::class.java,
+                Any::class.java
+            )
+        )
+    )
+
+    router.request<RPC<List<Map<String,Any>>>>(
         "getTokenAccountsByOwner", params,
-        Map::class.java
+        type
     ) { result ->
         result.map {
-            it as Map<String, Any>
-        }.map {
-            it["value"] as List<*>
-        }.map {
-            it[0] as Map<String, Any>
-        }.map {
-            it["pubkey"] as String
+            it.value!!.first().get("pubkey") as String
         }.map {
             PublicKey(it)
         }.onSuccess {

@@ -17,21 +17,11 @@ fun Api.getInflationReward(
         params.add(RpcEpochConfig(it, commitment))
     }
 
-    router.request<List<Map<String, Any>>>(
+    router.request<List<InflationReward>>(
         "getInflationReward", params,
         List::class.java
     ){ result ->
-        result.map {
-            it.filterNotNull()
-        }.map {
-            it.map { item -> item as Map<String, Any> }
-        }.map {
-            val list: MutableList<InflationReward> = ArrayList()
-            for (item in it) {
-                list.add(InflationReward(item))
-            }
-            list
-        }.onSuccess {
+        result.onSuccess {
             onComplete(Result.success(it))
         }.onFailure {
             onComplete(Result.failure(it))

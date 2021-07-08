@@ -1,19 +1,11 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
-import java.util.*
+import com.squareup.moshi.JsonClass
 
-class InflationReward(pa: Map<String, Any>) {
-    @Json(name = "epoch")
-    private val epoch: Double = pa["epoch"] as Double
-
-    @Json(name = "effectiveSlot")
-    private val effectiveSlot: Double = pa["effectiveSlot"] as Double
-
-    @Json(name = "amount")
-    private val amount: Double = pa["amount"] as Double
-
-    @Json(name = "postBalance")
-    private val postBalance: Double = pa["postBalance"] as Double
-
-}
+@JsonClass(generateAdapter = true)
+data class InflationReward(
+    val epoch: Double,
+    val effectiveSlot: Double,
+    val amount: Double,
+    val postBalance: Double
+)

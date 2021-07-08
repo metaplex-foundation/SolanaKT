@@ -1,7 +1,6 @@
 package com.solana.models
 
 import com.squareup.moshi.Json
-import java.util.*
 
 class TokenResultObjects {
     open class TokenAmountInfo(
