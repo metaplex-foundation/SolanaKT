@@ -3,9 +3,9 @@ package com.solana.api
 import com.solana.core.PublicKey
 
 fun Api.getIdentity(onComplete: (Result<PublicKey>) -> Unit) {
-    router.request(
+    router.request<Map<String, Any>>(
         "getIdentity", ArrayList(),
-        MutableMap::class.java
+        Map::class.java
     ) { result ->
         result.map {
             val base58 = it["identity"] as String

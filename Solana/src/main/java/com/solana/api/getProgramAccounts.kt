@@ -37,7 +37,7 @@ private fun <T: BorshCodable> Api.getProgramAccounts(
     if (programAccountConfig != null) {
         params.add(programAccountConfig)
     }
-    router.request(
+    router.request<List<Map<String, Any>>>(
         "getProgramAccounts", params,
         List::class.java
     ){ result ->
@@ -77,7 +77,7 @@ fun <T :BorshCodable> Api.getProgramAccounts(
     filters.add(DataSize(dataSize.toLong()))
     val programAccountConfig = ProgramAccountConfig(filters = filters)
     params.add(programAccountConfig)
-    router.request(
+    router.request<List<Map<String, Any>>>(
         "getProgramAccounts", params,
         List::class.java
     ) { result ->
@@ -114,7 +114,7 @@ fun <T :BorshCodable>Api.getProgramAccounts(account: PublicKey,
     })
     val programAccountConfig = ProgramAccountConfig(filters = filters)
     params.add(programAccountConfig)
-    router.request(
+    router.request<List<Map<String, Any>>>(
         "getProgramAccounts", params,
         List::class.java
     ){ result ->

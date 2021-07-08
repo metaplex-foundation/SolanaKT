@@ -54,7 +54,7 @@ class NetworkingRouter(
     fun <T> request(
         method: String,
         params: List<Any>?,
-        clazz: Class<T>?,
+        clazz: Type?,
         onComplete: (Result<T>) -> Unit
     ) {
         val url = endpoint.url
@@ -69,7 +69,7 @@ class NetworkingRouter(
 
     private fun <T> call(
         request: Request,
-        clazz: Class<T>?,
+        clazz: Type?,
         onComplete: (Result<T>) -> Unit
     ) {
         httpClient.newCall(request).enqueue(object : Callback {
@@ -79,7 +79,7 @@ class NetworkingRouter(
             override fun onResponse(call: Call, response: Response) {
                 response.body?.let { body ->
                     val responses = body.string()
-                    fromJsonToResult(responses, clazz)
+                    fromJsonToResult<T>(responses, clazz)
                         .map { rpcResult ->
                             rpcResult.error?.let { error ->
                                 onComplete(Result.failure(NetworkingError.invalidResponse(error)))
@@ -99,37 +99,18 @@ class NetworkingRouter(
         })
     }
 
-    private fun <T> fromJsonToResult(string: String, clazz: Class<T>?): Result<RpcResponse<T>> {
+    private fun <T> fromJsonToResult(string: String, clazz: Type?): Result<RpcResponse<T>> {
         return try {
             val adapter: JsonAdapter<RpcResponse<T>> = moshi.adapter(
                 Types.newParameterizedType(
                     RpcResponse::class.java,
-                    Type::class.java.cast(clazz)
+                    clazz
                 )
             )
             val result = adapter.fromJson(string)!!
             Result.success(result)
         } catch (e: Exception) {
-            return try {
-                // A hack for recreating and adapter that supports Generics.
-                // I wanted to pass RPC<BufferInfo<T>>::class.java but I have no idea how to creat it.
-                val adapter: JsonAdapter<RpcResponse<T>> = moshi.adapter(
-                    Types.newParameterizedType(
-                        RpcResponse::class.java,
-                        Types.newParameterizedType(
-                            RPC::class.java,
-                            Types.newParameterizedType(
-                                BufferInfo::class.java,
-                                Type::class.java.cast(clazz)
-                            )
-                        )
-                    )
-                )
-                val result = adapter.fromJson(string)!!
-                Result.success(result)
-            } catch (e: Exception) {
-                Result.failure(NetworkingError.decodingError(e))
-            }
+            Result.failure(NetworkingError.decodingError(e))
         }
     }
 }
