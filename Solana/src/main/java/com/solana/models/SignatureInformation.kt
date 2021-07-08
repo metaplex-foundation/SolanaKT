@@ -4,8 +4,8 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class SignatureInformation(
-    private var err: Any?,
-    private val memo: Any?,
-    private val signature: String?,
-    private val slot: Long?
+    var err: Any?,
+    val memo: Any?,
+    val signature: String?,
+    val slot: Long?
 )

@@ -1,10 +1,9 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-class SimulatedTransaction(
+data class SimulatedTransaction(
     override val value: Value
 ) : RPC<SimulatedTransaction.Value>(null, value) {
 
