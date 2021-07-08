@@ -33,13 +33,13 @@ interface BorshOutput<Self> {
             val constructor = obj.javaClass.kotlin.constructors.first()
             val kotlinParameters = constructor.parameters
 
-            if (obj.javaClass.declaredFields.firstOrNull { !it.isAnnotationPresent(FieldOrder::class.java) } != null) {
-                throw java.lang.IllegalArgumentException("Serializing borsh data requires all fields to be annotated with @FieldOrder")
-            }
-
             val fields = obj.javaClass.declaredFields
                 .filter { kotlinParameters.map { kf -> kf.name }.contains(it.name) }
-                .sortedBy { field -> field.getAnnotation(FieldOrder::class.java).order }
+                .sortedBy { field ->
+                    val annotation = field.getAnnotation(FieldOrder::class.java)
+                    annotation?.order
+                        ?: throw java.lang.IllegalArgumentException("Serializing borsh data requires all fields to be annotated with @FieldOrder")
+                }
 
             for (field in fields) {
                 field.isAccessible = true
