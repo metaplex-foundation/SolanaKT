@@ -3,6 +3,9 @@ package com.solana.api
 import com.solana.core.PublicKey
 import com.solana.models.RPC
 import com.solana.models.buffer.BufferInfo
+import com.solana.networking.models.RpcResponse
+import com.squareup.moshi.Types
+import java.lang.reflect.Type
 
 fun <T>Api.getAccountInfo(account: PublicKey,
                                         decodeTo: Class<T>,
@@ -26,13 +29,19 @@ fun <T> Api.getAccountInfo(account: PublicKey,
     }
     params.add(account.toString())
     params.add(parameterMap)
-    router.request("getAccountInfo", params, decodeTo) { result ->
+
+    val type = Types.newParameterizedType(
+        RPC::class.java,
+        Types.newParameterizedType(
+            BufferInfo::class.java,
+            Type::class.java.cast(decodeTo)
+        )
+    )
+
+    router.request<RPC<BufferInfo<T>>>("getAccountInfo", params, type) { result ->
         result
             .map {
-                it as RPC<BufferInfo<*>>
-            }
-            .map {
-                it.value as BufferInfo<T>
+                it.value!!
             }
             .onSuccess {
                 onComplete(Result.success(it))

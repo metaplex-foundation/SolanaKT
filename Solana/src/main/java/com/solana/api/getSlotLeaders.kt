@@ -9,7 +9,7 @@ fun Api.getSlotLeaders(startSlot: Long,
     val params: MutableList<Any> = ArrayList()
     params.add(startSlot)
     params.add(limit)
-    router.request(
+    router.request<List<String>>(
         "getSlotLeaders", params,
         List::class.java
     ){ result ->
