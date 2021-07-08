@@ -1,17 +1,11 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class BlockConfig (
-    @Json(name = "encoding")
+@JsonClass(generateAdapter = true)
+data class BlockConfig (
     val encoding: String = "json",
-
-    @Json(name = "transactionDetails")
     val transactionDetails: String = "full",
-
-    @Json(name = "rewards")
     val rewards: Boolean = true,
-
-    @Json(name = "commitment")
     val commitment: String = "finalized"
 )

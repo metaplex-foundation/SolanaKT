@@ -16,7 +16,7 @@ class SimulatedTransaction(
 }
 
 @JsonClass(generateAdapter = true)
-class SimulatedAccount(
+data class SimulatedAccount(
     override val value: Value
 ) : RPC<SimulatedAccount.Value>(null, value) {
 

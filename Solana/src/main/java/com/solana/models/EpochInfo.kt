@@ -1,20 +1,12 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class EpochInfo (
-    @Json(name = "absoluteSlot")
+@JsonClass(generateAdapter = true)
+data class EpochInfo (
     val absoluteSlot: Long,
-
-    @Json(name = "blockHeight")
     val blockHeight: Long,
-
-    @Json(name = "epoch")
     val epoch: Long,
-
-    @Json(name = "slotIndex")
     val slotIndex: Long,
-
-    @Json(name = "slotsInEpoch")
     val slotsInEpoch: Long
 )

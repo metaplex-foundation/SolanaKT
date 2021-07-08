@@ -5,7 +5,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-class ClusterNode(
+data class ClusterNode(
     var pubkey: PublicKey,
     var gossip: String?,
     var tpu: String?,

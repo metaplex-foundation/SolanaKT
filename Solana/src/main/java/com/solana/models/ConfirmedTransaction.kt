@@ -2,95 +2,62 @@ package com.solana.models
 
 import com.solana.models.TokenResultObjects.TokenAmountInfo
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class ConfirmedTransaction(
-    @Json(name = "meta") val meta: Meta?,
-    @Json(name = "slot") val slot: Long?,
-    @Json(name = "transaction") val transaction: Transaction?,
+@JsonClass(generateAdapter = true)
+data class ConfirmedTransaction(
+    val meta: Meta?,
+    val slot: Long?,
+    val transaction: Transaction?,
 ) {
-    class Header (
-        @Json(name = "numReadonlySignedAccounts")
+    @JsonClass(generateAdapter = true)
+    data class Header (
         val numReadonlySignedAccounts: Long,
-
-        @Json(name = "numReadonlyUnsignedAccounts")
         val numReadonlyUnsignedAccounts: Long,
-
-        @Json(name = "numRequiredSignatures")
         val numRequiredSignatures: Long
     )
 
-    class Instruction (
-        @Json(name = "accounts")
+    @JsonClass(generateAdapter = true)
+    data class Instruction (
         val accounts: List<Long>?,
-
-        @Json(name = "data")
         val data: String?,
-
-        @Json(name = "programIdIndex")
         val programIdIndex: Long
     )
-
-    class Message (
-        @Json(name = "accountKeys")
+    @JsonClass(generateAdapter = true)
+    data class Message (
         val accountKeys: List<String>,
-
-        @Json(name = "header")
         val header: Header,
-
-        @Json(name = "instructions")
         val instructions: List<Instruction>,
-
-        @Json(name = "recentBlockhash")
         val recentBlockhash: String
     )
 
-    class Status (
-        @Json(name = "Ok")
+    @JsonClass(generateAdapter = true)
+    data class Status (
         val ok: Any?
     )
 
-    class TokenBalance (
-        @Json(name = "accountIndex")
+    @JsonClass(generateAdapter = true)
+    data class TokenBalance (
         val accountIndex: Double,
-
-        @Json(name = "mint")
         val mint: String,
-
-        @Json(name = "uiTokenAmount")
         val uiTokenAmount: TokenAmountInfo
     )
 
-    class Meta (
-        @Json(name = "err")
+    @JsonClass(generateAdapter = true)
+    data class Meta (
         val err: Any?,
-
-        @Json(name = "fee")
         val fee: Long,
-
-        @Json(name = "innerInstructions")
         val innerInstructions: List<Any>,
-
-        @Json(name = "preTokenBalances")
         val preTokenBalances: List<TokenBalance>,
-
-        @Json(name = "postTokenBalances")
         val postTokenBalances: List<TokenBalance>,
-
-        @Json(name = "postBalances")
         val postBalances: List<Long>,
-
-        @Json(name = "preBalances")
         val preBalances: List<Long>,
-
-        @Json(name = "status")
         val status: Status
     )
 
-    class Transaction (
-        @Json(name = "message")
+    @JsonClass(generateAdapter = true)
+    data class Transaction (
         val message: ConfirmedTransaction.Message,
-
-        @Json(name = "signatures")
         val signatures: List<String>,
     )
 }

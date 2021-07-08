@@ -1,20 +1,12 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class EpochSchedule (
-    @Json(name = "slotsPerEpoch")
+@JsonClass(generateAdapter = true)
+data class EpochSchedule (
     val slotsPerEpoch: Long,
-
-    @Json(name = "leaderScheduleSlotOffset")
     val leaderScheduleSlotOffset: Long,
-
-    @Json(name = "warmup")
     val warmup: Boolean,
-
-    @Json(name = "firstNormalEpoch")
     val firstNormalEpoch: Long,
-
-    @Json(name = "firstNormalSlot")
     val firstNormalSlot: Long
 )

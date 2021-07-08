@@ -4,7 +4,7 @@ import com.solana.models.buffer.BufferInfo
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-class TokenAccountInfo(
+data class TokenAccountInfo(
     override val value: List<Value>? = null
 ) : RPC<List<TokenAccountInfo.Value>>(null, value) {
     @JsonClass(generateAdapter = true)

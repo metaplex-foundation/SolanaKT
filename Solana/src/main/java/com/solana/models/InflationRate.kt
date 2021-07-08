@@ -1,17 +1,11 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class InflationRate {
-    @Json(name = "total")
-    private val total = 0f
-
-    @Json(name = "validator")
-    private val validator = 0f
-
-    @Json(name = "foundation")
-    private val foundation = 0f
-
-    @Json(name = "epoch")
-    private val epoch: Long = 0
-}
+@JsonClass(generateAdapter = true)
+data class InflationRate (
+    val total: Float,
+    val validator: Float,
+    val foundation: Float,
+    val epoch: Long
+)

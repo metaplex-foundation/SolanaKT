@@ -1,10 +1,9 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-class RecentBlockhash(
+data class RecentBlockhash(
     override val value: Value
 ) : RPC<RecentBlockhash.Value>(null, value) {
     @JsonClass(generateAdapter = true)

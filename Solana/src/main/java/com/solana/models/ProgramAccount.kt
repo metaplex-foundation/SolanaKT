@@ -6,7 +6,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-class ProgramAccount<T: BorshCodable>(
+data class ProgramAccount<T: BorshCodable>(
     @Json(name = "account") val account: BufferInfo<T>,
     @Json(name = "pubkey")  val pubkey: String
 )

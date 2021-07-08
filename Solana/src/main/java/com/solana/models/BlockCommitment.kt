@@ -1,10 +1,9 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class BlockCommitment(
-    @Json(name = "commitment")
+@JsonClass(generateAdapter = true)
+data class BlockCommitment(
     var commitment: LongArray?,
-    @Json(name = "totalStake")
     var totalStake: Long
 )
