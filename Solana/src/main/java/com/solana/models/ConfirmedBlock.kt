@@ -1,20 +1,12 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class ConfirmedBlock (
-    @Json(name = "blockTime")
+@JsonClass(generateAdapter = true)
+data class ConfirmedBlock (
     val blockTime: Long,
-
-    @Json(name = "blockhash")
     val blockhash: String?,
-
-    @Json(name = "parentSlot")
     val parentSlot:Long,
-
-    @Json(name = "previousBlockhash")
     val previousBlockhash: String?,
-
-    @Json(name = "transactions")
     val transactions: List<ConfirmedTransaction>?
 )

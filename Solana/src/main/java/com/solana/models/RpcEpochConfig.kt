@@ -1,8 +1,9 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class RpcEpochConfig(
-    @Json(name = "epoch") val epoch: Long,
-    @Json(name = "commitment") val commitment: String?
+@JsonClass(generateAdapter = true)
+data class RpcEpochConfig(
+    val epoch: Long,
+    val commitment: String?
 )

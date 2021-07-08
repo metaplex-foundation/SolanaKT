@@ -1,20 +1,12 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-class SimulateTransactionConfig (
-    @Json(name = "encoding")
+@JsonClass(generateAdapter = true)
+data class SimulateTransactionConfig (
     var encoding: RpcSendTransactionConfig.Encoding = RpcSendTransactionConfig.Encoding.base64,
-
-    @Json(name = "accounts")
     var accounts: Map<String, *>? = null,
-
-    @Json(name = "commitment")
     val commitment: String = "finalized",
-
-    @Json(name = "sigVerify")
     val sigVerify: Boolean = false,
-
-    @Json(name = "replaceRecentBlockhash")
     var replaceRecentBlockhash: Boolean = false
 )
