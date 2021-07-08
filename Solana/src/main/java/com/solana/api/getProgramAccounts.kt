@@ -2,8 +2,11 @@ package com.solana.api
 
 import com.solana.core.PublicKey
 import com.solana.models.*
+import com.solana.models.buffer.BufferInfo
 import com.solana.vendor.borshj.Borsh
 import com.solana.vendor.borshj.BorshCodable
+import com.squareup.moshi.Types
+import java.lang.reflect.Type
 import java.util.function.Consumer
 
 fun <T: BorshCodable>Api.getProgramAccounts(
@@ -37,19 +40,18 @@ private fun <T: BorshCodable> Api.getProgramAccounts(
     if (programAccountConfig != null) {
         params.add(programAccountConfig)
     }
-    router.request<List<Map<String, Any>>>(
+    val type = Types.newParameterizedType(
+        List::class.java,
+        Types.newParameterizedType(
+            ProgramAccount::class.java,
+            Type::class.java.cast(decodeTo)
+        )
+    )
+    router.request<List<ProgramAccount<T>>>(
         "getProgramAccounts", params,
-        List::class.java
+        type
     ){ result ->
-        result.map{
-            it.map { item -> item as Map<String, Any> }
-        }.map{
-            val result: MutableList<ProgramAccount<T>> = ArrayList()
-            for (item in it) {
-                result.add(ProgramAccount(item, decodeTo))
-            }
-            result
-        }.onSuccess {
+        result.onSuccess {
             onComplete(Result.success(it))
         }.onFailure {
             onComplete(Result.failure(it))
@@ -77,19 +79,20 @@ fun <T :BorshCodable> Api.getProgramAccounts(
     filters.add(DataSize(dataSize.toLong()))
     val programAccountConfig = ProgramAccountConfig(filters = filters)
     params.add(programAccountConfig)
-    router.request<List<Map<String, Any>>>(
+
+    val type = Types.newParameterizedType(
+        List::class.java,
+        Types.newParameterizedType(
+            ProgramAccount::class.java,
+            Type::class.java.cast(decodeTo)
+        )
+    )
+
+    router.request<List<ProgramAccount<T>>>(
         "getProgramAccounts", params,
-        List::class.java
+        type
     ) { result ->
-        result.map{
-            it.map { item -> item as Map<String, Any> }
-        }.map{
-            val result: MutableList<ProgramAccount<T>> = ArrayList()
-            for (item in it) {
-                result.add(ProgramAccount(item, decodeTo))
-            }
-            result
-        }.onSuccess {
+        result.onSuccess {
             onComplete(Result.success(it))
         }.onFailure {
             onComplete(Result.failure(it))
@@ -112,21 +115,22 @@ fun <T :BorshCodable>Api.getProgramAccounts(account: PublicKey,
             )
         )
     })
+
+    val type = Types.newParameterizedType(
+        List::class.java,
+        Types.newParameterizedType(
+            ProgramAccount::class.java,
+            Type::class.java.cast(decodeTo)
+        )
+    )
+
     val programAccountConfig = ProgramAccountConfig(filters = filters)
     params.add(programAccountConfig)
-    router.request<List<Map<String, Any>>>(
+    router.request<List<ProgramAccount<T>>>(
         "getProgramAccounts", params,
-        List::class.java
+        type
     ){ result ->
-        result.map{
-            it.map { item -> item as Map<String, Any> }
-        }.map{
-            val result: MutableList<ProgramAccount<T>> = ArrayList()
-            for (item in it) {
-                result.add(ProgramAccount(item, decodeTo))
-            }
-            result
-        }.onSuccess {
+        result.onSuccess {
             onComplete(Result.success(it))
         }.onFailure {
             onComplete(Result.failure(it))
