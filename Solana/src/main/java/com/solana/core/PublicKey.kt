@@ -33,11 +33,9 @@ class PublicKeyRule(
 }
 
 @JsonClass(generateAdapter = true)
-data class PublicKey(val tempKey: ByteArray) : BorshCodable {
-    val pubkey: ByteArray
+data class PublicKey(val pubkey: ByteArray) : BorshCodable {
     init{
-        require(tempKey.size <= PUBLIC_KEY_LENGTH) { "Invalid public key input" }
-        this.pubkey = tempKey
+        require(pubkey.size <= PUBLIC_KEY_LENGTH) { "Invalid public key input" }
     }
     constructor(pubkeyString: String) : this(Base58.decode(pubkeyString))
 
