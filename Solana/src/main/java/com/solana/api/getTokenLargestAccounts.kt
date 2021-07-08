@@ -1,26 +1,27 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
+import com.solana.models.RPC
 import com.solana.models.TokenResultObjects
+import com.squareup.moshi.Types
 
 fun Api.getTokenLargestAccounts(tokenMint: PublicKey,
                             onComplete: (Result<List<TokenResultObjects.TokenAccount>>) -> Unit) {
     val params: MutableList<Any> = ArrayList()
     params.add(tokenMint.toString())
-    router.request<Map<String, Any>>(
+    val type = Types.newParameterizedType(
+        RPC::class.java,
+        Types.newParameterizedType(
+            List::class.java,
+            TokenResultObjects.TokenAccount::class.java
+        )
+    )
+    router.request<RPC<List<TokenResultObjects.TokenAccount>>>(
         "getTokenLargestAccounts", params,
-        Map::class.java
+        type
     ){ result ->
         result.map {
-            it["value"] as List<*>
-        }.map {
-            it.map { item -> item as Map<String, Any> }
-        }.map {
-            val list: MutableList<TokenResultObjects.TokenAccount> = ArrayList()
-            for (item in (it)) {
-                list.add(TokenResultObjects.TokenAccount(item))
-            }
-            list
+            it.value!!
         }.onSuccess {
             onComplete(Result.success(it))
         }.onFailure {

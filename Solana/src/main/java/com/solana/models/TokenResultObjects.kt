@@ -9,14 +9,7 @@ class TokenResultObjects {
         @Json(name = "decimals") var decimals: Int,
         @Json(name = "uiAmount") var uiAmount: Double,
         @Json(name = "uiAmountString") var uiAmountString: String
-    ) {
-        constructor(am: Map<String, Any>) : this(
-            amount =  am["amount"] as String,
-            decimals = (am["decimals"] as Double).toInt(),
-            uiAmount = am["uiAmount"] as Double,
-            uiAmountString = am["uiAmountString"] as String
-        )
-    }
+    )
 
     class TokenAccount (
         @Json(name = "amount") val amount: String?,
@@ -24,15 +17,7 @@ class TokenResultObjects {
         @Json(name = "uiAmount") val uiAmount: Double?,
         @Json(name = "uiAmountString") val uiAmountString: String?,
         @Json(name = "address") val address: String?
-    ) {
-    constructor(am: Map<String, Any>) : this (
-            amount = am["amount"] as String,
-            decimals = (am["decimals"] as Double).toInt(),
-            uiAmount = am["uiAmount"] as Double,
-            uiAmountString = am["uiAmountString"] as String,
-            address = am["uiAmountString"] as String
-        )
-    }
+    )
 
     class TokenInfo (
         @Json(name = "isNative")
@@ -68,22 +53,5 @@ class TokenResultObjects {
 
         @Json(name = "space")
         private val space: Int? = null
-    )
-
-    class Value (
-        @Json(name = "data")
-        private val data: Data,
-
-        @Json(name = "executable")
-        private val executable: Boolean,
-
-        @Json(name = "lamports")
-        private val lamports: Long,
-
-        @Json(name = "owner")
-        private val owner: String,
-
-        @Json(name = "rentEpoch")
-        private val rentEpoch: Long = 0
     )
 }

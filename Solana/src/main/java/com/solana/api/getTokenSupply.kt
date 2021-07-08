@@ -1,21 +1,27 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
+import com.solana.models.RPC
 import com.solana.models.TokenResultObjects
+import com.solana.models.buffer.BufferInfo
+import com.squareup.moshi.Types
+import java.lang.reflect.Type
 
 fun Api.getTokenSupply(tokenMint: PublicKey,
                    onComplete: (Result<TokenResultObjects.TokenAmountInfo>) -> Unit) {
     val params: MutableList<Any> = ArrayList()
     params.add(tokenMint.toString())
-    router.request<Map<String, Any>>(
+    val type = Types.newParameterizedType(
+        RPC::class.java,
+        TokenResultObjects.TokenAmountInfo::class.java
+    )
+    router.request<RPC<TokenResultObjects.TokenAmountInfo>>(
         "getTokenSupply",
         params,
-        Map::class.java
+        type
     ){ result ->
         result.map {
-            it["value"]  as Map<String, Any>
-        }.map {
-            TokenResultObjects.TokenAmountInfo(it)
+            it.value!!
         }.onSuccess {
             onComplete(Result.success(it))
         }.onFailure {

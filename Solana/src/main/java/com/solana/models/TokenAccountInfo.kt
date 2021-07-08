@@ -1,5 +1,6 @@
 package com.solana.models
 
+import com.solana.models.buffer.BufferInfo
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
@@ -8,7 +9,7 @@ class TokenAccountInfo(
 ) : RPC<List<TokenAccountInfo.Value>>(null, value) {
     @JsonClass(generateAdapter = true)
     class Value(
-        val account: TokenResultObjects.Value? = null,
+        val account: BufferInfo<TokenResultObjects.Data>? = null,
         val pubkey: String? = null
     )
 }
