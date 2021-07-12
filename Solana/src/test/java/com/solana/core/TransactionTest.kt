@@ -3,9 +3,9 @@ package com.solana.core
 import com.solana.programs.MemoProgram.writeUtf8
 import com.solana.programs.SystemProgram
 import org.bitcoinj.core.Base58
-import org.java_websocket.util.Base64
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.util.*
 
 
 class TransactionTest {
@@ -20,9 +20,10 @@ class TransactionTest {
         transaction.sign(signer)
         val serializedTransaction: ByteArray = transaction.serialize()
 
+
         assertEquals(
             "ASdDdWBaKXVRA+6flVFiZokic9gK0+r1JWgwGg/GJAkLSreYrGF4rbTCXNJvyut6K6hupJtm72GztLbWNmRF1Q4BAAEDBhrZ0FOHFUhTft4+JhhJo9+3/QL6vHWyI8jkatuFPQzrerzQ2HXrwm2hsYGjM5s+8qMWlbt6vbxngnO8rc3lqgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAy+KIwZmU8DLmYglP3bPzrlpDaKkGu6VIJJwTOYQmRfUBAgIAAQwCAAAAuAsAAAAAAAA=",
-            Base64.encodeBytes(serializedTransaction)
+            Base64.getEncoder().encodeToString(serializedTransaction)
         )
     }
 
@@ -41,7 +42,7 @@ class TransactionTest {
             .build()
         assertEquals(
             "AV6w4Af9PSHhNsTSal4vlPF7Su9QXgCVyfDChHImJITLcS5BlNotKFeMoGw87VwjS3eNA2JCL+MEoReynCNbWAoBAAECBhrZ0FOHFUhTft4+JhhJo9+3/QL6vHWyI8jkatuFPQwFSlNQ+F3IgtYUpVZyeIopbd8eq6vQpgZ4iEky9O72oMviiMGZlPAy5mIJT92z865aQ2ipBrulSCScEzmEJkX1AQEBAAlUZXN0IG1lbW8=",
-            Base64.encodeBytes(transaction.serialize())
+            Base64.getEncoder().encodeToString(transaction.serialize())
         )
     }
 

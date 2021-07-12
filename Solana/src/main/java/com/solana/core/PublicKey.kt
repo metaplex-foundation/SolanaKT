@@ -53,9 +53,7 @@ data class PublicKey(val pubkey: ByteArray) : BorshCodable {
 
     override fun hashCode(): Int {
         var result = 17
-        if (pubkey != null) {
-            result = 31 * result + Arrays.hashCode(pubkey)
-        }
+        result = 31 * result + Arrays.hashCode(pubkey)
         return result
     }
 
@@ -75,7 +73,7 @@ data class PublicKey(val pubkey: ByteArray) : BorshCodable {
     companion object {
         const val PUBLIC_KEY_LENGTH = 32
 
-        fun readPubkey(bytes: ByteArray?, offset: Int): PublicKey {
+        fun readPubkey(bytes: ByteArray, offset: Int): PublicKey {
             val buf = ByteUtils.readBytes(bytes, offset, PUBLIC_KEY_LENGTH)
             return PublicKey(buf)
         }

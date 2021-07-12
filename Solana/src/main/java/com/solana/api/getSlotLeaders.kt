@@ -16,8 +16,6 @@ fun Api.getSlotLeaders(startSlot: Long,
         result.map {
             it.filterNotNull()
         }.map {
-            it.map { item -> item as String }
-        }.map {
             val list: MutableList<PublicKey> = ArrayList()
             for (item in it) {
                 list.add(PublicKey(item))

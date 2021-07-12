@@ -38,7 +38,7 @@ object SystemProgram : Program() {
         Utils.uint32ToByteArrayLE(PROGRAM_INDEX_CREATE_ACCOUNT.toLong(), data, 0)
         Utils.int64ToByteArrayLE(lamports, data, 4)
         Utils.int64ToByteArrayLE(space, data, 12)
-        System.arraycopy(programId.toByteArray()!!, 0, data, 20, 32)
+        System.arraycopy(programId.toByteArray(), 0, data, 20, 32)
         return createTransactionInstruction(PROGRAM_ID, keys, data)
     }
 }

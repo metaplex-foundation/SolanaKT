@@ -71,9 +71,6 @@ object HdUtil {
      * @param array an byte array
      */
     fun reverse(array: ByteArray) {
-        if (array == null) {
-            return
-        }
         var i = 0
         var j = array.size - 1
         var tmp: Byte

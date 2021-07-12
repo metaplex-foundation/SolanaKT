@@ -5,6 +5,7 @@ import java.math.BigInteger
 import java.nio.charset.StandardCharsets
 import java.util.*
 
+@Suppress("UNCHECKED_CAST")
 interface BorshOutput<Self> {
     fun write(borsh: Borsh, obj: Any): Self {
         val rule: BorshRule<*>? = borsh.getRules().firstOrNull { it.clazz == obj.javaClass }
@@ -43,11 +44,14 @@ interface BorshOutput<Self> {
 
             for (field in fields) {
                 field.isAccessible = true
-                this.write(borsh, field[obj])
+                field[obj]?.let {
+                    this.write(borsh, it)
+                }
             }
         } catch (error: IllegalAccessException) {
             throw RuntimeException(error)
         }
+
 
         return this as Self
     }

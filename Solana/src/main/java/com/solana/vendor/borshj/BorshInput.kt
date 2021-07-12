@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 import kotlin.reflect.KClass
 
+@Suppress("UNCHECKED_CAST")
 interface BorshInput {
     fun <T> read(borsh: Borsh, klass: Class<*>): T {
         val rule = borsh.getRules().firstOrNull { it.clazz == klass }

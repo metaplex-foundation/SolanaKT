@@ -84,7 +84,7 @@ class Message {
         val out = ByteBuffer.allocate(bufferSize)
         val accountKeysBuff = ByteBuffer.allocate(accountKeysSize * PublicKey.PUBLIC_KEY_LENGTH)
         for (accountMeta in keysList) {
-            accountKeysBuff.put(accountMeta.publicKey.toByteArray()!!)
+            accountKeysBuff.put(accountMeta.publicKey.toByteArray())
             if (accountMeta.isSigner) {
                 messageHeader.numRequiredSignatures = (messageHeader.numRequiredSignatures.plus(1)).toByte()
                 if (!accountMeta.isWritable) {

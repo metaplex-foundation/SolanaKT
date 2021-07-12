@@ -15,7 +15,7 @@ object Hash {
      * @return sha256(input)
      */
     @JvmStatic
-    fun sha256(input: ByteArray?): ByteArray {
+    fun sha256(input: ByteArray): ByteArray {
         return try {
             val digest = MessageDigest.getInstance("SHA-256")
             digest.digest(input)
@@ -49,7 +49,7 @@ object Hash {
      * @return h160(input)
      */
     @JvmStatic
-    fun h160(input: ByteArray?): ByteArray {
+    fun h160(input: ByteArray): ByteArray {
         val sha256 = sha256(input)
         val digest = RIPEMD160Digest()
         digest.update(sha256, 0, sha256.size)
