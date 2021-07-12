@@ -19,9 +19,9 @@ class BorshWriter(stream: OutputStream) : BorshOutput<BorshWriter?>, Closeable, 
         stream.flush()
     }
 
-    override fun write(array: ByteArray): BorshWriter {
+    override fun write(bytes: ByteArray): BorshWriter {
         return try {
-            stream.write(array)
+            stream.write(bytes)
             this
         } catch (error: IOException) {
             throw RuntimeException(error)

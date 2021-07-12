@@ -13,18 +13,18 @@ object ByteUtils {
     const val UINT_64_LENGTH = 8
     val HEX_ARRAY = "0123456789ABCDEF".toCharArray()
     @JvmStatic
-    fun readBytes(buf: ByteArray?, offset: Int, length: Int): ByteArray {
+    fun readBytes(buf: ByteArray, offset: Int, length: Int): ByteArray {
         val b = ByteArray(length)
         System.arraycopy(buf, offset, b, 0, length)
         return b
     }
 
     @JvmStatic
-    fun readUint64(buf: ByteArray?, offset: Int): BigInteger {
+    fun readUint64(buf: ByteArray, offset: Int): BigInteger {
         return BigInteger(Utils.reverseBytes(readBytes(buf, offset, UINT_64_LENGTH)))
     }
 
-    fun readUint64Price(buf: ByteArray?, offset: Int): BigInteger {
+    fun readUint64Price(buf: ByteArray, offset: Int): BigInteger {
         return BigInteger(readBytes(buf, offset, UINT_64_LENGTH))
     }
 
