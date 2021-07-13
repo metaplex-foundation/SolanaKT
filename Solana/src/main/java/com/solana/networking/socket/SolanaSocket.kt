@@ -1,6 +1,7 @@
 package com.solana.networking.socket
 
-import android.util.Log
+import com.solana.core.PublicKey
+import com.solana.core.PublicKeyJsonAdapter
 import com.solana.core.PublicKeyRule
 import com.solana.models.buffer.AccountInfoRule
 import com.solana.models.buffer.MintRule
@@ -11,7 +12,7 @@ import com.solana.models.buffer.moshi.TokenSwapInfoJsonAdapter
 import com.solana.networking.RPCEndpoint
 import com.solana.networking.models.RpcRequest
 import com.solana.networking.models.RpcResponse
-import com.solana.networking.socket.models.SocketMethod
+import com.solana.networking.socket.models.*
 import com.solana.vendor.borshj.Borsh
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -28,12 +29,12 @@ sealed class SolanaSocketError: Exception() {
 
 interface SolanaSocketEventsDelegate {
     fun connected()
-    fun accountNotification()
-    fun programNotification()
-    fun signatureNotification()
-    fun logsNotification()
+    fun accountNotification(notification: RpcResponse<AccountNotification<List<String>>>)
+    fun programNotification(notification: RpcResponse<ProgramNotification<List<String>>>)
+    fun signatureNotification(notification: RpcResponse<SignatureNotification>)
+    fun logsNotification(notification: RpcResponse<LogsNotification>)
     fun unsubscribed(id: String)
-    fun subscribed(socketId: Long, id: String)
+    fun subscribed(socketId: Int, id: String)
     fun disconnecting(code: Int, reason: String)
     fun disconnected(code: Int, reason: String)
     fun error(error: Exception)
@@ -55,6 +56,7 @@ class SolanaSocket(
     }
     private val moshi: Moshi by lazy {
         Moshi.Builder()
+            .add(PublicKeyJsonAdapter())
             .add(MintJsonAdapter(borsh()))
             .add(TokenSwapInfoJsonAdapter(borsh()))
             .add(AccountInfoJsonAdapter(borsh()))
@@ -80,6 +82,38 @@ class SolanaSocket(
         return writeToSocket(rpcRequest)
     }
 
+    fun accountUnSubscribe(socketId: Int): Result<String> {
+        val params: MutableList<Any> = ArrayList()
+        params.add(socketId)
+        val rpcRequest = RpcRequest(SocketMethod.accountUnsubscribe.string, params)
+        return writeToSocket(rpcRequest)
+    }
+
+    fun logsSubscribe(mentions: List<String>): Result<String> {
+        val params: MutableList<Any> = ArrayList()
+        params.add(mapOf("mentions" to mentions))
+        params.add(mapOf("encoding" to "base64", "commitment" to "recent"))
+        val rpcRequest = RpcRequest(SocketMethod.logsSubscribe.string, params)
+        return writeToSocket(rpcRequest)
+    }
+
+    fun logsSubscribeAll(): Result<String> {
+        val params: MutableList<Any> = ArrayList()
+        params.add("all")
+        params.add(mapOf("encoding" to "base64", "commitment" to "recent"))
+        val rpcRequest = RpcRequest(SocketMethod.logsSubscribe.string, params)
+        return writeToSocket(rpcRequest)
+    }
+
+    fun logsUnsubscribe(socketId: Int): Result<String> {
+        val params: MutableList<Any> = ArrayList()
+        params.add(socketId)
+        val rpcRequest = RpcRequest(SocketMethod.logsUnsubscribe.string, params)
+        return writeToSocket(rpcRequest)
+    }
+
+
+
     fun writeToSocket(request: RpcRequest): Result<String> {
         val rpcRequestJsonAdapter = moshi.adapter(RpcRequest::class.java)
         val json = rpcRequestJsonAdapter.toJson(request)
@@ -88,48 +122,102 @@ class SolanaSocket(
     }
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
-        if(enableDebugLogs) { Log.d(TAG, "connected")}
+        if(enableDebugLogs) { println(TAG + " connected")}
         delegate?.connected()
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
 
-        if(enableDebugLogs) { Log.d(TAG, "text: $text")}
+        if(enableDebugLogs) { println(TAG + " text: $text")}
         val responseJsonAdapter = moshi.adapter(Map::class.java)
         try {
-            val methodString = responseJsonAdapter.fromJson(text)?.get("method")
+            val dictJson = responseJsonAdapter.fromJson(text)
+            val methodString = dictJson?.get("method")
             methodString?.let {
                 when(it){
                     SocketMethod.accountNotification.string -> {
-                        delegate?.accountNotification()
+                        val subscriptionAdapter: JsonAdapter<RpcResponse<AccountNotification<List<String>>>> = moshi.adapter(
+                            Types.newParameterizedType(
+                                RpcResponse::class.java,
+                                Types.newParameterizedType(
+                                    AccountNotification::class.java,
+                                    Types.newParameterizedType(
+                                        List::class.java,
+                                        String::class.java
+                                    )
+                                )
+                            )
+                        )
+                        subscriptionAdapter.fromJson(text)?.let {
+                            delegate?.accountNotification(it)
+                        }
                     }
                     SocketMethod.signatureNotification.string -> {
-                        delegate?.signatureNotification()
+                        val subscriptionAdapter: JsonAdapter<RpcResponse<SignatureNotification>> = moshi.adapter(
+                            Types.newParameterizedType(
+                                RpcResponse::class.java,
+                                SignatureNotification::class.java
+                            )
+                        )
+                        subscriptionAdapter.fromJson(text)?.let {
+                            delegate?.signatureNotification(it)
+                        }
                     }
                     SocketMethod.logsNotification.string -> {
-                        delegate?.logsNotification()
+                        val subscriptionAdapter: JsonAdapter<RpcResponse<LogsNotification>> = moshi.adapter(
+                            Types.newParameterizedType(
+                                RpcResponse::class.java,
+                                LogsNotification::class.java
+                            )
+                        )
+                        subscriptionAdapter.fromJson(text)?.let {
+                            delegate?.logsNotification(it)
+                        }
                     }
                     SocketMethod.programNotification.string -> {
-                        delegate?.programNotification()
+                        val subscriptionAdapter: JsonAdapter<RpcResponse<ProgramNotification<List<String>>>> = moshi.adapter(
+                            Types.newParameterizedType(
+                                RpcResponse::class.java,
+                                Types.newParameterizedType(
+                                    ProgramNotification::class.java,
+                                    Types.newParameterizedType(
+                                        List::class.java,
+                                        String::class.java
+                                    )
+                                )
+                            )
+                        )
+                        subscriptionAdapter.fromJson(text)?.let {
+                            delegate?.programNotification(it)
+                        }
+
                     }
                     else -> { }
                 }
             } ?: run {
-                val subscriptionAdapter: JsonAdapter<RpcResponse<Int>> = moshi.adapter(
-                    Types.newParameterizedType(
-                        RpcResponse::class.java,
-                        Int::class.javaObjectType
+                if(dictJson?.get("result") is Double) {
+                    val subscriptionAdapter: JsonAdapter<RpcResponse<Int>> = moshi.adapter(
+                        Types.newParameterizedType(
+                            RpcResponse::class.java,
+                            Int::class.javaObjectType
+                        )
                     )
-                )
-                val subscription = subscriptionAdapter.fromJson(text)
+                    subscriptionAdapter.fromJson(text)?.let {
+                        delegate?.subscribed(it.result!!, it.id!!)
+                    }
+                }
 
-                val unSubscriptionAdapter: JsonAdapter<RpcResponse<Boolean>> = moshi.adapter(
-                    Types.newParameterizedType(
-                        RpcResponse::class.java,
-                        Boolean::class.javaObjectType
+                if(responseJsonAdapter.fromJson(text)?.get("result") is Boolean){
+                    val unSubscriptionAdapter: JsonAdapter<RpcResponse<Boolean>> = moshi.adapter(
+                        Types.newParameterizedType(
+                            RpcResponse::class.java,
+                            Boolean::class.javaObjectType
+                        )
                     )
-                )
-                val unSubscription = unSubscriptionAdapter.fromJson(text)
+                    val unSubscription = unSubscriptionAdapter.fromJson(text)?.let {
+                        delegate?.unsubscribed(it.id!!)
+                    }
+                }
             }
 
         } catch (error: java.lang.Exception){
@@ -138,22 +226,22 @@ class SolanaSocket(
     }
 
     override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-        if(enableDebugLogs) { Log.d(TAG, "bytes")}
+        if(enableDebugLogs) { println(TAG + " bytes")}
 
     }
 
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-        if(enableDebugLogs) { Log.d(TAG, "closing")}
+        if(enableDebugLogs) { println(TAG + " closing")}
         delegate?.disconnecting(code, reason)
     }
 
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-        if(enableDebugLogs) { Log.d(TAG, "closed")}
+        if(enableDebugLogs) { println(TAG + " closed")}
         delegate?.disconnected(code, reason)
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-        if(enableDebugLogs) { Log.d(TAG, "failure")}
+        if(enableDebugLogs) { println(TAG + " failure")}
         delegate?.error(Exception(t))
     }
 }

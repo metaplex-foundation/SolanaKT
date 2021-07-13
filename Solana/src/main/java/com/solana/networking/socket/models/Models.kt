@@ -75,3 +75,10 @@ data class  ResponseErrorData (
     // public let err: ResponseErrorDataError
     val logs: List<String>
 )
+
+@JsonClass(generateAdapter = true)
+data class LogsNotification (
+    val signature: String,
+    val logs: List<String>,
+    val err: ResponseError?
+)
