@@ -1,5 +1,6 @@
 package com.solana.networking
 
+import com.solana.core.PublicKeyJsonAdapter
 import com.solana.core.PublicKeyRule
 import com.solana.models.RPC
 import com.solana.models.buffer.AccountInfoRule
@@ -29,7 +30,7 @@ sealed class NetworkingError(override val message: String?) : Exception(message)
 }
 
 class NetworkingRouter(
-    private val endpoint: RPCEndpoint,
+    val endpoint: RPCEndpoint,
     private val httpClient: OkHttpClient = OkHttpClient()
 ) {
 
@@ -41,6 +42,7 @@ class NetworkingRouter(
 
     private val moshi: Moshi by lazy{
         Moshi.Builder()
+            .add(PublicKeyJsonAdapter())
             .add(MintJsonAdapter(borsh()))
             .add(TokenSwapInfoJsonAdapter(borsh()))
             .add(AccountInfoJsonAdapter(borsh()))

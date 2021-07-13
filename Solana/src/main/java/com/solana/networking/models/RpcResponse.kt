@@ -1,5 +1,6 @@
 package com.solana.networking.models
 
+import com.solana.models.RPC
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
@@ -13,5 +14,13 @@ class RpcResponse<T>(
     val error: RPCError?,
     val jsonrpc: String?,
     val id: String?,
-    val result: T?
+    val result: T?,
+
+    // Socket
+    val params: Params<T>?
+)
+
+class Params<T> (
+    val result: RPC<T>?,
+    val subscription: Int
 )

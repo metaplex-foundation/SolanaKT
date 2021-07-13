@@ -1,11 +1,11 @@
 package com.solana.core
 
+import com.solana.models.buffer.Buffer
+import com.solana.models.buffer.Mint
 import com.solana.vendor.ByteUtils
 import com.solana.vendor.TweetNaclFast
-import com.solana.vendor.borshj.BorshCodable
-import com.solana.vendor.borshj.BorshInput
-import com.solana.vendor.borshj.BorshOutput
-import com.solana.vendor.borshj.BorshRule
+import com.solana.vendor.borshj.*
+import com.squareup.moshi.FromJson
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import org.bitcoinj.core.Base58
@@ -32,7 +32,6 @@ class PublicKeyRule(
     }
 }
 
-@JsonClass(generateAdapter = true)
 data class PublicKey(val pubkey: ByteArray) : BorshCodable {
     init{
         require(pubkey.size <= PUBLIC_KEY_LENGTH) { "Invalid public key input" }
@@ -127,5 +126,12 @@ data class PublicKey(val pubkey: ByteArray) : BorshCodable {
         fun valueOf(publicKey: String): PublicKey {
             return PublicKey(publicKey)
         }
+    }
+}
+
+class PublicKeyJsonAdapter {
+    @FromJson
+    fun fromJson(rawData: Any): PublicKey {
+        return PublicKey(rawData as String)
     }
 }
