@@ -112,7 +112,35 @@ class SolanaSocket(
         return writeToSocket(rpcRequest)
     }
 
+    fun programSubscribe(publicKey: String): Result<String> {
+        val params: MutableList<Any> = ArrayList()
+        params.add(publicKey)
+        params.add(mapOf("encoding" to "base64", "commitment" to "recent"))
+        val rpcRequest = RpcRequest(SocketMethod.programSubscribe.string, params)
+        return writeToSocket(rpcRequest)
+    }
 
+    fun programUnsubscribe(socketId: Int): Result<String> {
+        val params: MutableList<Any> = ArrayList()
+        params.add(socketId)
+        val rpcRequest = RpcRequest(SocketMethod.programUnsubscribe.string, params)
+        return writeToSocket(rpcRequest)
+    }
+
+    fun signatureSubscribe(signature: String): Result<String> {
+        val params: MutableList<Any> = ArrayList()
+        params.add(signature)
+        params.add(mapOf("encoding" to "base64", "commitment" to "recent"))
+        val rpcRequest = RpcRequest(SocketMethod.signatureSubscribe.string, params)
+        return writeToSocket(rpcRequest)
+    }
+
+    fun signatureUnsubscribe(socketId: Int): Result<String> {
+        val params: MutableList<Any> = ArrayList()
+        params.add(socketId)
+        val rpcRequest = RpcRequest(SocketMethod.signatureUnsubscribe.string, params)
+        return writeToSocket(rpcRequest)
+    }
 
     fun writeToSocket(request: RpcRequest): Result<String> {
         val rpcRequestJsonAdapter = moshi.adapter(RpcRequest::class.java)
@@ -214,7 +242,7 @@ class SolanaSocket(
                             Boolean::class.javaObjectType
                         )
                     )
-                    val unSubscription = unSubscriptionAdapter.fromJson(text)?.let {
+                    unSubscriptionAdapter.fromJson(text)?.let {
                         delegate?.unsubscribed(it.id!!)
                     }
                 }

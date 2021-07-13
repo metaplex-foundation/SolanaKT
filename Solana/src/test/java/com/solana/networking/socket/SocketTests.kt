@@ -208,7 +208,110 @@ class SocketTests {
         latch.await(20, TimeUnit.SECONDS)
     }
 
+    @Test
+    fun testSocketProgramSubscribe() {
+        val latch = CountDownLatch(2)
+        val delegate = MockSolanaLiveEventsDelegate()
+        var expected_id: String?
+        delegate.onConected = {
+            latch.countDown()
+            expected_id = socket.programSubscribe("9B5XszUGdMaxCZ7uSQhPzdks5ZQSmWxrmzCSvtJ6Ns6g").getOrThrow()
+        }
+        delegate.onSubscribed = { socketId: Int, id: String ->
+            latch.countDown()
+            Assert.assertEquals(id, id)
+            socket.stop()
+        }
+        socket.start(delegate)
+        latch.await(20, TimeUnit.SECONDS)
+    }
 
+    @Test
+    fun testSocketProgramUnSubscribe() {
+        val latch = CountDownLatch(3)
+        val delegate = MockSolanaLiveEventsDelegate()
+        var expected_id: String?
+        delegate.onConected = {
+            latch.countDown()
+            expected_id = socket.programSubscribe("9B5XszUGdMaxCZ7uSQhPzdks5ZQSmWxrmzCSvtJ6Ns6g").getOrThrow()
+        }
+        delegate.onSubscribed = { socketId: Int, id: String ->
+            latch.countDown()
+            socket.programUnsubscribe(socketId)
+            Assert.assertEquals(id, id)
+        }
+        delegate.onUnsubscribed = { id: String ->
+            latch.countDown()
+            Assert.assertNotNull(id)
+            socket.stop()
+        }
+        socket.start(delegate)
+        latch.await(20, TimeUnit.SECONDS)
+    }
+
+    @Test
+    fun testSocketProgramNotification() {
+        val latch = CountDownLatch(3)
+        val delegate = MockSolanaLiveEventsDelegate()
+        var expected_id: String? = null
+        delegate.onConected = {
+            latch.countDown()
+            expected_id = socket.programSubscribe("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").getOrThrow()
+        }
+
+        delegate.onSubscribed = { socketId: Int, id: String ->
+            latch.countDown()
+            Assert.assertEquals(expected_id, id)
+        }
+        delegate.onProgramNotification = { notification ->
+            latch.countDown()
+            Assert.assertNotNull(notification.params?.result)
+            socket.stop()
+        }
+        socket.start(delegate)
+        latch.await(20, TimeUnit.SECONDS)
+    }
+
+    @Test
+    fun testSocketSignatureSubscribe() {
+        val latch = CountDownLatch(2)
+        val delegate = MockSolanaLiveEventsDelegate()
+        var expected_id: String?
+        delegate.onConected = {
+            latch.countDown()
+            expected_id = socket.signatureSubscribe("Nfq1kEFqe5dBbTnprNZZVfnzvYJAKpUoibhYFBbaBXp37L7bAip89Qbs6mtiybQprY2GucMTgkxWPx81dNWh2Mh").getOrThrow()
+        }
+        delegate.onSubscribed = { socketId: Int, id: String ->
+            latch.countDown()
+            Assert.assertEquals(id, id)
+            socket.stop()
+        }
+        socket.start(delegate)
+        latch.await(20, TimeUnit.SECONDS)
+    }
+
+    @Test
+    fun testSocketSignatureUnSubscribe() {
+        val latch = CountDownLatch(3)
+        val delegate = MockSolanaLiveEventsDelegate()
+        var expected_id: String?
+        delegate.onConected = {
+            latch.countDown()
+            expected_id = socket.signatureSubscribe("Nfq1kEFqe5dBbTnprNZZVfnzvYJAKpUoibhYFBbaBXp37L7bAip89Qbs6mtiybQprY2GucMTgkxWPx81dNWh2Mh").getOrThrow()
+        }
+        delegate.onSubscribed = { socketId: Int, id: String ->
+            latch.countDown()
+            socket.signatureUnsubscribe(socketId)
+            Assert.assertEquals(id, id)
+        }
+        delegate.onUnsubscribed = { id: String ->
+            latch.countDown()
+            Assert.assertNotNull(id)
+            socket.stop()
+        }
+        socket.start(delegate)
+        latch.await(20, TimeUnit.SECONDS)
+    }
 
     @Test
     fun testSocketSubscription() {
