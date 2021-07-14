@@ -29,9 +29,10 @@ fun Action.getTokenWallets(
         val pubkeyValue = accountsValues.map { Pair(it.pubkey, it.account) }
         val wallets = pubkeyValue.map {
             val mintAddress = it.second.data!!.value!!.mint
-            Wallet(it.first, it.second.lamports.toLong(), true)
+            val token = this.supportedTokens.firstOrNull() { it.address == mintAddress.toBase58() } ?: Token.unsupported(mintAddress.toBase58())
+            Wallet(it.first, it.second.lamports, token, true)
         }
-        return@map wallets
+       wallets
     }.run(onComplete)
 }
 

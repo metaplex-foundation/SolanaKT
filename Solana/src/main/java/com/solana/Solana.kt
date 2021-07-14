@@ -9,9 +9,9 @@ import com.solana.vendor.TokensListParser
 
 class Solana(val router: NetworkingRouter){
     val api: Api = Api(router)
-    val action: Action = Action(api)
     val socket: SolanaSocket = SolanaSocket(router.endpoint)
     val supportedTokens: List<Token> by lazy {
         TokensListParser().parse(router.endpoint.network.name).getOrThrows()
     }
+    val action: Action = Action(api, supportedTokens)
 }
