@@ -40,7 +40,7 @@ class NetworkingRouter(
         return borsh
     }
 
-    private val moshi: Moshi by lazy{
+    private val moshi: Moshi by lazy {
         Moshi.Builder()
             .add(PublicKeyJsonAdapter())
             .add(MintJsonAdapter(borsh()))
