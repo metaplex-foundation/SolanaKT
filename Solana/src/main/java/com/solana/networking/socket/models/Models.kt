@@ -19,21 +19,6 @@ data class SocketSubscription(
 )
 
 @JsonClass(generateAdapter = true)
-data class AccountNotification<T>(
-    val data: T?,
-    val lamports: Long,
-    val owner: PublicKey,
-    val executable: Boolean,
-    val rentEpoch: Long
-)
-
-@JsonClass(generateAdapter = true)
-data class ProgramNotification<T> (
-    val pubkey: PublicKey,
-    val account: AccountNotification<T>
-)
-
-@JsonClass(generateAdapter = true)
 data class TokenAccountNotificationData (
     val program: String,
     val parsed: TokenAccountNotificationDataParsed
@@ -72,7 +57,6 @@ data class ResponseError (
 
 @JsonClass(generateAdapter = true)
 data class  ResponseErrorData (
-    // public let err: ResponseErrorDataError
     val logs: List<String>
 )
 
