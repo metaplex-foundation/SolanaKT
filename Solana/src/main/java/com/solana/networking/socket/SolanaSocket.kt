@@ -1,11 +1,9 @@
 package com.solana.networking.socket
 
-import com.solana.core.PublicKey
 import com.solana.core.PublicKeyJsonAdapter
 import com.solana.core.PublicKeyRule
-import com.solana.models.buffer.AccountInfoRule
-import com.solana.models.buffer.MintRule
-import com.solana.models.buffer.TokenSwapInfoRule
+import com.solana.models.ProgramAccount
+import com.solana.models.buffer.*
 import com.solana.models.buffer.moshi.AccountInfoJsonAdapter
 import com.solana.models.buffer.moshi.MintJsonAdapter
 import com.solana.models.buffer.moshi.TokenSwapInfoJsonAdapter
@@ -29,8 +27,8 @@ sealed class SolanaSocketError: Exception() {
 
 interface SolanaSocketEventsDelegate {
     fun connected()
-    fun accountNotification(notification: RpcResponse<AccountNotification<List<String>>>)
-    fun programNotification(notification: RpcResponse<ProgramNotification<List<String>>>)
+    fun accountNotification(notification: RpcResponse<BufferInfo<AccountInfo>>)
+    fun programNotification(notification: RpcResponse<ProgramAccount<AccountInfo>>)
     fun signatureNotification(notification: RpcResponse<SignatureNotification>)
     fun logsNotification(notification: RpcResponse<LogsNotification>)
     fun unsubscribed(id: String)
@@ -164,15 +162,12 @@ class SolanaSocket(
             methodString?.let {
                 when(it){
                     SocketMethod.accountNotification.string -> {
-                        val subscriptionAdapter: JsonAdapter<RpcResponse<AccountNotification<List<String>>>> = moshi.adapter(
+                        val subscriptionAdapter: JsonAdapter<RpcResponse<BufferInfo<AccountInfo>>> = moshi.adapter(
                             Types.newParameterizedType(
                                 RpcResponse::class.java,
                                 Types.newParameterizedType(
-                                    AccountNotification::class.java,
-                                    Types.newParameterizedType(
-                                        List::class.java,
-                                        String::class.java
-                                    )
+                                    BufferInfo::class.java,
+                                    AccountInfo::class.java
                                 )
                             )
                         )
@@ -203,15 +198,12 @@ class SolanaSocket(
                         }
                     }
                     SocketMethod.programNotification.string -> {
-                        val subscriptionAdapter: JsonAdapter<RpcResponse<ProgramNotification<List<String>>>> = moshi.adapter(
+                        val subscriptionAdapter: JsonAdapter<RpcResponse<ProgramAccount<AccountInfo>>> = moshi.adapter(
                             Types.newParameterizedType(
                                 RpcResponse::class.java,
                                 Types.newParameterizedType(
-                                    ProgramNotification::class.java,
-                                    Types.newParameterizedType(
-                                        List::class.java,
-                                        String::class.java
-                                    )
+                                    ProgramAccount::class.java,
+                                    AccountInfo::class.java
                                 )
                             )
                         )

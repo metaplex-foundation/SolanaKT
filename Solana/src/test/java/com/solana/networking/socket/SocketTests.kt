@@ -1,9 +1,16 @@
 package com.solana.networking.socket
 
 import com.solana.core.PublicKeyJsonAdapter
+import com.solana.core.PublicKeyRule
+import com.solana.models.ProgramAccount
+import com.solana.models.buffer.*
+import com.solana.models.buffer.moshi.AccountInfoJsonAdapter
+import com.solana.models.buffer.moshi.MintJsonAdapter
+import com.solana.models.buffer.moshi.TokenSwapInfoJsonAdapter
 import com.solana.networking.RPCEndpoint
 import com.solana.networking.models.RpcResponse
 import com.solana.networking.socket.models.*
+import com.solana.vendor.borshj.Borsh
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -16,10 +23,10 @@ import java.util.concurrent.TimeUnit
 class MockSolanaLiveEventsDelegate: SolanaSocketEventsDelegate {
     var onConected: (() -> Unit)? = null
     var onDisconnected: (() -> Unit)? = null
-    var onAccountNotification: ((RpcResponse<AccountNotification<List<String>>>) -> Unit)? = null
+    var onAccountNotification: ((RpcResponse<BufferInfo<AccountInfo>>) -> Unit)? = null
     var onSignatureNotification: ((RpcResponse<SignatureNotification>) -> Unit)? = null
     var onLogsNotification: ((RpcResponse<LogsNotification>) -> Unit)? = null
-    var onProgramNotification: ((RpcResponse<ProgramNotification<List<String>>>) -> Unit)? = null
+    var onProgramNotification: ((RpcResponse<ProgramAccount<AccountInfo>>) -> Unit)? = null
     var onSubscribed: ((Int, String) -> Unit)? = null
     var onUnsubscribed: ((String) -> Unit)? = null
 
@@ -27,11 +34,11 @@ class MockSolanaLiveEventsDelegate: SolanaSocketEventsDelegate {
         onConected?.let { it() }
     }
 
-    override fun accountNotification(notification: RpcResponse<AccountNotification<List<String>>>) {
+    override fun accountNotification(notification: RpcResponse<BufferInfo<AccountInfo>>) {
         onAccountNotification?.let { it(notification) }
     }
 
-    override fun programNotification(notification: RpcResponse<ProgramNotification<List<String>>>) {
+    override fun programNotification(notification: RpcResponse<ProgramAccount<AccountInfo>>) {
         onProgramNotification?.let { it(notification) }
     }
 
@@ -66,7 +73,19 @@ class MockSolanaLiveEventsDelegate: SolanaSocketEventsDelegate {
 
 class SocketTests {
     val socket = SolanaSocket(RPCEndpoint.devnetSolana, enableDebugLogs = true)
-    val moshi = Moshi.Builder().add(PublicKeyJsonAdapter()).addLast(KotlinJsonAdapterFactory()).build()
+    fun borsh(): Borsh {
+        val borsh = Borsh()
+        borsh.setRules(listOf(PublicKeyRule(), AccountInfoRule(), MintRule(), TokenSwapInfoRule()))
+        return borsh
+    }
+    val moshi: Moshi by lazy {
+        Moshi.Builder()
+            .add(PublicKeyJsonAdapter())
+            .add(MintJsonAdapter(borsh()))
+            .add(TokenSwapInfoJsonAdapter(borsh()))
+            .add(AccountInfoJsonAdapter(borsh()))
+            .addLast(KotlinJsonAdapterFactory()).build()
+    }
 
     @Test
     fun testSocketConnected() {
@@ -361,15 +380,12 @@ class SocketTests {
              }
         """.trimIndent()
 
-        val unSubscriptionAdapter: JsonAdapter<RpcResponse<AccountNotification<List<String>>>> = moshi.adapter(
+        val unSubscriptionAdapter: JsonAdapter<RpcResponse<BufferInfo<AccountInfo>>> = moshi.adapter(
             Types.newParameterizedType(
                 RpcResponse::class.java,
                 Types.newParameterizedType(
-                    AccountNotification::class.java,
-                    Types.newParameterizedType(
-                        List::class.java,
-                        String::class.java
-                    )
+                    BufferInfo::class.java,
+                    AccountInfo::class.java
                 )
             )
         )
@@ -406,59 +422,17 @@ class SocketTests {
                }
             }
         """.trimIndent()
-        val unSubscriptionAdapter: JsonAdapter<RpcResponse<ProgramNotification<List<String>>>> = moshi.adapter(
+        val unSubscriptionAdapter: JsonAdapter<RpcResponse<ProgramAccount<AccountInfo>>> = moshi.adapter(
             Types.newParameterizedType(
                 RpcResponse::class.java,
                 Types.newParameterizedType(
-                    ProgramNotification::class.java,
-                    Types.newParameterizedType(
-                        List::class.java,
-                        String::class.java
-                    )
+                    ProgramAccount::class.java,
+                    AccountInfo::class.java
                 )
             )
         )
         val result = unSubscriptionAdapter.fromJson(string)!!
         Assert.assertEquals(result.params?.subscription, 24040)
-    }
-
-    @Test
-    fun testDecodingProgramNotification2() {
-        val string = """
-            {
-               "jsonrpc":"2.0",
-               "method":"programNotification",
-               "params":{
-                  "result":{
-                     "context":{
-                        "slot":67598736
-                     },
-                     "value":{
-                        "account":{
-                           "data":"nBuzaooPfhgHcAYxbpZVcXFw1EVjyEKxicgjr8u5NXLBX7xfCGw2E1YiSeeGXLbrKu5MAquX1zwR9P12vhAr1HgSXyTyR66VeevvJcyFKeEDSPWMzh723b8KLxtfd2TyPYYG5HYXx3HcH3Dbxvx17QxADJtRaHYTvde9pB98PsP9FcHWrzkCUZi4bhWtQYeUACGkYCQtMo2hbJuWqBG5rzS45rr9W2YJK",
-                           "executable":false,
-                           "lamports":2039280,
-                           "owner":"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-                           "rentEpoch":156
-                        },
-                        "pubkey":"9FENcWRd1bf8P97e2exQtV3eEZCkaRa3KFFjTkYXpBHQ"
-                     }
-                  },
-                  "subscription":22601084
-               }
-            }
-        """.trimIndent()
-        val unSubscriptionAdapter: JsonAdapter<RpcResponse<ProgramNotification<String>>> = moshi.adapter(
-            Types.newParameterizedType(
-                RpcResponse::class.java,
-                Types.newParameterizedType(
-                    ProgramNotification::class.java,
-                    String::class.java
-                )
-            )
-        )
-        val result = unSubscriptionAdapter.fromJson(string)!!
-        Assert.assertEquals(result.params?.subscription, 22601084)
     }
 
     @Test
@@ -502,11 +476,11 @@ class SocketTests {
            }
         }
         """.trimIndent()
-        val unSubscriptionAdapter: JsonAdapter<RpcResponse<AccountNotification<TokenAccountNotificationData>>> = moshi.adapter(
+        val unSubscriptionAdapter: JsonAdapter<RpcResponse<BufferInfoJson<TokenAccountNotificationData>>> = moshi.adapter(
             Types.newParameterizedType(
                 RpcResponse::class.java,
                 Types.newParameterizedType(
-                    AccountNotification::class.java,
+                    BufferInfoJson::class.java,
                     TokenAccountNotificationData::class.java
                 )
             )
