@@ -36,7 +36,7 @@ object TokenProgram : Program() {
         val keys: MutableList<AccountMeta> = ArrayList()
         keys.add(AccountMeta(source, false, true))
         keys.add(AccountMeta(destination, false, true))
-        keys.add(AccountMeta(owner, true, true))
+        keys.add(AccountMeta(owner, true, false))
         val transactionData = encodeTransferTokenInstructionData(
             amount
         )

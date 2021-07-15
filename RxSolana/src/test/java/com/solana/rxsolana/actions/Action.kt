@@ -116,7 +116,6 @@ class Action {
     }
 
     @Test
-<<<<<<< HEAD
     fun getMintDataTest() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), InMemoryAccountStorage())
         val result = solana.action.getMintData(PublicKey("8wzZaGf89zqx7PRBoxk9T6QyWWQbhwhdU555ZxRnceG3")).blockingGet()
