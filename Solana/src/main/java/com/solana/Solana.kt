@@ -2,12 +2,19 @@ package com.solana
 
 import com.solana.actions.Action
 import com.solana.api.Api
+import com.solana.core.Account
 import com.solana.models.Token
 import com.solana.networking.NetworkingRouter
 import com.solana.networking.socket.SolanaSocket
 import com.solana.vendor.TokensListParser
 
-class Solana(val router: NetworkingRouter){
+interface SolanaAccountStorage {
+    fun save(account: Account) : Result<Unit>
+    fun account(): Result<Account>
+    fun clear(): Result<Unit>
+}
+
+ class Solana(val router: NetworkingRouter, private val auth: SolanaAccountStorage){
     val api: Api = Api(router)
     val socket: SolanaSocket = SolanaSocket(router.endpoint)
     val supportedTokens: List<Token> by lazy {
