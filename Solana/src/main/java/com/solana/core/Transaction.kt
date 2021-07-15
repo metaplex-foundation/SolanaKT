@@ -15,7 +15,7 @@ class Transaction {
         return this
     }
 
-    fun setRecentBlockHash(recentBlockhash: String?) {
+    fun setRecentBlockHash(recentBlockhash: String) {
         message.setRecentBlockHash(recentBlockhash)
     }
 

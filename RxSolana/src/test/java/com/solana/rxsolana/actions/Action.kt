@@ -1,6 +1,8 @@
 package com.solana.rxsolana.actions
 
 import com.solana.Solana
+import com.solana.actions.sendSOL
+import com.solana.actions.serializeAndSendWithFee
 import com.solana.core.Account
 import com.solana.core.DerivationPath
 import com.solana.core.PublicKey
@@ -81,6 +83,27 @@ class Action {
         val simulatedTransaction: SimulatedTransaction =
             solana.api.simulateTransaction(transaction, addresses).blockingGet()
         Assert.assertTrue(simulatedTransaction.value.logs.size > 0)
+    }
+
+    @Test
+    fun sendTransactionTests(){
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), InMemoryAccountStorage())
+
+        val lamports = 111L
+        val destination = PublicKey("3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG")
+
+        val feePayer: Account = Account.fromMnemonic(
+            Arrays.asList(
+                "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
+            ), ""
+            , DerivationPath.BIP44_M_44H_501H_0H_OH
+        )
+
+        val instructions = SystemProgram.transfer(feePayer.publicKey, destination, lamports)
+        val transaction = Transaction()
+        transaction.addInstruction(instructions)
+        val result = solana.api.sendTransaction(transaction, listOf(feePayer)).blockingGet()
+        Assert.assertNotNull(result)
     }
 
     @Test

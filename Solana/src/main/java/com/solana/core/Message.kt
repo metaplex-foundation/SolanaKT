@@ -37,7 +37,7 @@ class Message {
     }
 
     private var recentBlockhash: String? = null
-    private val accountKeys: AccountKeysList
+    private val accountKeys: AccountKeysList = AccountKeysList()
     private val instructions: MutableList<TransactionInstruction>
     private var feePayer: Account? = null
     fun addInstruction(instruction: TransactionInstruction): Message {
@@ -140,7 +140,6 @@ class Message {
     }
 
     init {
-        accountKeys = AccountKeysList()
         instructions = ArrayList()
     }
 }

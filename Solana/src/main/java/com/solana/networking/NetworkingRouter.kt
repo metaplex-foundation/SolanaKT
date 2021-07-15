@@ -61,8 +61,9 @@ class NetworkingRouter(
         val rpcRequest = RpcRequest(method, params)
         val rpcRequestJsonAdapter: JsonAdapter<RpcRequest> = moshi.adapter(RpcRequest::class.java)
 
+        val jsonParams = rpcRequestJsonAdapter.toJson(rpcRequest)
         val request: Request = Request.Builder().url(url)
-            .post(RequestBody.create(JSON, rpcRequestJsonAdapter.toJson(rpcRequest))).build()
+            .post(RequestBody.create(JSON, jsonParams)).build()
 
         call(request, clazz, onComplete)
     }

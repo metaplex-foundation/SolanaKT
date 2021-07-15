@@ -7,7 +7,7 @@ class TransactionBuilder {
         return this
     }
 
-    fun setRecentBlockHash(recentBlockHash: String?): TransactionBuilder {
+    fun setRecentBlockHash(recentBlockHash: String): TransactionBuilder {
         transaction.setRecentBlockHash(recentBlockHash)
         return this
     }
