@@ -29,7 +29,7 @@ class Action {
         val result = solana.action.sendSOL(
             sender,
             PublicKey("3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG"),
-            100000
+            1
         ).blockingGet()
         Assert.assertNotNull(result)
     }
@@ -125,7 +125,32 @@ class Action {
     @Test
     fun getMultipleMintDatas() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), InMemoryAccountStorage())
-        val result = solana.action.getMultipleMintDatas(listOf(PublicKey("8wzZaGf89zqx7PRBoxk9T6QyWWQbhwhdU555ZxRnceG3"))).blockingGet()
+        val result =
+            solana.action.getMultipleMintDatas(listOf(PublicKey("8wzZaGf89zqx7PRBoxk9T6QyWWQbhwhdU555ZxRnceG3")))
+                .blockingGet()
         Assert.assertNotNull(result)
+    }
+
+    fun sendSPLTokensTest() {
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), InMemoryAccountStorage())
+
+        // Create account from private key
+        val feePayer: Account = Account.fromMnemonic(
+            Arrays.asList(
+                "siege", "amazing", "camp", "income", "refuse", "struggle", "feed", "kingdom", "lawn", "champion", "velvet", "crystal", "stomach", "trend", "hen", "uncover", "roast", "nasty", "until", "hidden", "crumble", "city", "bag", "minute"
+            ), ""
+            , DerivationPath.BIP44_M_44H_501H_0H_OH
+        )
+        val mintAddress = PublicKey("6AUM4fSvCAxCugrbJPFxTqYFp9r3axYx973yoSyzDYVH")
+        val source =  PublicKey("8hoBQbSFKfDK3Mo7Wwc15Pp2bbkYuJE8TdQmnHNDjXoQ")
+        val destination =  PublicKey("8Poh9xusEcKtmYZ9U4FSfjrrrQR155TLWGAsyFWjjKxB")
+        val transactionId = solana.action.sendSPLTokens(
+            feePayer,
+            mintAddress = mintAddress,
+            fromPublicKey = source,
+            destinationAddress = destination,
+            1
+        ).blockingGet()
+        Assert.assertNotNull(transactionId)
     }
 }
