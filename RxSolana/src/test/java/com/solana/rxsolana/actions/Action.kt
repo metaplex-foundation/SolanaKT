@@ -29,7 +29,7 @@ class Action {
         val result = solana.action.sendSOL(
             sender,
             PublicKey("3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG"),
-            100000
+            1
         ).blockingGet()
         Assert.assertNotNull(result)
     }

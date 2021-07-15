@@ -17,13 +17,13 @@ object AssociatedTokenProgram : Program() {
     ): TransactionInstruction {
 
         val keys = listOf(
-            AccountMeta(payer, true, true),
-            AccountMeta(associatedAccount, false, true),
-            AccountMeta(owner, false, false),
-            AccountMeta(mint,  false, false),
-            AccountMeta(SystemProgram.PROGRAM_ID, false, false),
-            AccountMeta(programId, false, false),
-            AccountMeta(TokenProgram.SYSVAR_RENT_PUBKEY, false,  false)
+            AccountMeta(payer, isSigner = true, isWritable = true),
+            AccountMeta(associatedAccount, isSigner = false, isWritable = true),
+            AccountMeta(owner, isSigner = false, isWritable = false),
+            AccountMeta(mint, isSigner = false, isWritable = false),
+            AccountMeta(SystemProgram.PROGRAM_ID, isSigner = false, isWritable = false),
+            AccountMeta(programId, isSigner = false, isWritable = false),
+            AccountMeta(TokenProgram.SYSVAR_RENT_PUBKEY, isSigner = false, isWritable = false)
         )
 
         return TransactionInstruction(
