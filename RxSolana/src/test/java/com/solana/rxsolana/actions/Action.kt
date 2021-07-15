@@ -114,4 +114,18 @@ class Action {
         val result = solana.api.sendTransaction(transaction, listOf(feePayer)).blockingGet()
         Assert.assertNotNull(result)
     }
+
+    @Test
+    fun getMintDataTest() {
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), InMemoryAccountStorage())
+        val result = solana.action.getMintData(PublicKey("8wzZaGf89zqx7PRBoxk9T6QyWWQbhwhdU555ZxRnceG3")).blockingGet()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun getMultipleMintDatas() {
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), InMemoryAccountStorage())
+        val result = solana.action.getMultipleMintDatas(listOf(PublicKey("8wzZaGf89zqx7PRBoxk9T6QyWWQbhwhdU555ZxRnceG3"))).blockingGet()
+        Assert.assertNotNull(result)
+    }
 }
