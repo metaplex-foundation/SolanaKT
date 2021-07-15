@@ -10,6 +10,7 @@ import com.solana.networking.NetworkingRouter
 import com.solana.networking.RPCEndpoint
 import com.solana.programs.MemoProgram
 import com.solana.programs.SystemProgram
+import com.solana.rxsolana.InMemoryAccountStorage
 import com.solana.rxsolana.api.*
 import org.junit.Assert
 import org.junit.Test
@@ -22,7 +23,9 @@ class Action {
         val sender: Account = Account.fromMnemonic(listOf(
             "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
         ), "")
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val auth = InMemoryAccountStorage()
+        auth.save(sender)
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), auth)
         val result = solana.action.sendSOL(
             sender,
             PublicKey("3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG"),
@@ -36,7 +39,9 @@ class Action {
         val sender: Account = Account.fromMnemonic(listOf(
             "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
         ), "")
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val auth = InMemoryAccountStorage()
+        auth.save(sender)
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), auth)
         val result = solana.action.getTokenWallets(
             sender.publicKey
         ).blockingGet()
@@ -48,7 +53,9 @@ class Action {
         val sender: Account = Account.fromMnemonic(listOf(
             "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
         ), "")
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val auth = InMemoryAccountStorage()
+        auth.save(sender)
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), auth)
         val result = solana.action.createTokenAccount(sender, PublicKey("6AUM4fSvCAxCugrbJPFxTqYFp9r3axYx973yoSyzDYVH")).blockingGet()
         Assert.assertNotNull(result)
     }
@@ -58,14 +65,16 @@ class Action {
         val sender: Account = Account.fromMnemonic(listOf(
             "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
         ), "")
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val auth = InMemoryAccountStorage()
+        auth.save(sender)
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), auth)
         val result = solana.action.closeTokenAccount(sender, PublicKey("FunTu3uhvMX4L99KBckyW5dq4YscxszdvciGdXcYJngi")).blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun simulateTransactionTest() {
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), InMemoryAccountStorage())
         val transaction =
             "ASdDdWBaKXVRA+6flVFiZokic9gK0+r1JWgwGg/GJAkLSreYrGF4rbTCXNJvyut6K6hupJtm72GztLbWNmRF1Q4BAAEDBhrZ0FOHFUhTft4+JhhJo9+3/QL6vHWyI8jkatuFPQzrerzQ2HXrwm2hsYGjM5s+8qMWlbt6vbxngnO8rc3lqgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAy+KIwZmU8DLmYglP3bPzrlpDaKkGu6VIJJwTOYQmRfUBAgIAAQwCAAAAuAsAAAAAAAA="
         val addresses = listOf(PublicKey.valueOf("QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo"))
@@ -76,7 +85,7 @@ class Action {
 
     @Test
     fun transactionMemoTest() {
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), InMemoryAccountStorage())
 
         val lamports = 10101
         val destination = PublicKey("3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG")
