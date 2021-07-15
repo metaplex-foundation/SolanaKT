@@ -7,7 +7,6 @@ import com.solana.models.REQUIRED_ACCOUNT_SPACE
 import com.solana.programs.SystemProgram
 import com.solana.programs.TokenProgram
 import com.solana.api.getMinimumBalanceForRentExemption
-import com.solana.api.sendTransaction
 
 fun Action.createTokenAccount(
     account: Account,

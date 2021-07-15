@@ -102,13 +102,13 @@ data class PublicKey(val pubkey: ByteArray) : BorshCodable {
 
         @Throws(Exception::class)
         fun findProgramAddress(
-            seeds: List<ByteArray>?,
+            seeds: List<ByteArray>,
             programId: PublicKey
         ): ProgramDerivedAddress {
             var nonce = 255
             val address: PublicKey
             val seedsWithNonce: MutableList<ByteArray> = ArrayList()
-            seedsWithNonce.addAll(seeds!!)
+            seedsWithNonce.addAll(seeds)
             while (nonce != 0) {
                 address = try {
                     seedsWithNonce.add(byteArrayOf(nonce.toByte()))

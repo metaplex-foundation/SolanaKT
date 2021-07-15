@@ -12,7 +12,7 @@ import java.util.*
  */
 object TokenProgram : Program() {
     val PROGRAM_ID = PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
-    private val SYSVAR_RENT_PUBKEY = PublicKey("SysvarRent111111111111111111111111111111111")
+    val SYSVAR_RENT_PUBKEY = PublicKey("SysvarRent111111111111111111111111111111111")
     private const val INITIALIZE_METHOD_ID = 1
     private const val TRANSFER_METHOD_ID = 3
     private const val CLOSE_ACCOUNT_METHOD_ID = 9

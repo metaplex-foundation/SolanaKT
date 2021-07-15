@@ -62,7 +62,7 @@ class PublicKeyTest {
     fun createProgramAddress() {
         val programId = PublicKey("BPFLoader1111111111111111111111111111111111")
         var programAddress = PublicKey.createProgramAddress(
-            listOf(PublicKey("SeedPubey1111111111111111111111111111111111").toByteArray()!!),
+            listOf(PublicKey("SeedPubey1111111111111111111111111111111111").toByteArray()),
             programId
         )
         assertTrue(programAddress.equals(PublicKey("GUs5qLUfsEHkcMB9T38vjr18ypEhRuNWiePW2LoK4E3K")))

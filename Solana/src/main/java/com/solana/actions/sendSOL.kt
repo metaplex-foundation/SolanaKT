@@ -5,7 +5,6 @@ import com.solana.core.PublicKey
 import com.solana.core.Transaction
 import com.solana.programs.SystemProgram
 
-
 fun Action.sendSOL(
     account: Account,
     destination: PublicKey,
