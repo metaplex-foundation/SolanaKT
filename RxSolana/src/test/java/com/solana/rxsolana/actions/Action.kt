@@ -1,6 +1,8 @@
 package com.solana.rxsolana.actions
 
 import com.solana.Solana
+import com.solana.actions.sendSOL
+import com.solana.actions.serializeAndSendWithFee
 import com.solana.core.Account
 import com.solana.core.DerivationPath
 import com.solana.core.PublicKey
@@ -50,27 +52,34 @@ class Action {
 
     @Test
     fun TestCreateTokenAccount() {
-        val sender: Account = Account.fromMnemonic(listOf(
-            "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
-        ), "")
+        val seender: Account = Account.fromMnemonic(
+            Arrays.asList(
+                "siege", "amazing", "camp", "income", "refuse", "struggle", "feed", "kingdom", "lawn", "champion", "velvet", "crystal", "stomach", "trend", "hen", "uncover", "roast", "nasty", "until", "hidden", "crumble", "city", "bag", "minute"
+            ), ""
+            , DerivationPath.BIP44_M_44H_501H_0H_OH
+        )
         val auth = InMemoryAccountStorage()
-        auth.save(sender)
+        auth.save(seender)
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), auth)
-        val result = solana.action.createTokenAccount(sender, PublicKey("6AUM4fSvCAxCugrbJPFxTqYFp9r3axYx973yoSyzDYVH")).blockingGet()
+        val result = solana.action.createTokenAccount(seender, PublicKey("6AUM4fSvCAxCugrbJPFxTqYFp9r3axYx973yoSyzDYVH")).blockingGet()
         Assert.assertNotNull(result)
     }
 
-    @Test
+    // This works but requires a 0 balance wallet
+    /*@Test
     fun TestCloseTokenAccount() {
-        val sender: Account = Account.fromMnemonic(listOf(
-            "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
-        ), "")
+        val sender: Account = Account.fromMnemonic(
+            Arrays.asList(
+                "siege", "amazing", "camp", "income", "refuse", "struggle", "feed", "kingdom", "lawn", "champion", "velvet", "crystal", "stomach", "trend", "hen", "uncover", "roast", "nasty", "until", "hidden", "crumble", "city", "bag", "minute"
+            ), ""
+            , DerivationPath.BIP44_M_44H_501H_0H_OH
+        )
         val auth = InMemoryAccountStorage()
         auth.save(sender)
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), auth)
-        val result = solana.action.closeTokenAccount(sender, PublicKey("FunTu3uhvMX4L99KBckyW5dq4YscxszdvciGdXcYJngi")).blockingGet()
+        val result = solana.action.closeTokenAccount(sender, PublicKey("FRo1fyKnzeNTbk22ZSjwUXQLceqSos7et3h2uqNLpUar")).blockingGet()
         Assert.assertNotNull(result)
-    }
+    }*/
 
     @Test
     fun simulateTransactionTest() {
@@ -81,6 +90,27 @@ class Action {
         val simulatedTransaction: SimulatedTransaction =
             solana.api.simulateTransaction(transaction, addresses).blockingGet()
         Assert.assertTrue(simulatedTransaction.value.logs.size > 0)
+    }
+
+    @Test
+    fun sendTransactionTests(){
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), InMemoryAccountStorage())
+
+        val lamports = 111L
+        val destination = PublicKey("3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG")
+
+        val feePayer: Account = Account.fromMnemonic(
+            Arrays.asList(
+                "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
+            ), ""
+            , DerivationPath.BIP44_M_44H_501H_0H_OH
+        )
+
+        val instructions = SystemProgram.transfer(feePayer.publicKey, destination, lamports)
+        val transaction = Transaction()
+        transaction.addInstruction(instructions)
+        val result = solana.api.sendTransaction(transaction, listOf(feePayer)).blockingGet()
+        Assert.assertNotNull(result)
     }
 
     @Test
@@ -131,6 +161,7 @@ class Action {
         Assert.assertNotNull(result)
     }
 
+    @Test
     fun sendSPLTokensTest() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), InMemoryAccountStorage())
 

@@ -18,22 +18,22 @@ fun Action.createTokenAccount(
             val transaction = Transaction()
             val newAccount = Account()
             val createAccountInstruction = SystemProgram.createAccount(
-                account.publicKey,
-                newAccount.publicKey,
-                balance,
+                fromPublicKey = account.publicKey,
+                newAccountPublickey = newAccount.publicKey,
+                lamports = balance,
                 REQUIRED_ACCOUNT_SPACE,
                 TokenProgram.PROGRAM_ID
             )
 
             transaction.addInstruction(createAccountInstruction)
             val initializeAccountInstruction = TokenProgram.initializeAccount(
-                newAccount.publicKey,
-                mintAddress,
-                account.publicKey
+                account = newAccount.publicKey,
+                mint = mintAddress,
+                owner = account.publicKey
             )
 
             transaction.addInstruction(initializeAccountInstruction)
-            this.serializeAndSendWithFee(transaction, listOf(newAccount, account), null){ result ->
+            this.serializeAndSendWithFee(transaction, listOf(account,newAccount), null){ result ->
                 result.onSuccess { transactionId ->
                     onComplete(Result.success(Pair(transactionId, newAccount.publicKey)))
                 }.onFailure { error ->

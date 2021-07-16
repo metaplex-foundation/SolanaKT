@@ -284,7 +284,7 @@ class Methods {
     @Test
     fun TestGetSlotLeaders() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana), InMemoryAccountStorage())
-        val result = solana.api.getSlotLeaders(66372704, 10).blockingGet()
+        val result = solana.api.getSlotLeaders(68587828, 10).blockingGet()
         Assert.assertNotNull(result)
     }
 

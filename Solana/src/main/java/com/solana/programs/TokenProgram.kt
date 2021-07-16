@@ -93,14 +93,14 @@ object TokenProgram : Program() {
     }
 
     fun closeAccount(
-        source: PublicKey?,
-        destination: PublicKey?,
-        owner: PublicKey?
+        account: PublicKey,
+        destination: PublicKey,
+        owner: PublicKey
     ): TransactionInstruction {
         val keys: MutableList<AccountMeta> = ArrayList()
-        keys.add(AccountMeta(source!!, false, true))
-        keys.add(AccountMeta(destination!!, false, true))
-        keys.add(AccountMeta(owner!!, true, false))
+        keys.add(AccountMeta(account, false, true))
+        keys.add(AccountMeta(destination, false, true))
+        keys.add(AccountMeta(owner, false, false))
         val buffer = ByteBuffer.allocate(1)
         buffer.order(ByteOrder.LITTLE_ENDIAN)
         buffer.put(CLOSE_ACCOUNT_METHOD_ID.toByte())
