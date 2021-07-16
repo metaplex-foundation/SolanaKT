@@ -12,7 +12,11 @@ fun Action.closeTokenAccount(
     onComplete: ((Result<Pair<String, PublicKey>>) -> Unit)
 ){
     val transaction = Transaction()
-    val instruction = TokenProgram.closeAccount(tokenPubkey, account.publicKey, account.publicKey)
+    val instruction = TokenProgram.closeAccount(
+        account = tokenPubkey,
+        destination = account.publicKey,
+        owner= account.publicKey
+    )
     transaction.addInstruction(instruction)
     api.sendTransaction(transaction, listOf(account)){ result ->
         result.onSuccess { transactionId ->
