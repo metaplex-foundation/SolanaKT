@@ -8,13 +8,9 @@ The objective is to create a cross platform, fully functional, highly tested and
 - [x] Sign and send transactions.
 - [x] Key pair generation
 - [x] RPC configuration.
-- [x] SPM integration
 - [x] Few libraries requirement (Moshi, okhttp3, bitcoinj, eddsa). RxKotlin is optional.
 - [x] Fully tested (53%)
 - [x] Sockets
-- [ ] Type-safe Transaction templates
-- [ ] Documentation with guides and examples
-- [ ] Program template library for common tasks
 
 ### Support it 
 
