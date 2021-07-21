@@ -4,7 +4,7 @@ plugins {
     id 'maven-publish'
 }
 
-group 'com.solana.rxsolana'
+group 'com.solana'
 version '1.0.0'
 
 android {

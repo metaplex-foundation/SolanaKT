@@ -4,7 +4,7 @@ plugins {
     id 'maven-publish'
 }
 
-group 'com.solana.solana'
+group 'com.solana'
 version '1.0.0'
 
 android {
@@ -52,7 +52,7 @@ dependencies {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact("$buildDir/outputs/aar/rxSolana-release.aar")  {
+            artifact("$buildDir/outputs/aar/solana-release.aar")  {
                 builtBy tasks.getByName("assemble")
             }
             artifactId 'solana'
