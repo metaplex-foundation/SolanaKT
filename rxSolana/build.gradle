@@ -46,6 +46,24 @@ dependencies {
 }
 
 publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'rxSolana'
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'rxSolana'
+                description = 'A kotlin Solana lib'
+                url = 'http://www.example.com/library'
+            }
+        }
+    }
     repositories {
         maven {
             name = "GitHubPackages"
