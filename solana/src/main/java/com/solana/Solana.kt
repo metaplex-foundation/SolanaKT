@@ -14,7 +14,7 @@ interface SolanaAccountStorage {
     fun clear(): Result<Unit>
 }
 
- class Solana(val router: NetworkingRouter, private val auth: SolanaAccountStorage){
+ class Solana(val router: NetworkingRouter){
     val api: Api = Api(router)
     val socket: SolanaSocket = SolanaSocket(router.endpoint)
     val supportedTokens: List<Token> by lazy {
