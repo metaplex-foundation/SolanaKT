@@ -12,6 +12,3 @@ The objective is to create a cross platform, fully functional, highly tested and
 - [x] Fully tested (53%)
 - [x] Sockets
 
-### Support it 
-
-SOL: CN87nZuhnFdz74S9zn3bxCcd5ZxW55nwvgAv5C2Tz3K7
