@@ -2,6 +2,7 @@ package com.solana.rxsolana.api
 
 import com.solana.Solana
 import com.solana.core.PublicKey
+import com.solana.models.SignatureStatusRequestConfiguration
 import com.solana.models.buffer.AccountInfo
 import com.solana.models.buffer.TokenSwapInfo
 import com.solana.networking.NetworkingRouter
@@ -264,6 +265,13 @@ class Methods {
     fun TestGetConfirmedSignaturesForAddress2() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getConfirmedSignaturesForAddress2(PublicKey("5Zzguz4NsSRFxGkHfM4FmsFpGZiCDtY72zH2jzMcqkJx"), 10, null, null).blockingGet()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetSignatureStatuses() {
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val result = solana.api.getSignatureStatuses(listOf("3citcRRbx1vTjXazYLXZ4cwVHNkx6baFrSNp5msR2mgTRuuod4qhqTi921emn2CjU93sSM5dGGhCcHeVtvQyPfCV"), SignatureStatusRequestConfiguration(true)).blockingGet()
         Assert.assertNotNull(result)
     }
 

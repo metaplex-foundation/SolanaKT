@@ -400,6 +400,19 @@ fun Api.getSlot(): Single<Long> {
     }
 }
 
+fun Api.getSignatureStatuses(signatures: List<String>, configs: SignatureStatusRequestConfiguration? = SignatureStatusRequestConfiguration()): Single<SignatureStatus> {
+    return Single.create { emitter ->
+        this.getSignatureStatuses(signatures, configs) { result ->
+            result.onSuccess {
+                emitter.onSuccess(it)
+            }.onFailure {
+                emitter.onError(it)
+            }
+        }
+        Disposables.empty()
+    }
+}
+
 fun Api.getConfirmedBlocks(start: Int, end: Int): Single<List<Double>> {
     return Single.create { emitter ->
         this.getConfirmedBlocks(start,end) { result ->
