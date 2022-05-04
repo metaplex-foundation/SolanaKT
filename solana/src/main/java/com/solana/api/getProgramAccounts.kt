@@ -29,7 +29,7 @@ fun <T: BorshCodable> Api.getProgramAccounts(account: PublicKey,
     return getProgramAccounts(account, ProgramAccountConfig(RpcSendTransactionConfig.Encoding.base64), decodeTo, onComplete)
 }
 
-private fun <T: BorshCodable> Api.getProgramAccounts(
+fun <T: BorshCodable> Api.getProgramAccounts(
     account: PublicKey,
     programAccountConfig: ProgramAccountConfig?,
     decodeTo: Class<T>,
