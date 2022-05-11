@@ -12,6 +12,7 @@ import com.solana.networking.models.RPCError
 import com.solana.networking.models.RpcRequest
 import com.solana.networking.models.RpcResponse
 import com.solana.vendor.borshj.Borsh
+import com.solana.vendor.borshj.BorshRule
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -27,24 +28,34 @@ sealed class NetworkingError(override val message: String?) : Exception(message)
     data class decodingError(val rpcError: java.lang.Exception) : NetworkingError(rpcError.message)
 }
 
+class NetworkingRouterConfig(val rules: List<BorshRule<*>> = listOf(), val moshiAdapters: List<Object> = listOf())
+
 class NetworkingRouter(
     val endpoint: RPCEndpoint,
-    private val httpClient: OkHttpClient = OkHttpClient()
+    private val httpClient: OkHttpClient = OkHttpClient(),
+    private val config: NetworkingRouterConfig? = null
 ) {
 
     private fun borsh(): Borsh {
         val borsh = Borsh()
-        borsh.setRules(listOf(PublicKeyRule(), AccountInfoRule(), MintRule(), TokenSwapInfoRule()))
+        val rules = listOf(PublicKeyRule(), AccountInfoRule(), MintRule(), TokenSwapInfoRule()) + (config?.rules ?: listOf())
+        borsh.setRules(rules)
         return borsh
     }
 
     private val moshi: Moshi by lazy {
-        Moshi.Builder()
+        val moshiBuilder = Moshi.Builder()
             .add(PublicKeyJsonAdapter())
             .add(MintJsonAdapter(borsh()))
             .add(TokenSwapInfoJsonAdapter(borsh()))
             .add(AccountInfoJsonAdapter(borsh()))
-            .addLast(KotlinJsonAdapterFactory()).build()
+
+        for (adapter in config?.moshiAdapters ?: listOf()) {
+            moshiBuilder.add(adapter)
+        }
+
+        moshiBuilder.addLast(KotlinJsonAdapterFactory())
+        moshiBuilder.build()
     }
 
     companion object {
