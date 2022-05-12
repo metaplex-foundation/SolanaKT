@@ -107,8 +107,9 @@ class NetworkingRouter(
                             }
                         }.onFailure {
                             onComplete(Result.failure(it))
+                            return
                         }
-                }.run {
+                }?:run {
                     onComplete(Result.failure(NetworkingError.invalidResponseNoData))
                 }
             }
