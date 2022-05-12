@@ -28,7 +28,11 @@ sealed class NetworkingError(override val message: String?) : Exception(message)
     data class decodingError(val rpcError: java.lang.Exception) : NetworkingError(rpcError.message)
 }
 
-class NetworkingRouterConfig(val rules: List<BorshRule<*>> = listOf(), val moshiAdapters: List<Object> = listOf())
+interface MoshiAdapterFactory {
+    fun create(borsh: Borsh): Object
+}
+
+class NetworkingRouterConfig(val rules: List<BorshRule<*>> = listOf(), val moshiAdapters: List<MoshiAdapterFactory> = listOf())
 
 class NetworkingRouter(
     val endpoint: RPCEndpoint,
@@ -51,7 +55,7 @@ class NetworkingRouter(
             .add(AccountInfoJsonAdapter(borsh()))
 
         for (adapter in config?.moshiAdapters ?: listOf()) {
-            moshiBuilder.add(adapter)
+            moshiBuilder.add(adapter.create(borsh()))
         }
 
         moshiBuilder.addLast(KotlinJsonAdapterFactory())
