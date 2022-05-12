@@ -41,7 +41,7 @@ fun Action.getMultipleMintDatas(
     programId: PublicKey = TokenProgram.PROGRAM_ID,
     onComplete: ((Result<Map<PublicKey, Mint>, Exception>) -> Unit)
 ){
-    ContResult<List<BufferInfo<Mint>>, ResultError> { cb ->
+    ContResult<List<BufferInfo<Mint>?>, ResultError> { cb ->
         this.api.getMultipleAccounts(mintAddresses, Mint::class.java) { result ->
             result.onSuccess {
                 cb(Result.success(it))
@@ -50,10 +50,10 @@ fun Action.getMultipleMintDatas(
             }
         }
     }.flatMap { account ->
-        if(account.find { it.owner == programId.toBase58()} == null) {
+        if(account.find { it?.owner == programId.toBase58()} == null) {
             return@flatMap ContResult.failure(ResultError("Invalid mint owner"))
         }
-        val values = account.mapNotNull { it.data?.value }
+        val values = account.mapNotNull { it?.data?.value }
         if(values.size != mintAddresses.size) {
             return@flatMap ContResult.failure(ResultError("Some of mint data are missing"))
         }
