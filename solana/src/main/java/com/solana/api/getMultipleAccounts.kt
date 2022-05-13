@@ -9,7 +9,7 @@ import java.lang.reflect.Type
 fun <T> Api.getMultipleAccounts(
     accounts: List<PublicKey>,
     decodeTo: Class<T>,
-    onComplete: ((Result<List<BufferInfo<T>>>) -> Unit)
+    onComplete: ((Result<List<BufferInfo<T>?>>) -> Unit)
 ) {
 
     val publickeys = accounts.map { it.toBase58() }
