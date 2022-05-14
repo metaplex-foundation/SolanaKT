@@ -19,6 +19,10 @@ class Transaction {
         message.setRecentBlockHash(recentBlockhash)
     }
 
+    fun setFeePayer(feePayer: Account?) {
+        message.setFeePayer(feePayer)
+    }
+
     fun sign(signer: Account) {
         sign(listOf(signer))
     }
