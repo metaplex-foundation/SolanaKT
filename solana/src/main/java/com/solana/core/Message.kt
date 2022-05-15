@@ -118,11 +118,15 @@ class Message {
 
     private fun getAccountKeys(): List<AccountMeta> {
         val keysList: MutableList<AccountMeta> = accountKeys.list
-        val feePayerIndex = findAccountIndex(keysList, feePayer!!)
         val newList: MutableList<AccountMeta> = ArrayList()
-        val feePayerMeta = keysList[feePayerIndex]
-        newList.add(AccountMeta(feePayerMeta.publicKey, true, true))
-        keysList.removeAt(feePayerIndex)
+        try {
+            val feePayerIndex = findAccountIndex(keysList, feePayer!!)
+            val feePayerMeta = keysList[feePayerIndex]
+            newList.add(AccountMeta(feePayerMeta.publicKey, true, true))
+            keysList.removeAt(feePayerIndex)
+        } catch(e: RuntimeException) { // Fee payer not yet in list
+            newList.add(AccountMeta(feePayer!!, true, true))
+        }
         newList.addAll(keysList)
         return newList
     }
@@ -138,11 +142,11 @@ class Message {
 
     override fun toString(): String {
         return """Message(
-            | header: not set,
-            | accountKeys: [${accountKeys.list.joinToString()}],
-            | recentBlockhash: $recentBlockhash,
-            | instructions: [${instructions.joinToString()}]
-        )""".trimMargin()
+            |  header: not set,
+            |  accountKeys: [${accountKeys.list.joinToString()}],
+            |  recentBlockhash: $recentBlockhash,
+            |  instructions: [${instructions.joinToString()}]
+        |)""".trimMargin()
     }
 
     companion object {

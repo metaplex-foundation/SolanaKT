@@ -57,9 +57,9 @@ class Transaction {
 
     override fun toString(): String {
         return """Transaction(
-            | signatures: [${signatures.joinToString()}],
-            | message: ${message}
-        )""".trimMargin()
+            |  signatures: [${signatures.joinToString()}],
+            |  message: ${message}
+        |)""".trimMargin()
     }
 
     companion object {
