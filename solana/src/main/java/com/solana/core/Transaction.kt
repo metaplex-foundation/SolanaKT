@@ -20,7 +20,7 @@ class Transaction {
     }
 
     fun setFeePayer(feePayer: PublicKey?) {
-        message.setFeePayer(feePayer)
+        message.feePayer = feePayer
     }
 
     fun sign(signer: Account) {
@@ -29,8 +29,10 @@ class Transaction {
 
     fun sign(signers: List<Account>) {
         require(signers.size != 0) { "No signers" }
-        val feePayer = signers[0].publicKey
-        message.setFeePayer(feePayer)
+        // Fee payer defaults to first signer if not set
+        message.feePayer ?: let {
+            message.feePayer = signers[0].publicKey
+        }
         serializedMessage = message.serialize()
         for (signer in signers) {
             val signatureProvider = TweetNaclFast.Signature(ByteArray(0), signer.secretKey)

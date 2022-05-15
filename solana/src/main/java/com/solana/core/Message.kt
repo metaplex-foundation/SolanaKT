@@ -39,7 +39,8 @@ class Message {
     private var recentBlockhash: String? = null
     private val accountKeys: AccountKeysList = AccountKeysList()
     private val instructions: MutableList<TransactionInstruction>
-    private var feePayer: PublicKey? = null
+    var feePayer: PublicKey? = null
+
     fun addInstruction(instruction: TransactionInstruction): Message {
         accountKeys.addAll(instruction.keys)
         accountKeys.add(AccountMeta(instruction.programId, false, false))
@@ -109,10 +110,6 @@ class Message {
             out.put(compiledInstruction.data)
         }
         return out.array()
-    }
-
-    fun setFeePayer(feePayer: PublicKey?) {
-        this.feePayer = feePayer
     }
 
     private fun getAccountKeys(): List<AccountMeta> {
