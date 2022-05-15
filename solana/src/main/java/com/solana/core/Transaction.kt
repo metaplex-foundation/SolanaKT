@@ -19,7 +19,7 @@ class Transaction {
         message.setRecentBlockHash(recentBlockhash)
     }
 
-    fun setFeePayer(feePayer: Account?) {
+    fun setFeePayer(feePayer: PublicKey?) {
         message.setFeePayer(feePayer)
     }
 
@@ -29,7 +29,7 @@ class Transaction {
 
     fun sign(signers: List<Account>) {
         require(signers.size != 0) { "No signers" }
-        val feePayer = signers[0]
+        val feePayer = signers[0].publicKey
         message.setFeePayer(feePayer)
         serializedMessage = message.serialize()
         for (signer in signers) {
