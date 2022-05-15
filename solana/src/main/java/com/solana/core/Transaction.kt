@@ -55,6 +55,13 @@ class Transaction {
         return out.array()
     }
 
+    override fun toString(): String {
+        return """Transaction(
+            | signatures: [${signatures.joinToString()}],
+            | message: ${message}
+        )""".trimMargin()
+    }
+
     companion object {
         const val SIGNATURE_LENGTH = 64
     }

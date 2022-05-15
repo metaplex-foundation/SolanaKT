@@ -18,6 +18,10 @@ class Message {
             )
         }
 
+        override fun toString(): String {
+            return "numRequiredSignatures: $numRequiredSignatures, numReadOnlySignedAccounts: $numReadonlySignedAccounts, numReadOnlyUnsignedAccounts: $numReadonlyUnsignedAccounts"
+        }
+
         companion object {
             const val HEADER_LENGTH = 3
         }
@@ -130,6 +134,15 @@ class Message {
             }
         }
         throw RuntimeException("unable to find account index")
+    }
+
+    override fun toString(): String {
+        return """Message(
+            | header: not set,
+            | accountKeys: [${accountKeys.list.joinToString()}],
+            | recentBlockhash: $recentBlockhash,
+            | instructions: [${instructions.joinToString()}]
+        )""".trimMargin()
     }
 
     companion object {
