@@ -18,6 +18,10 @@ class Message {
             )
         }
 
+        override fun toString(): String {
+            return "numRequiredSignatures: $numRequiredSignatures, numReadOnlySignedAccounts: $numReadonlySignedAccounts, numReadOnlyUnsignedAccounts: $numReadonlyUnsignedAccounts"
+        }
+
         companion object {
             const val HEADER_LENGTH = 3
         }
@@ -39,7 +43,8 @@ class Message {
     private var recentBlockhash: String? = null
     private val accountKeys: AccountKeysList = AccountKeysList()
     private val instructions: MutableList<TransactionInstruction>
-    private var feePayer: Account? = null
+    var feePayer: PublicKey? = null
+
     fun addInstruction(instruction: TransactionInstruction): Message {
         accountKeys.addAll(instruction.keys)
         accountKeys.add(AccountMeta(instruction.programId, false, false))
@@ -111,17 +116,17 @@ class Message {
         return out.array()
     }
 
-    fun setFeePayer(feePayer: Account?) {
-        this.feePayer = feePayer
-    }
-
     private fun getAccountKeys(): List<AccountMeta> {
         val keysList: MutableList<AccountMeta> = accountKeys.list
-        val feePayerIndex = findAccountIndex(keysList, feePayer!!.publicKey)
         val newList: MutableList<AccountMeta> = ArrayList()
-        val feePayerMeta = keysList[feePayerIndex]
-        newList.add(AccountMeta(feePayerMeta.publicKey, true, true))
-        keysList.removeAt(feePayerIndex)
+        try {
+            val feePayerIndex = findAccountIndex(keysList, feePayer!!)
+            val feePayerMeta = keysList[feePayerIndex]
+            newList.add(AccountMeta(feePayerMeta.publicKey, true, true))
+            keysList.removeAt(feePayerIndex)
+        } catch(e: RuntimeException) { // Fee payer not yet in list
+            newList.add(AccountMeta(feePayer!!, true, true))
+        }
         newList.addAll(keysList)
         return newList
     }
@@ -133,6 +138,15 @@ class Message {
             }
         }
         throw RuntimeException("unable to find account index")
+    }
+
+    override fun toString(): String {
+        return """Message(
+            |  header: not set,
+            |  accountKeys: [${accountKeys.list.joinToString()}],
+            |  recentBlockhash: $recentBlockhash,
+            |  instructions: [${instructions.joinToString()}]
+        |)""".trimMargin()
     }
 
     companion object {
