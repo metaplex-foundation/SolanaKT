@@ -15,13 +15,15 @@ fun Action.sendSPLTokens(
     fromPublicKey: PublicKey,
     destinationAddress: PublicKey,
     amount: Long,
+    allowUnfundedRecipient: Boolean = false,
     account: Account,
     onComplete: ((Result<String, ResultError>) -> Unit)
 ){
     ContResult<SPLTokenDestinationAddress, ResultError> { cb ->
         this.findSPLTokenDestinationAddress(
             mintAddress,
-            destinationAddress
+            destinationAddress,
+            allowUnfundedRecipient
         ) { cb(it) }
     }.flatMap { spl ->
         val toPublicKey = spl.first

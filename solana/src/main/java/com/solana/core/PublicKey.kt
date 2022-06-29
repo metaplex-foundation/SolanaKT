@@ -2,6 +2,7 @@ package com.solana.core
 
 import com.solana.models.buffer.Buffer
 import com.solana.models.buffer.Mint
+import com.solana.programs.TokenProgram
 import com.solana.vendor.ByteUtils
 import com.solana.vendor.TweetNaclFast
 import com.solana.vendor.borshj.*
@@ -121,6 +122,18 @@ data class PublicKey(val pubkey: ByteArray) : BorshCodable {
                 return ProgramDerivedAddress(address, nonce)
             }
             throw Exception("Unable to find a viable program address nonce")
+        }
+
+        @Throws(Exception::class)
+        fun associatedTokenAddress(walletAddress: PublicKey, tokenMintAddress: PublicKey) : ProgramDerivedAddress {
+            return findProgramAddress(
+                listOf(
+                    walletAddress.toByteArray(),
+                    TokenProgram.PROGRAM_ID.toByteArray(),
+                    tokenMintAddress.toByteArray()
+                ),
+                PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")
+            )
         }
 
         fun valueOf(publicKey: String): PublicKey {

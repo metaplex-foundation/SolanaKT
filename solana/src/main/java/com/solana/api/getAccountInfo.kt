@@ -3,20 +3,20 @@ package com.solana.api
 import com.solana.core.PublicKey
 import com.solana.models.RPC
 import com.solana.models.buffer.BufferInfo
-import com.solana.networking.models.RpcResponse
 import com.squareup.moshi.Types
 import java.lang.reflect.Type
+import com.solana.vendor.ResultError
 
 fun <T>Api.getAccountInfo(account: PublicKey,
                                         decodeTo: Class<T>,
-                                        onComplete: ((Result<BufferInfo<T>>) -> Unit)) {
+                                        onComplete: ((com.solana.vendor.Result<BufferInfo<T>, ResultError>) -> Unit)) {
     return getAccountInfo(account, HashMap(), decodeTo, onComplete)
 }
 
 fun <T> Api.getAccountInfo(account: PublicKey,
                           additionalParams: Map<String, Any?>,
                           decodeTo: Class<T>,
-                          onComplete: ((Result<BufferInfo<T>>) -> Unit)) {
+                          onComplete: ((com.solana.vendor.Result<BufferInfo<T>, ResultError>) -> Unit)) {
 
 
     val params: MutableList<Any> = ArrayList()
@@ -38,17 +38,23 @@ fun <T> Api.getAccountInfo(account: PublicKey,
         )
     )
 
-    router.request<RPC<BufferInfo<T>>>("getAccountInfo", params, type) { result ->
+    router.request<RPC<BufferInfo<T>?>>("getAccountInfo", params, type) { result ->
         result
             .map {
-                it.value!!
+                it.value
             }
             .onSuccess {
-                onComplete(Result.success(it))
+                if(it != null){
+                    onComplete(com.solana.vendor.Result.success(it))
+                } else {
+                    onComplete(com.solana.vendor.Result.failure(nullValueError))
+                }
             }
             .onFailure {
-                onComplete(Result.failure(it))
+                onComplete(com.solana.vendor.Result.failure(ResultError(it)))
             }
     }
 }
+
+val nullValueError = ResultError("Account return Null")
 

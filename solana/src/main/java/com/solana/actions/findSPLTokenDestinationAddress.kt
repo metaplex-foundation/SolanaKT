@@ -1,7 +1,9 @@
 package com.solana.actions
 
 import com.solana.api.getAccountInfo
+import com.solana.api.nullValueError
 import com.solana.core.PublicKey
+import com.solana.core.PublicKey.Companion.createProgramAddress
 import com.solana.models.buffer.AccountInfo
 import com.solana.models.buffer.BufferInfo
 import com.solana.programs.SystemProgram
@@ -14,6 +16,62 @@ import com.solana.vendor.flatMap
 typealias SPLTokenDestinationAddress = Pair<PublicKey,Boolean>
 
 fun Action.findSPLTokenDestinationAddress(
+    mintAddress: PublicKey,
+    destinationAddress: PublicKey,
+    allowUnfundedRecipient: Boolean = false,
+    onComplete: ((Result<SPLTokenDestinationAddress, ResultError>) -> Unit)
+){
+    if(allowUnfundedRecipient) {
+        checkSPLTokenAccountExistence(
+            mintAddress,
+            destinationAddress,
+            onComplete
+        )
+    } else {
+        findSPLTokenDestinationAddressOfExistingAccount(
+            mintAddress,
+            destinationAddress,
+            onComplete
+        )
+    }
+}
+
+private fun Action.checkSPLTokenAccountExistence(
+    mintAddress: PublicKey,
+    destinationAddress: PublicKey,
+    onComplete: ((Result<SPLTokenDestinationAddress, ResultError>) -> Unit)
+) {
+
+    var associatedTokenAddress: PublicKey? = null
+    try {
+        val associatedProgramDerivedAddress = PublicKey.associatedTokenAddress(destinationAddress, mintAddress).address
+        associatedTokenAddress = associatedProgramDerivedAddress
+    } catch (error: Exception){
+        onComplete(Result.failure(error))
+    }
+
+    var hasAssociatedTokenAccount: Boolean = false
+    associatedTokenAddress?.let {
+        this.api.getAccountInfo(
+            associatedTokenAddress,
+            AccountInfo::class.java
+        ) { result ->
+            result.onSuccess {
+                hasAssociatedTokenAccount = true
+            }.onFailure {
+                if(it == nullValueError){
+                    hasAssociatedTokenAccount = false
+                } else {
+                    onComplete(Result.failure(it))
+                    return@onFailure
+                }
+            }
+            onComplete(Result.success(SPLTokenDestinationAddress(associatedTokenAddress!!, !hasAssociatedTokenAccount)))
+        }
+    }
+}
+
+private fun Action.findSPLTokenDestinationAddressOfExistingAccount(
     mintAddress: PublicKey,
     destinationAddress: PublicKey,
     onComplete: ((Result<SPLTokenDestinationAddress, ResultError>) -> Unit)
@@ -40,7 +98,7 @@ fun Action.findSPLTokenDestinationAddress(
             val owner = destinationAddress
             val tokenMint = mintAddress
 
-            val address = PublicKey.createProgramAddress(
+            val address = createProgramAddress(
                 listOf(owner.toByteArray()),
                 tokenMint
             )
@@ -63,7 +121,7 @@ fun Action.findSPLTokenDestinationAddress(
                 var isUnregisteredAsocciatedToken = true
                 // if associated token account has been registered
                 if(info1.owner == TokenProgram.PROGRAM_ID.toBase58() &&
-                        info.data?.value != null) {
+                    info.data?.value != null) {
                     isUnregisteredAsocciatedToken = false
                 }
                 SPLTokenDestinationAddress(toPublicKey,isUnregisteredAsocciatedToken)
