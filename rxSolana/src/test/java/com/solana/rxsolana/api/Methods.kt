@@ -215,7 +215,7 @@ class Methods {
     @Test
     fun TestGetConfirmedBlocks() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getConfirmedBlocks(64203570, 64203580).blockingGet()
+        val result = solana.api.getConfirmedBlocks(136943382, 136943392).blockingGet()
         Assert.assertNotNull(result)
     }
 
