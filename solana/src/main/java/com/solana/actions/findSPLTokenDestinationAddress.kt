@@ -50,7 +50,7 @@ private fun Action.checkSPLTokenAccountExistence(
         onComplete(Result.failure(error))
     }
 
-    var hasAssociatedTokenAccount: Boolean = false
+    var hasAssociatedTokenAccount = false
     associatedTokenAddress?.let {
         this.api.getAccountInfo(
             associatedTokenAddress,
@@ -66,7 +66,7 @@ private fun Action.checkSPLTokenAccountExistence(
                     return@onFailure
                 }
             }
-            onComplete(Result.success(SPLTokenDestinationAddress(associatedTokenAddress!!, !hasAssociatedTokenAccount)))
+            onComplete(Result.success(SPLTokenDestinationAddress(associatedTokenAddress, !hasAssociatedTokenAccount)))
         }
     }
 }
@@ -84,23 +84,20 @@ private fun Action.findSPLTokenDestinationAddressOfExistingAccount(
             result.onSuccess {
                 cb(Result.success(it))
             }.onFailure {
-                cb(Result.failure(Exception(it)))
+                cb(Result.failure(it))
             }
         }
     }.flatMap { info ->
         val toTokenMint = info.data?.value?.mint?.toBase58()
-        var toPublicKeyString: String = ""
+        var toPublicKeyString = ""
         if (mintAddress.toBase58() == toTokenMint) {
             // detect if destination address is already a SPLToken address
             toPublicKeyString = destinationAddress.toBase58()
         }else if (info.owner == SystemProgram.PROGRAM_ID.toBase58()) {
             // detect if destination address is a SOL address
-            val owner = destinationAddress
-            val tokenMint = mintAddress
-
             val address = createProgramAddress(
-                listOf(owner.toByteArray()),
-                tokenMint
+                listOf(destinationAddress.toByteArray()),
+                mintAddress
             )
             toPublicKeyString = address.toBase58()
         }

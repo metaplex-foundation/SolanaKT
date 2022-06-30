@@ -13,6 +13,10 @@ fun Api.getTokenAccountsByOwner(owner: PublicKey, tokenMint: PublicKey, onComple
     parameterMap["mint"] = tokenMint.toBase58()
     params.add(parameterMap)
 
+    val encodingMap: MutableMap<String, Any> = HashMap()
+    encodingMap["encoding"] = "base64"
+    params.add(encodingMap)
+
     val type = Types.newParameterizedType(
         RPC::class.java,
         Types.newParameterizedType(
