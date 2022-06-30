@@ -180,6 +180,32 @@ class Action {
             mintAddress = mintAddress,
             fromPublicKey = source,
             destinationAddress = destination,
+            allowUnfundedRecipient = false,
+            1
+        ).blockingGet()
+        Assert.assertNotNull(transactionId)
+    }
+
+    @Test
+    fun sendSPLTokensUnfundedAccountTest() {
+        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+
+        // Create account from private key
+        val feePayer: Account = Account.fromMnemonic(
+            Arrays.asList(
+                "siege", "amazing", "camp", "income", "refuse", "struggle", "feed", "kingdom", "lawn", "champion", "velvet", "crystal", "stomach", "trend", "hen", "uncover", "roast", "nasty", "until", "hidden", "crumble", "city", "bag", "minute"
+            ), ""
+            , DerivationPath.BIP44_M_44H_501H_0H_OH
+        )
+        val mintAddress = PublicKey("6AUM4fSvCAxCugrbJPFxTqYFp9r3axYx973yoSyzDYVH")
+        val source =  PublicKey("8hoBQbSFKfDK3Mo7Wwc15Pp2bbkYuJE8TdQmnHNDjXoQ")
+        val destination =  PublicKey("PBVmekuqJtZhWqwcXhgjTJREJx5ogUSBNAz3631QQxg")
+        val transactionId = solana.action.sendSPLTokens(
+            feePayer,
+            mintAddress = mintAddress,
+            fromPublicKey = source,
+            destinationAddress = destination,
+            allowUnfundedRecipient = true,
             1
         ).blockingGet()
         Assert.assertNotNull(transactionId)

@@ -21,15 +21,12 @@ fun Action.getMintData(
         it.onSuccess { account ->
             if (account.owner != programId.toBase58()) {
                 onComplete(Result.failure(RuntimeException("Invalid mint owner")))
-                return@getAccountInfo
             }
 
             account.data?.value?.let { mint ->
                 onComplete(Result.success(mint))
-                return@getAccountInfo
             }
             onComplete(Result.failure(RuntimeException("Invalid data")))
-            return@getAccountInfo
         }.onFailure { error ->
             onComplete(Result.failure(RuntimeException(error)))
         }

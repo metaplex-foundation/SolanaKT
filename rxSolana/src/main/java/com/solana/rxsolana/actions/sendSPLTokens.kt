@@ -12,7 +12,9 @@ fun Action.sendSPLTokens(
     mintAddress: PublicKey,
     fromPublicKey: PublicKey,
     destinationAddress: PublicKey,
+    allowUnfundedRecipient: Boolean = false,
     amount: Long
+
 ): Single<String> {
     return Single.create { emitter ->
         this.sendSPLTokens(
@@ -20,7 +22,9 @@ fun Action.sendSPLTokens(
             fromPublicKey = fromPublicKey,
             destinationAddress = destinationAddress,
             amount = amount,
+            allowUnfundedRecipient = allowUnfundedRecipient,
             account = account
+
         ) { result ->
             result.onSuccess {
                 emitter.onSuccess(it)

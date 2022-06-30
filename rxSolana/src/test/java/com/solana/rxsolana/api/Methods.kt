@@ -29,9 +29,9 @@ class Methods {
     @Test
     fun TestGetConfirmedTransaction() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getConfirmedTransaction("7Zk9yyJCXHapoKyHwd8AzPeW9fJWCvszR6VAcHUhvitN5W9QG9JRnoYXR8SBQPTh27piWEmdybchDt5j7xxoUth").blockingGet()
+        val result = solana.api.getConfirmedTransaction("v2Wun8mG3uUc2PyAoVofPXRCFDJC8ApDwpWLjftgbBfvDsEXN3ZtAgpZrjeFuFaYj1TPZFFNipvkVZwevMByYTo").blockingGet()
         Assert.assertTrue(result.slot!! > 0)
-        Assert.assertEquals(result.transaction!!.signatures[0], "7Zk9yyJCXHapoKyHwd8AzPeW9fJWCvszR6VAcHUhvitN5W9QG9JRnoYXR8SBQPTh27piWEmdybchDt5j7xxoUth")
+        Assert.assertEquals(result.transaction!!.signatures[0], "v2Wun8mG3uUc2PyAoVofPXRCFDJC8ApDwpWLjftgbBfvDsEXN3ZtAgpZrjeFuFaYj1TPZFFNipvkVZwevMByYTo")
     }
 
     @Test
@@ -73,7 +73,8 @@ class Methods {
     @Test
     fun TestGetBlockTime() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getBlockTime(63426807).blockingGet()
+        val height = solana.api.getBlockHeight().blockingGet()
+        val result = solana.api.getBlockTime(height - 10).blockingGet()
         Assert.assertNotNull(result)
     }
 
@@ -185,7 +186,8 @@ class Methods {
     @Test
     fun TestGetConfirmedBlock() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getConfirmedBlock(64201119).blockingGet()
+        val slot = solana.api.getSnapshotSlot().blockingGet()
+        val result = solana.api.getConfirmedBlock(slot.toInt()).blockingGet()
         Assert.assertNotNull(result)
     }
 
@@ -213,7 +215,7 @@ class Methods {
     @Test
     fun TestGetConfirmedBlocks() {
         val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getConfirmedBlocks(64203570, 64203580).blockingGet()
+        val result = solana.api.getConfirmedBlocks(136943382, 136943392).blockingGet()
         Assert.assertNotNull(result)
     }
 
