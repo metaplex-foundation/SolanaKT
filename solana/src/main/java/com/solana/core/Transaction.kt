@@ -36,7 +36,7 @@ class Transaction {
         for (signer in signers) {
             val signatureProvider = TweetNaclFast.Signature(ByteArray(0), signer.secretKey)
             val signature = signatureProvider.detached(serializedMessage)
-            _addSignature(Signature(signature, signer.publicKey))
+            signatures.add(Signature(signature, signer.publicKey))
         }
         return Result.success(Unit)
     }
@@ -52,7 +52,7 @@ class Transaction {
             .allocate(signaturesLength.size + signaturesSize * SIGNATURE_LENGTH + serializedMessage.size)
         out.put(signaturesLength)
         for (signature in signatures) {
-            out.put(signature.signature)
+            signature.signature?.let { out.put(it) }
         }
         out.put(serializedMessage)
         if(verifySignatures) {
