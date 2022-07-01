@@ -41,8 +41,8 @@ class Message {
     }
 
     private var recentBlockhash: String? = null
-    private val accountKeys: AccountKeysList = AccountKeysList()
-    private val instructions: MutableList<TransactionInstruction>
+    val accountKeys: AccountKeysList = AccountKeysList()
+    val instructions: MutableList<TransactionInstruction>
     var feePayer: PublicKey? = null
 
     fun addInstruction(instruction: TransactionInstruction): Message {
@@ -57,7 +57,6 @@ class Message {
     }
 
     fun serialize(): ByteArray {
-        requireNotNull(recentBlockhash) { "recentBlockhash required" }
         require(instructions.size != 0) { "No instructions provided" }
         val messageHeader = MessageHeader()
         val keysList = getAccountKeys()

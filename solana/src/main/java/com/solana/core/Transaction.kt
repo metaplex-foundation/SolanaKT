@@ -1,14 +1,13 @@
 package com.solana.core
 
-import com.solana.vendor.ShortvecEncoding
-import com.solana.vendor.TweetNaclFast
+import com.solana.vendor.*
 import org.bitcoinj.core.Base58
 import java.nio.ByteBuffer
 import java.util.*
 
 class Transaction {
     private val message: Message = Message()
-    private val signatures: MutableList<String> = ArrayList()
+    private val signatures: MutableList<Signature> = ArrayList()
     private lateinit var serializedMessage: ByteArray
     fun addInstruction(instruction: TransactionInstruction): Transaction {
         message.addInstruction(instruction)
@@ -23,12 +22,12 @@ class Transaction {
         message.feePayer = feePayer
     }
 
-    fun sign(signer: Account) {
-        sign(listOf(signer))
+    fun sign(signer: Account): Result<Unit, ResultError> {
+        return sign(listOf(signer))
     }
 
-    fun sign(signers: List<Account>) {
-        require(signers.size != 0) { "No signers" }
+    fun sign(signers: List<Account>): Result<Unit, ResultError> {
+        require(signers.isNotEmpty()) { return Result.failure(ResultError("No signers")) }
         // Fee payer defaults to first signer if not set
         message.feePayer ?: let {
             message.feePayer = signers[0].publicKey
@@ -37,22 +36,99 @@ class Transaction {
         for (signer in signers) {
             val signatureProvider = TweetNaclFast.Signature(ByteArray(0), signer.secretKey)
             val signature = signatureProvider.detached(serializedMessage)
-            signatures.add(Base58.encode(signature))
+            _addSignature(Signature(signature, signer.publicKey))
         }
+        return Result.success(Unit)
     }
 
-    fun serialize(): ByteArray {
+    fun serialize(
+        requiredAllSignatures: Boolean = true,
+        verifySignatures: Boolean = false
+    ): Result<ByteArray, ResultError> {
+
         val signaturesSize = signatures.size
         val signaturesLength = ShortvecEncoding.encodeLength(signaturesSize)
         val out = ByteBuffer
             .allocate(signaturesLength.size + signaturesSize * SIGNATURE_LENGTH + serializedMessage.size)
         out.put(signaturesLength)
         for (signature in signatures) {
-            val rawSignature = Base58.decode(signature)
-            out.put(rawSignature)
+            out.put(signature.signature)
         }
         out.put(serializedMessage)
-        return out.array()
+        if(verifySignatures) {
+            if(_verifySignatures(requiredAllSignatures).getOrDefault(false)){
+                return Result.failure(ResultError("Could not verify"))
+            }
+        }
+        return Result.success(out.array())
+    }
+
+    // MARK: - Helpers
+
+    fun addSignature(signature: Signature): Result<Unit, ResultError> {
+        return compile() // Ensure signatures array is populated
+            .flatMap { _addSignature(signature) }
+    }
+
+    fun serializeMessage(): Result<ByteArray, ResultError> {
+        return compile()
+            .map { it.serialize() }
+    }
+
+    fun findSignature(pubkey: PublicKey) = signatures.firstOrNull { it.publicKey == pubkey }
+
+    // MARK: - Compiling
+
+    fun compile(): Result<Message, ResultError> {
+        return compileMessage()
+    }
+
+    fun compileMessage(): Result<Message, ResultError> {
+        require(message.instructions.size > 0) { Result.failure(ResultError("No instructions provided")) }
+        return Result.success(message)
+    }
+
+    fun _partialSign(message: Message, signers: List<Account>): Result<Unit, ResultError> {
+        require(signers.isNotEmpty()) { return Result.failure(ResultError("No signers")) }
+        serializedMessage = message.serialize()
+        for (signer in signers) {
+            val signatureProvider = TweetNaclFast.Signature(ByteArray(0), signer.secretKey)
+            val signature = signatureProvider.detached(serializedMessage)
+            _addSignature(Signature(signature, signer.publicKey))
+        }
+        return Result.success(Unit)
+    }
+
+    private fun _addSignature(signature: Signature): Result<Unit, ResultError> {
+        val data = signature.signature
+        require(data?.size == 64) { return Result.failure("Signer not valid ${signature.publicKey.toBase58()}") }
+        val index = signatures.indexOfFirst { it.publicKey == signature.publicKey }
+        return if (index >= 0) {
+            signatures[index] = signature
+            Result.success(Unit)
+        } else {
+            Result.failure("Signer not valid ${signature.publicKey.toBase58()}")
+        }
+    }
+
+    // MARK: - Verifying
+    private fun _verifySignatures(
+        requiredAllSignatures: Boolean
+    ): Result<Boolean, ResultError> {
+        for (signature in signatures) {
+            if (signature.signature == null) {
+                if (requiredAllSignatures) {
+                    return Result.success(false)
+                }
+            } else {
+                if (!TweetNaclFast.Signature(signature.publicKey.toByteArray(), ByteArray(0))
+                        .detached_verify(serializedMessage, signature.signature)
+                ) {
+                    return Result.success(false)
+                }
+            }
+        }
+        return Result.success(true)
     }
 
     override fun toString(): String {
@@ -64,5 +140,14 @@ class Transaction {
 
     companion object {
         const val SIGNATURE_LENGTH = 64
+    }
+
+    data class Signature(
+        val signature: ByteArray?,
+        val publicKey: PublicKey
+    ) {
+        override fun toString(): String {
+            return "${publicKey.toBase58()} -> ${Base58.encode(signature)}"
+        }
     }
 }
