@@ -7,7 +7,7 @@ import java.util.*
 
 class Transaction {
     private val message: Message = Message()
-    private val signatures: MutableList<Signature> = ArrayList()
+    private var signatures: MutableList<Signature> = ArrayList()
     private lateinit var serializedMessage: ByteArray
     fun addInstruction(instruction: TransactionInstruction): Transaction {
         message.addInstruction(instruction)
@@ -37,6 +37,7 @@ class Transaction {
             val signatureProvider = TweetNaclFast.Signature(ByteArray(0), signer.secretKey)
             val signature = signatureProvider.detached(serializedMessage)
             signatures.add(Signature(signature, signer.publicKey))
+            //addSignature(Signature(signature, signer.publicKey))
         }
         return Result.success(Unit)
     }
@@ -80,11 +81,61 @@ class Transaction {
     // MARK: - Compiling
 
     fun compile(): Result<Message, ResultError> {
-        return compileMessage()
+        return compileMessage().map { message ->
+            val signedKeys = message.accountKeys.list
+            if(signatures.size == signedKeys.size){
+                var isValid = true
+                for ((index, signature) in signatures.withIndex()) {
+                    if(signedKeys[index].publicKey != signature.publicKey) {
+                        isValid = false
+                        break
+                    }
+                }
+                if(isValid){
+                    return@map message
+                }
+            }
+            signatures = signedKeys.map { Signature(null, it.publicKey) }.toMutableList()
+            message
+        }
     }
 
     fun compileMessage(): Result<Message, ResultError> {
         require(message.instructions.size > 0) { Result.failure(ResultError("No instructions provided")) }
+        val programIds = mutableListOf<PublicKey>()
+        val accountMetas = mutableListOf<AccountMeta>()
+
+        for (instruction in message.instructions) {
+            accountMetas.addAll(instruction.keys)
+            if(!programIds.contains(instruction.programId)){
+                programIds.add(instruction.programId)
+            }
+        }
+        for(programId in programIds){
+            accountMetas.add(
+                AccountMeta(programId, isSigner = false, isWritable = false)
+            )
+        }
+
+        val comparator = Comparator { x: AccountMeta, y: AccountMeta ->
+            if(x.isSigner != y.isSigner) { return@Comparator x.isSigner.compareTo(true) }
+            if(x.isWritable != y.isWritable) { return@Comparator x.isWritable.compareTo(true) }
+            return@Comparator false.compareTo(false)
+        }
+
+        accountMetas.sortWith(comparator)
+
+        accountMetas.fold(listOf<AccountMeta>()) { result, accountMeta ->
+            val uniqueMetas = result.toMutableList()
+            val index = uniqueMetas.indexOfFirst { it.publicKey == accountMeta.publicKey }
+            if(index >= 0) {
+                uniqueMetas[index].isWritable = uniqueMetas[index].isWritable || accountMeta.isWritable
+            } else {
+                uniqueMetas.add(accountMeta)
+            }
+            uniqueMetas
+        }
+        accountMetas.removeAll { it.publicKey == message.feePayer}
         return Result.success(message)
     }
 
@@ -147,7 +198,7 @@ class Transaction {
         val publicKey: PublicKey
     ) {
         override fun toString(): String {
-            return "${publicKey.toBase58()} -> ${Base58.encode(signature)}"
+            return "${publicKey.toBase58()} -> ${signature?.let { Base58.encode(it) }}"
         }
     }
 }
