@@ -9,6 +9,7 @@ import com.solana.core.PublicKey
 import com.solana.core.Transaction
 import com.solana.models.SimulatedTransaction
 import com.solana.networking.NetworkingRouter
+import com.solana.networking.OkHttpNetworkingRouter
 import com.solana.networking.RPCEndpoint
 import com.solana.programs.MemoProgram
 import com.solana.programs.SystemProgram
@@ -27,7 +28,7 @@ class Action {
         ), "")
         val auth = InMemoryAccountStorage()
         auth.save(sender)
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.action.sendSOL(
             sender,
             PublicKey("3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG"),
@@ -43,7 +44,7 @@ class Action {
         ), "")
         val auth = InMemoryAccountStorage()
         auth.save(sender)
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.action.getTokenWallets(
             sender.publicKey
         ).blockingGet()
@@ -60,7 +61,7 @@ class Action {
         )
         val auth = InMemoryAccountStorage()
         auth.save(seender)
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.action.createTokenAccount(seender, PublicKey("6AUM4fSvCAxCugrbJPFxTqYFp9r3axYx973yoSyzDYVH")).blockingGet()
         Assert.assertNotNull(result)
     }
@@ -83,7 +84,7 @@ class Action {
 
     @Test
     fun simulateTransactionTest() {
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val transaction =
             "ASdDdWBaKXVRA+6flVFiZokic9gK0+r1JWgwGg/GJAkLSreYrGF4rbTCXNJvyut6K6hupJtm72GztLbWNmRF1Q4BAAEDBhrZ0FOHFUhTft4+JhhJo9+3/QL6vHWyI8jkatuFPQzrerzQ2HXrwm2hsYGjM5s+8qMWlbt6vbxngnO8rc3lqgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAy+KIwZmU8DLmYglP3bPzrlpDaKkGu6VIJJwTOYQmRfUBAgIAAQwCAAAAuAsAAAAAAAA="
         val addresses = listOf(PublicKey.valueOf("QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo"))
@@ -94,7 +95,7 @@ class Action {
 
     @Test
     fun sendTransactionTests(){
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
 
         val lamports = 111L
         val destination = PublicKey("3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG")
@@ -115,7 +116,7 @@ class Action {
 
     @Test
     fun transactionMemoTest() {
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
 
         val lamports = 10101
         val destination = PublicKey("3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG")
@@ -147,14 +148,14 @@ class Action {
 
     @Test
     fun getMintDataTest() {
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.action.getMintData(PublicKey("8wzZaGf89zqx7PRBoxk9T6QyWWQbhwhdU555ZxRnceG3")).blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun getMultipleMintDatas() {
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result =
             solana.action.getMultipleMintDatas(listOf(PublicKey("8wzZaGf89zqx7PRBoxk9T6QyWWQbhwhdU555ZxRnceG3")))
                 .blockingGet()
@@ -163,7 +164,7 @@ class Action {
 
     @Test
     fun sendSPLTokensTest() {
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
 
         // Create account from private key
         val feePayer: Account = Account.fromMnemonic(
@@ -188,7 +189,7 @@ class Action {
 
     @Test
     fun sendSPLTokensUnfundedAccountTest() {
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
 
         // Create account from private key
         val feePayer: Account = Account.fromMnemonic(

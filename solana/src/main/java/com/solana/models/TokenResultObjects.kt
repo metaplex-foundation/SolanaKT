@@ -6,7 +6,7 @@ class TokenResultObjects {
     open class TokenAmountInfo(
         @Json(name = "amount") var amount: String?,
         @Json(name = "decimals") var decimals: Int,
-        @Json(name = "uiAmount") var uiAmount: Double,
+        @Json(name = "uiAmount") var uiAmount: Double?,
         @Json(name = "uiAmountString") var uiAmountString: String
     )
 
