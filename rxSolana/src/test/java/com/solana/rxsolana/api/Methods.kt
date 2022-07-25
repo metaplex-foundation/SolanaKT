@@ -30,9 +30,13 @@ class Methods {
     @Test
     fun TestGetConfirmedTransaction() {
         val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getConfirmedTransaction("v2Wun8mG3uUc2PyAoVofPXRCFDJC8ApDwpWLjftgbBfvDsEXN3ZtAgpZrjeFuFaYj1TPZFFNipvkVZwevMByYTo").blockingGet()
+
+        val slot = solana.api.getSnapshotSlot().blockingGet()
+        val block = solana.api.getConfirmedBlock(slot.toInt()).blockingGet()
+        val signature = block.transactions!!.first().transaction!!.signatures.first()
+        val result = solana.api.getConfirmedTransaction(signature).blockingGet()
         Assert.assertTrue(result.slot!! > 0)
-        Assert.assertEquals(result.transaction!!.signatures[0], "v2Wun8mG3uUc2PyAoVofPXRCFDJC8ApDwpWLjftgbBfvDsEXN3ZtAgpZrjeFuFaYj1TPZFFNipvkVZwevMByYTo")
+        Assert.assertEquals(result.transaction!!.signatures[0], signature)
     }
 
     @Test
@@ -73,9 +77,9 @@ class Methods {
 
     @Test
     fun TestGetBlockTime() {
-        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.mainnetBetaSolana))
         val height = solana.api.getBlockHeight().blockingGet()
-        val result = solana.api.getBlockTime(height - 10).blockingGet()
+        val result = solana.api.getBlockTime(height).blockingGet()
         Assert.assertNotNull(result)
     }
 
@@ -216,7 +220,8 @@ class Methods {
     @Test
     fun TestGetConfirmedBlocks() {
         val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getConfirmedBlocks(136943382, 136943392).blockingGet()
+        val height = solana.api.getBlockHeight().blockingGet().toInt()
+        val result = solana.api.getConfirmedBlocks(height, height - 10).blockingGet()
         Assert.assertNotNull(result)
     }
 
