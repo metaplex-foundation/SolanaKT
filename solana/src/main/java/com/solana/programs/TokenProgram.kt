@@ -13,6 +13,7 @@ import java.util.*
 object TokenProgram : Program() {
     val PROGRAM_ID = PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
     val SYSVAR_RENT_PUBKEY = PublicKey("SysvarRent111111111111111111111111111111111")
+    private const val INITIALIZE_MINT_ID = 0
     private const val INITIALIZE_METHOD_ID = 1
     private const val TRANSFER_METHOD_ID = 3
     private const val CLOSE_ACCOUNT_METHOD_ID = 9
@@ -69,6 +70,34 @@ object TokenProgram : Program() {
             PROGRAM_ID,
             keys,
             transactionData
+        )
+    }
+
+    fun initializeMint(
+        mint: PublicKey,
+        decimals: Byte,
+        mintAuthority: PublicKey,
+        freezeAuthority: PublicKey? = null,
+    ): TransactionInstruction {
+        val keys: MutableList<AccountMeta> = ArrayList()
+        keys.add(AccountMeta(mint, false, false))
+        keys.add(AccountMeta(SYSVAR_RENT_PUBKEY, false, false))
+
+        val buffer = ByteBuffer.allocate(1 + 1 + 32 + 1 + 32)
+        buffer.order(ByteOrder.LITTLE_ENDIAN)
+        buffer.put(INITIALIZE_MINT_ID.toByte())
+        buffer.put(decimals)
+        buffer.put(mintAuthority.pubkey)
+        buffer.put(when {
+            freezeAuthority != null -> 1
+            else -> 0
+        }.toByte())
+        buffer.put(freezeAuthority?.pubkey ?: ByteArray(32) { 0x0 })
+
+        return createTransactionInstruction(
+            PROGRAM_ID,
+            keys,
+            buffer.array()
         )
     }
 
