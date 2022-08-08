@@ -13,9 +13,11 @@ import java.util.*
 object TokenProgram : Program() {
     val PROGRAM_ID = PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
     val SYSVAR_RENT_PUBKEY = PublicKey("SysvarRent111111111111111111111111111111111")
+
     private const val INITIALIZE_MINT_ID = 0
     private const val INITIALIZE_METHOD_ID = 1
     private const val TRANSFER_METHOD_ID = 3
+    private const val MINT_TO_METHOD_ID = 7
     private const val CLOSE_ACCOUNT_METHOD_ID = 9
     private const val TRANSFER_CHECKED_METHOD_ID = 12
 
@@ -114,6 +116,29 @@ object TokenProgram : Program() {
         val buffer = ByteBuffer.allocate(1)
         buffer.order(ByteOrder.LITTLE_ENDIAN)
         buffer.put(INITIALIZE_METHOD_ID.toByte())
+        return createTransactionInstruction(
+            PROGRAM_ID,
+            keys,
+            buffer.array()
+        )
+    }
+
+    fun mintTo(
+        mint: PublicKey,
+        destination: PublicKey,
+        mintAuthority: PublicKey,
+        amount: Long,
+    ): TransactionInstruction {
+        val keys: MutableList<AccountMeta> = ArrayList()
+        keys.add(AccountMeta(mint, isSigner = false, isWritable = true))
+        keys.add(AccountMeta(destination, isSigner = false, isWritable = true))
+        keys.add(AccountMeta(mintAuthority, isSigner = true, isWritable = false))
+
+        val buffer = ByteBuffer.allocate(1 + 8)
+        buffer.order(ByteOrder.LITTLE_ENDIAN)
+        buffer.put(MINT_TO_METHOD_ID.toByte())
+        buffer.putLong(amount)
+
         return createTransactionInstruction(
             PROGRAM_ID,
             keys,
