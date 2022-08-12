@@ -2,13 +2,13 @@ package com.solana.rxsolana.actions
 
 import com.solana.actions.Action
 import com.solana.actions.closeTokenAccount
-import com.solana.core.HotAccount
+import com.solana.core.Account
 import com.solana.core.PublicKey
 import io.reactivex.Single
 import io.reactivex.disposables.Disposables
 
 fun Action.closeTokenAccount(
-    account: HotAccount,
+    account: Account,
     tokenPubkey: PublicKey,
 ) : Single<Pair<String, PublicKey>> {
     return Single.create { emitter ->
