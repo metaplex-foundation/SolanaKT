@@ -1,6 +1,7 @@
 package com.solana.api
 
 import com.solana.core.Account
+import com.solana.core.HotAccount
 import com.solana.core.Transaction
 import com.solana.models.RpcSendTransactionConfig
 import java.lang.RuntimeException

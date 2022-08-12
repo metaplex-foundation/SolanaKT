@@ -2,13 +2,13 @@ package com.solana.rxsolana.actions
 
 import com.solana.actions.Action
 import com.solana.actions.sendSOL
-import com.solana.core.Account
+import com.solana.core.HotAccount
 import com.solana.core.PublicKey
 import io.reactivex.Single
 import io.reactivex.disposables.Disposables
 
 fun Action.sendSOL(
-    account: Account,
+    account: HotAccount,
     destination: PublicKey,
     amount: Long
 ): Single<String> {
