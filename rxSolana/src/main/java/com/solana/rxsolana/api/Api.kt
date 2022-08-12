@@ -1,7 +1,7 @@
 package com.solana.rxsolana.api
 
 import com.solana.api.*
-import com.solana.core.HotAccount
+import com.solana.core.Account
 import com.solana.core.PublicKey
 import com.solana.core.Transaction
 import com.solana.models.*
@@ -49,7 +49,7 @@ fun Api.getConfirmedTransaction(signature: String): Single<ConfirmedTransaction>
     }
 }
 
-fun Api.sendTransaction(transaction: Transaction, signer: List<HotAccount>): Single<String> {
+fun Api.sendTransaction(transaction: Transaction, signer: List<Account>): Single<String> {
     return Single.create { emitter ->
         this.sendTransaction(transaction, signer) { result ->
             result.onSuccess {
