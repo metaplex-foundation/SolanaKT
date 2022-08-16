@@ -1,19 +1,15 @@
 package com.solana.rxsolana.actions
 
 import com.solana.Solana
-import com.solana.actions.sendSOL
-import com.solana.actions.serializeAndSendWithFee
-import com.solana.core.Account
+import com.solana.core.HotAccount
 import com.solana.core.DerivationPath
 import com.solana.core.PublicKey
 import com.solana.core.Transaction
 import com.solana.models.SimulatedTransaction
-import com.solana.networking.NetworkingRouter
 import com.solana.networking.OkHttpNetworkingRouter
 import com.solana.networking.RPCEndpoint
 import com.solana.programs.MemoProgram
 import com.solana.programs.SystemProgram
-import com.solana.rxsolana.InMemoryAccountStorage
 import com.solana.rxsolana.api.*
 import org.junit.Assert
 import org.junit.Test
@@ -23,10 +19,10 @@ import java.util.*
 class Action {
     @Test
     fun TestSendSOL() {
-        val sender: Account = Account.fromMnemonic(listOf(
+        val sender: HotAccount = HotAccount.fromMnemonic(listOf(
             "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
         ), "")
-        val auth = InMemoryAccountStorage()
+        val auth = InMemoryAccountStorage(sender)
         auth.save(sender)
         val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.action.sendSOL(
@@ -39,10 +35,10 @@ class Action {
 
     @Test
     fun TestGetTokenWallets() {
-        val sender: Account = Account.fromMnemonic(listOf(
+        val sender: HotAccount = HotAccount.fromMnemonic(listOf(
             "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
         ), "")
-        val auth = InMemoryAccountStorage()
+        val auth = InMemoryAccountStorage(sender)
         auth.save(sender)
         val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.action.getTokenWallets(
@@ -53,16 +49,16 @@ class Action {
 
     @Test
     fun TestCreateTokenAccount() {
-        val seender: Account = Account.fromMnemonic(
+        val sender: HotAccount = HotAccount.fromMnemonic(
             Arrays.asList(
                 "siege", "amazing", "camp", "income", "refuse", "struggle", "feed", "kingdom", "lawn", "champion", "velvet", "crystal", "stomach", "trend", "hen", "uncover", "roast", "nasty", "until", "hidden", "crumble", "city", "bag", "minute"
             ), ""
             , DerivationPath.BIP44_M_44H_501H_0H_OH
         )
-        val auth = InMemoryAccountStorage()
-        auth.save(seender)
+        val auth = InMemoryAccountStorage(sender)
+        auth.save(sender)
         val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.action.createTokenAccount(seender, PublicKey("6AUM4fSvCAxCugrbJPFxTqYFp9r3axYx973yoSyzDYVH")).blockingGet()
+        val result = solana.action.createTokenAccount(sender, PublicKey("6AUM4fSvCAxCugrbJPFxTqYFp9r3axYx973yoSyzDYVH")).blockingGet()
         Assert.assertNotNull(result)
     }
 
@@ -100,7 +96,7 @@ class Action {
         val lamports = 111L
         val destination = PublicKey("3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG")
 
-        val feePayer: Account = Account.fromMnemonic(
+        val feePayer: HotAccount = HotAccount.fromMnemonic(
             Arrays.asList(
                 "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
             ), ""
@@ -122,7 +118,7 @@ class Action {
         val destination = PublicKey("3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG")
 
         // Create account from private key
-        val feePayer: Account = Account.fromMnemonic(
+        val feePayer: HotAccount = HotAccount.fromMnemonic(
             Arrays.asList(
                 "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
             ), ""
@@ -167,7 +163,7 @@ class Action {
         val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
 
         // Create account from private key
-        val feePayer: Account = Account.fromMnemonic(
+        val feePayer: HotAccount = HotAccount.fromMnemonic(
             Arrays.asList(
                 "siege", "amazing", "camp", "income", "refuse", "struggle", "feed", "kingdom", "lawn", "champion", "velvet", "crystal", "stomach", "trend", "hen", "uncover", "roast", "nasty", "until", "hidden", "crumble", "city", "bag", "minute"
             ), ""
@@ -192,7 +188,7 @@ class Action {
         val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
 
         // Create account from private key
-        val feePayer: Account = Account.fromMnemonic(
+        val feePayer: HotAccount = HotAccount.fromMnemonic(
             Arrays.asList(
                 "siege", "amazing", "camp", "income", "refuse", "struggle", "feed", "kingdom", "lawn", "champion", "velvet", "crystal", "stomach", "trend", "hen", "uncover", "roast", "nasty", "until", "hidden", "crumble", "city", "bag", "minute"
             ), ""

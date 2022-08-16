@@ -1,7 +1,7 @@
 package com.solana.programs
 
 
-import com.solana.core.Account
+import com.solana.core.HotAccount
 import com.solana.core.PublicKey
 import com.solana.core.Transaction
 import junit.framework.Assert.assertEquals
@@ -164,7 +164,7 @@ class TokenProgramTest {
             159, 71, 234, 16, 104, 242, 116, 18, 106, 192, 38, 254, 250, 104, 231,
             160, 240
         ).map(Int::toByte).toByteArray()
-        private val MINT_ACCOUNT_SIGNER = Account(SECRET_KEY_92GL)
+        private val MINT_ACCOUNT_SIGNER = HotAccount(SECRET_KEY_92GL)
 
         // HmzQ2Qy4UAJLyYBMuA56ErzXL5DAnNQzaMNTzGKPHdQA
         private val SECRET_KEY_HmzQ = intArrayOf(
@@ -173,7 +173,7 @@ class TokenProgramTest {
             65, 114, 4, 173, 154, 18, 241, 134, 146, 247, 22, 182, 160, 59, 219, 236,
             24, 194, 1, 87, 250, 110, 250, 90, 91, 137, 249, 19, 128, 93, 175
         ).map(Int::toByte).toByteArray()
-        private val DESTINATION_KEY_PAIR = Account(SECRET_KEY_HmzQ)
+        private val DESTINATION_KEY_PAIR = HotAccount(SECRET_KEY_HmzQ)
 
         // CboHzBWtkrx2a8NuJAT7yAQBcviKz944ihbufZAx3ZpH
         private val SECRET_KEY_CboH = intArrayOf(
@@ -182,7 +182,7 @@ class TokenProgramTest {
             90, 165, 175, 10, 242, 194, 220, 35, 94, 196, 1, 212, 237, 92, 137, 230,
             246, 161, 91, 208, 252, 96, 190, 40, 191, 144, 144, 61, 78, 75, 150
         ).map(Int::toByte).toByteArray()
-        private val MINT_AUTHORITY_KEYPAIR_CboH = Account(SECRET_KEY_CboH);
+        private val MINT_AUTHORITY_KEYPAIR_CboH = HotAccount(SECRET_KEY_CboH);
 
         private val MINT_AUTHORITY_PUBLIC_KEY_9Aq6 = PublicKey("9Aq6XkUT8Nx2ztkpkUxc4HiVCFWKTJZWiLnhC94iofvy")
         private val FREEZE_AUTHORITY = PublicKey("22BMtVRGveoYeJyvYDHfJP5JMCRKTYbp3QMhxU1P8w1n")

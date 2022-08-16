@@ -15,7 +15,7 @@ public class MessageTest {
         PublicKey toPublickKey = new PublicKey("GrDMoeqMLFjeXQ24H56S1RLgT4R76jsuWCd6SvXyGPQ5");
         int lamports = 3000;
 
-        Account signer = new Account(Base58
+        HotAccount signer = new HotAccount(Base58
                 .decode("4Z7cXSyeFR8wNGMVXUE1TwtKn5D5Vu7FzEv69dokLv7KrQk7h6pu4LF8ZRR9yQBhc7uSM6RTTZtU1fmaxiNrxXrs"));
 
         Message message = new Message();

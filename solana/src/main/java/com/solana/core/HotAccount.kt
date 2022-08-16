@@ -18,8 +18,12 @@ sealed class DerivationPath(val path: String) {
 
 }
 
+interface Account {
+    val publicKey: PublicKey
+    fun sign(serializedMessage: ByteArray): ByteArray
+}
 
-class Account {
+class HotAccount : Account {
     private var keyPair: TweetNaclFast.Signature.KeyPair
 
     constructor() {
@@ -34,9 +38,15 @@ class Account {
         this.keyPair = keyPair
     }
 
-    val publicKey: PublicKey
+    override val publicKey: PublicKey
         get() = PublicKey(keyPair.publicKey)
-    val secretKey: ByteArray
+
+    override fun sign(serializedMessage: ByteArray): ByteArray {
+        val signatureProvider = TweetNaclFast.Signature(ByteArray(0), secretKey)
+        return signatureProvider.detached(serializedMessage)
+    }
+
+   private val secretKey: ByteArray
         get() = keyPair.secretKey
 
     companion object {
@@ -47,11 +57,11 @@ class Account {
          * @param passphrase seed passphrase
          * @return Solana account
          */
-        private fun fromBip44Mnemonic(words: List<String>, passphrase: String): Account {
+        private fun fromBip44Mnemonic(words: List<String>, passphrase: String): HotAccount {
             val solanaBip44 = SolanaBip44()
             val seed = MnemonicCode.toSeed(words, passphrase)
             val privateKey = solanaBip44.getPrivateKeyFromSeed(seed, DerivableType.BIP44)
-            return Account(TweetNaclFast.Signature.keyPair_fromSeed(privateKey))
+            return HotAccount(TweetNaclFast.Signature.keyPair_fromSeed(privateKey))
         }
 
         /**
@@ -61,24 +71,24 @@ class Account {
          * @param passphrase seed passphrase
          * @return Solana account
          */
-        private fun fromBip44MnemonicWithChange(words: List<String>, passphrase: String): Account {
+        private fun fromBip44MnemonicWithChange(words: List<String>, passphrase: String): HotAccount {
             val solanaBip44 = SolanaBip44()
             val seed = MnemonicCode.toSeed(words, passphrase)
             val privateKey = solanaBip44.getPrivateKeyFromSeed(seed, DerivableType.BIP44CHANGE)
-            return Account(TweetNaclFast.Signature.keyPair_fromSeed(privateKey))
+            return HotAccount(TweetNaclFast.Signature.keyPair_fromSeed(privateKey))
         }
 
 
-        private fun fromDeprecatedMnemonic(words: List<String>, passphrase: String): Account {
+        private fun fromDeprecatedMnemonic(words: List<String>, passphrase: String): HotAccount {
             val seed = MnemonicCode.toSeed(words, passphrase)
             val masterPrivateKey = HDKeyDerivation.createMasterPrivateKey(seed)
             val deterministicHierarchy = DeterministicHierarchy(masterPrivateKey)
             val child = deterministicHierarchy[HDUtils.parsePath(DerivationPath.DEPRECATED_M_501H_0H_0_0.path), true, true]
             val keyPair = TweetNaclFast.Signature.keyPair_fromSeed(child.privKeyBytes)
-            return Account(keyPair)
+            return HotAccount(keyPair)
         }
 
-        fun fromMnemonic(words: List<String>, passphrase: String, derivationPath: DerivationPath = DerivationPath.BIP44_M_44H_501H_0H_OH): Account {
+        fun fromMnemonic(words: List<String>, passphrase: String, derivationPath: DerivationPath = DerivationPath.BIP44_M_44H_501H_0H_OH): HotAccount {
             return when (derivationPath){
                 is DerivationPath.DEPRECATED_M_501H_0H_0_0 -> fromDeprecatedMnemonic(words, passphrase)
                 is DerivationPath.BIP44_M_44H_501H_0H -> fromBip44Mnemonic(words, passphrase)
@@ -87,18 +97,18 @@ class Account {
         }
 
         /**
-         * Creates an [Account] object from a Sollet-exported JSON string (array)
+         * Creates an [HotAccount] object from a Sollet-exported JSON string (array)
          * @param json Sollet-exported JSON string (array)
-         * @return [Account] built from Sollet-exported private key
+         * @return [HotAccount] built from Sollet-exported private key
          */
-        fun fromJson(json: String): Account {
-            return Account(convertJsonStringToByteArray(json))
+        fun fromJson(json: String): HotAccount {
+            return HotAccount(convertJsonStringToByteArray(json))
         }
 
         /**
-         * Convert's a Sollet-exported JSON string into a byte array usable for [Account] instantiation
+         * Convert's a Sollet-exported JSON string into a byte array usable for [HotAccount] instantiation
          * @param characters Sollet-exported JSON string
-         * @return byte array usable in [Account] instantiation
+         * @return byte array usable in [HotAccount] instantiation
          */
         private fun convertJsonStringToByteArray(characters: String): ByteArray {
             // Create resulting byte array

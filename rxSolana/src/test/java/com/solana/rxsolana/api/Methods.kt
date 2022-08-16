@@ -4,11 +4,8 @@ import com.solana.Solana
 import com.solana.core.PublicKey
 import com.solana.models.SignatureStatusRequestConfiguration
 import com.solana.models.buffer.AccountInfo
-import com.solana.models.buffer.TokenSwapInfo
-import com.solana.networking.NetworkingRouter
 import com.solana.networking.OkHttpNetworkingRouter
 import com.solana.networking.RPCEndpoint
-import com.solana.rxsolana.InMemoryAccountStorage
 import org.junit.Assert
 import org.junit.Test
 import kotlin.collections.listOf

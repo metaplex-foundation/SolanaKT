@@ -1,7 +1,6 @@
 package com.solana.core
 
 import com.solana.vendor.ShortvecEncoding
-import com.solana.vendor.TweetNaclFast
 import org.bitcoinj.core.Base58
 import java.nio.ByteBuffer
 import java.util.*
@@ -35,9 +34,7 @@ class Transaction {
         }
         serializedMessage = message.serialize()
         for (signer in signers) {
-            val signatureProvider = TweetNaclFast.Signature(ByteArray(0), signer.secretKey)
-            val signature = signatureProvider.detached(serializedMessage)
-            signatures.add(Base58.encode(signature))
+            signatures.add(Base58.encode(signer.sign(serializedMessage)))
         }
     }
 

@@ -9,7 +9,6 @@ import io.reactivex.disposables.Disposables
 import com.solana.actions.getMintData
 import com.solana.actions.getMultipleMintDatas
 
-
 fun Action.getMintData(
     mintAddress: PublicKey,
     programId: PublicKey = TokenProgram.PROGRAM_ID,
