@@ -3,6 +3,7 @@ package com.solana.api
 import com.solana.core.PublicKey
 import com.solana.models.ConfirmedSignFAddr2
 import com.solana.models.SignatureInformation
+import com.squareup.moshi.Types
 
 fun Api.getConfirmedSignaturesForAddress2(
     account: PublicKey,
@@ -17,7 +18,7 @@ fun Api.getConfirmedSignaturesForAddress2(
 
     router.request<List<SignatureInformation>>(
         "getConfirmedSignaturesForAddress2", params,
-        List::class.java
+        Types.newParameterizedType(List::class.java, SignatureInformation::class.java)
     ) { result ->
         result.onSuccess {
             onComplete(Result.success(it))
