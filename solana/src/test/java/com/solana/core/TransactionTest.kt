@@ -18,7 +18,7 @@ class TransactionTest {
         transaction.addInstruction(SystemProgram.transfer(fromPublicKey, toPublickKey, lamports.toLong()))
         transaction.setRecentBlockHash("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn")
         transaction.sign(signer)
-        val serializedTransaction: ByteArray = transaction.serialize(verifySignatures = true).getOrThrows()
+        val serializedTransaction: ByteArray = transaction.serialize(verifySignatures = false).getOrThrows()
 
         println(transaction)
 
