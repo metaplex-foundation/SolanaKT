@@ -4,38 +4,15 @@ import com.solana.vendor.*
 import org.bitcoinj.core.Base58
 import java.nio.ByteBuffer
 
-/**
- * Transaction signature as base-58 encoded string
- */
-typealias TransactionSignature = String
-
-/**
- * Default (empty) signature
- *
- * Signatures are 64 bytes in length
- */
 val DEFAULT_SIGNATURE = ByteArray(0)
 
-/**
- * Maximum over-the-wire size of a Transaction
- *
- * 1280 is IPv6 minimum MTU
- * 40 bytes is the size of the IPv6 header
- * 8 bytes is the size of the fragment header
- */
 const val PACKET_DATA_SIZE = 1280 - 40 - 8
 
 const val SIGNATURE_LENGTH = 64
 
-/**
- * Account metadata used to define instructions
- */
 class AccountMeta(
-    /** An account's public key */
     var publicKey: PublicKey,
-    /** True if an instruction requires a transaction signature matching `pubkey` */
     var isSigner: Boolean,
-    /** True if the `pubkey` can be loaded as a read-write account. */
     var isWritable: Boolean
 ) {
     override fun toString(): String {
@@ -43,82 +20,35 @@ class AccountMeta(
     }
 }
 
-/**
- * Configuration object for Transaction.serialize()
- */
 class SerializeConfig(
-    /** Require all transaction signatures be present (default: true) */
     val requireAllSignatures: Boolean = true,
-    /** Verify provided signatures (default: true) */
     val verifySignatures: Boolean = true
 )
 
-/**
- * Transaction Instruction class
- */
 data class TransactionInstruction(
-    /**
-     * Program Id to execute
-     */
     var programId: PublicKey,
-
-    /**
-     * Public keys to include in this transaction
-     * Boolean represents whether this pubkey needs to sign the transaction
-     */
     var keys: List<AccountMeta>,
-
-    /**
-     * Program input
-     */
     var data: ByteArray = ByteArray(0)
 )
 
-/**
- * Pair of signature and corresponding public key
- */
 data class SignaturePubkeyPair(
     var signature: ByteArray?,
     val publicKey: PublicKey
 )
 
-/**
- * Nonce information to be used to build an offline Transaction.
- */
 class NonceInformation(
-    /** The current blockhash stored in the nonce */
     val nonce: String,
-    /** AdvanceNonceAccount Instruction */
     val nonceInstruction: TransactionInstruction
 )
 
-/**
- * Transaction class
- */
 class Transaction {
-
-    /**
-     * Signatures for the transaction.  Typically created by invoking the
-     * `sign()` method
-     */
     var signatures = mutableListOf<SignaturePubkeyPair>()
-
-    /**
-     * The first (payer) Transaction signature
-     */
     val signature: ByteArray?
         get() = signatures.firstOrNull()?.signature
 
     private lateinit var serializedMessage: ByteArray
-
-    /**
-     * The transaction fee payer
-     */
     var feePayer: PublicKey? = null
 
-    /**
-     * The instructions to atomically execute
-     */
     val instructions = mutableListOf<TransactionInstruction>()
     lateinit var recentBlockhash: String
     var nonceInfo: NonceInformation? = null
@@ -127,7 +57,6 @@ class Transaction {
 
     fun add(vararg instruction: TransactionInstruction): Transaction {
         require(instruction.isNotEmpty()) { "No instructions" }
-
         this.instructions.addAll(instruction)
         return this
     }
@@ -168,24 +97,8 @@ class Transaction {
         val message = compile()
         partialSign(message, uniqueSigners)
         verifySignatures(message.serialize(), true)
-
-        /*val feePayer = signers[0]
-        message.setFeePayer(feePayer.publicKey)
-        serializedMessage = message.serialize()
-        for (signer in signers) {
-            val signatureProvider = TweetNaclFast.Signature(ByteArray(0), signer.secretKey)
-            val signature = signatureProvider.detached(serializedMessage)
-            signatures.add(Base58.encode(signature))
-        }*/
     }
 
-    /**
-     * Partially sign a transaction with the specified accounts. All accounts must
-     * correspond to either the fee payer or a signer account in the transaction
-     * instructions.
-     *
-     * All the caveats from the `sign` method apply to `partialSign`
-     */
     fun partialSign(vararg signers: Account) {
         require(signers.isNotEmpty()) { "No signers" }
 
@@ -214,11 +127,6 @@ class Transaction {
         }
     }
 
-    /**
-     * Add an externally created signature to a transaction. The public key
-     * must correspond to either the fee payer or a signer account in the transaction
-     * instructions.
-     */
     fun addSignature(pubkey: PublicKey, signature: ByteArray) {
         compile() // Ensure signatures array is populated
         _addSignature(pubkey, signature)
@@ -237,9 +145,6 @@ class Transaction {
         this.signatures[index].signature = signature
     }
 
-    /**
-     * Verify signatures of a complete, signed Transaction
-     */
     fun verifySignatures(): Boolean {
         return verifySignatures(this.serializeMessage(), true)
     }
@@ -481,38 +386,8 @@ class Transaction {
         return out
     }
 
-    /**
-     * Specify the public keys which will be used to sign the Transaction.
-     * The first signer will be used as the transaction fee payer account.
-     *
-     * Signatures can be added with either `partialSign` or `addSignature`
-     *
-     * @deprecated Deprecated since v0.84.0. Only the fee payer needs to be
-     * specified and it can be set in the Transaction constructor or with the
-     * `feePayer` property.
-     */
-    @Deprecated("Deprecated since v0.84.0.")
-    fun setSigners(vararg signers: PublicKey) {
-        require(signers.isNotEmpty()) { "No signers" }
-
-        val seen = mutableSetOf<PublicKey>()
-        this.signatures = signers.filter { key ->
-            if (seen.contains(key)) {
-                return@filter false
-            } else {
-                seen.add(key)
-                return@filter true
-            }
-        }.map { publicKey ->
-            SignaturePubkeyPair(signature = null, publicKey = publicKey)
-        }.toMutableList()
-    }
-
     companion object {
 
-        /**
-         * Parse a wire transaction into a Transaction object.
-         */
         fun from(buffer: ByteArray): Transaction {
             // Slice up wire data
             var byteArray = buffer
@@ -529,9 +404,6 @@ class Transaction {
             return populate(Message.from(byteArray), signatures)
         }
 
-        /**
-         * Populate Transaction object from message and signatures
-         */
         fun populate(message: Message, signatures: List<String> = emptyList()): Transaction {
             val transaction = Transaction()
             transaction.recentBlockhash = message.recentBlockhash
@@ -571,7 +443,6 @@ class Transaction {
                     )
                 )
             }
-
             return transaction
         }
     }

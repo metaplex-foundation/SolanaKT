@@ -23,11 +23,8 @@ class MessageHeader {
 }
 
 data class CompiledInstruction(
-    /** Index into the transaction keys array indicating the program account that executes this instruction */
     val programIdIndex: Int,
-    /** Ordered indices into the transaction keys array indicating which accounts to pass to the program */
     val accounts: List<Int>,
-    /** The program input data encoded as base 58 */
     val data: String
 )
 
@@ -36,7 +33,7 @@ const val PUBKEY_LENGTH = 32
 class Message(
     val header: MessageHeader,
     val accountKeys: List<PublicKey>,
-    val recentBlockhash: Blockhash,
+    val recentBlockhash: String,
     val instructions: List<com.solana.core.CompiledInstruction>
 ) {
     private var indexToProgramIds = mutableMapOf<Int, PublicKey>()
@@ -130,10 +127,6 @@ class Message(
             buffer.write(instruction.data)
         }
         return buffer.toByteArray()
-        /*.also {
-            Logger.debug(
-                it.asUByteArray().joinToString("") { it.toString(radix = 16).padStart(2, '0') })
-        }*/
     }
 
     fun setFeePayer(publicKey: PublicKey) {
@@ -142,9 +135,6 @@ class Message(
 
     companion object {
 
-        /**
-         * Decode a compiled message into a Message object.
-         */
         fun from(buffer: ByteArray): Message {
             // Slice up wire data
             var byteArray = buffer
@@ -196,7 +186,7 @@ class Message(
                     this.numReadonlyUnsignedAccounts = numReadonlyUnsignedAccounts.toByte()
                 },
                 accountKeys = accountKeys.map { PublicKey(it) },
-                recentBlockhash = Blockhash().plus(Base58.encode(recentBlockhash)),
+                recentBlockhash = String().plus(Base58.encode(recentBlockhash)),
                 instructions = instructions
             )
         }
@@ -206,7 +196,6 @@ class Message(
 }
 
 object Shortvec {
-
     @JvmStatic
     fun decodeLength(bytes: ByteArray): Pair<Int, ByteArray> {
         var newBytes = bytes
