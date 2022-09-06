@@ -1,3 +1,4 @@
+// This is a code is a port from https://github.com/portto/solana-web3.kotlin
 package com.solana.core
 
 import com.solana.vendor.borshj.BorshBuffer
