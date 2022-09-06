@@ -233,8 +233,7 @@ class Transaction {
     private fun partialSign(message: Message, signers: List<Account>) {
         val signData = message.serialize()
         signers.forEach { signer ->
-            val signature =
-                TweetNaclFast.Signature(ByteArray(0), signer.secretKey).detached(signData)
+            val signature = signer.sign(signData)
             _addSignature(signer.publicKey, signature)
         }
     }

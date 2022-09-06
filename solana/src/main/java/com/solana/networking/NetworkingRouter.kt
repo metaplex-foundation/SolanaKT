@@ -34,11 +34,21 @@ interface MoshiAdapterFactory {
 
 class NetworkingRouterConfig(val rules: List<BorshRule<*>> = listOf(), val moshiAdapters: List<MoshiAdapterFactory> = listOf())
 
-class NetworkingRouter(
-    val endpoint: RPCEndpoint,
+interface NetworkingRouter {
+    val endpoint: RPCEndpoint
+    fun <T> request(
+        method: String,
+        params: List<Any>?,
+        clazz: Type?,
+        onComplete: (Result<T>) -> Unit
+    )
+}
+
+class OkHttpNetworkingRouter(
+    override val endpoint: RPCEndpoint,
     private val httpClient: OkHttpClient = OkHttpClient(),
     private val config: NetworkingRouterConfig? = null
-) {
+) : NetworkingRouter {
 
     private fun borsh(): Borsh {
         val borsh = Borsh()
@@ -66,7 +76,7 @@ class NetworkingRouter(
         private val JSON: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()
     }
 
-    fun <T> request(
+    override fun <T> request(
         method: String,
         params: List<Any>?,
         clazz: Type?,

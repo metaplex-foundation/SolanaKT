@@ -46,7 +46,7 @@ class TransactionTest {
     }
 
     companion object {
-        private val signer: Account = Account(
+        private val signer: Account = HotAccount(
             Base58
                 .decode("4Z7cXSyeFR8wNGMVXUE1TwtKn5D5Vu7FzEv69dokLv7KrQk7h6pu4LF8ZRR9yQBhc7uSM6RTTZtU1fmaxiNrxXrs")
         )

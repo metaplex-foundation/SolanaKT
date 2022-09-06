@@ -1,4 +1,4 @@
-package com.solana
+package com.solana.rxsolana.actions
 
 import com.solana.core.HotAccount
 
