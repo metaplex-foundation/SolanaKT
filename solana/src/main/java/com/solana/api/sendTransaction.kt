@@ -18,23 +18,17 @@ fun Api.sendTransaction(
             result.map { recentBlockHash ->
                 transaction.setRecentBlockHash(recentBlockHash)
                 transaction.sign(signers)
-                transaction.serialize().map {
-                    val base64Trx: String = Base64.getEncoder().encodeToString(it)
-                    listOf(base64Trx, RpcSendTransactionConfig())
-                }.onSuccess {
-                    router.request("sendTransaction", it, String::class.java, onComplete)
-                }.onFailure {
-                    onComplete(Result.failure(RuntimeException(it)))
-                }
+                val serialized = transaction.serialize()
+                val base64Trx: String = Base64.getEncoder().encodeToString(serialized)
+                router.request("sendTransaction", listOf(base64Trx, RpcSendTransactionConfig()), String::class.java, onComplete)
             }
         }
     } else {
         transaction.setRecentBlockHash(recentBlockHash)
         transaction.sign(signers)
-        transaction.serialize().onSuccess {
-            val base64Trx: String = Base64.getEncoder().encodeToString(it)
-            val params = listOf(base64Trx, RpcSendTransactionConfig())
-            router.request("sendTransaction", params, String::class.java, onComplete)
-        }
+        val serialized = transaction.serialize()
+        val base64Trx: String = Base64.getEncoder().encodeToString(serialized)
+        val params = listOf(base64Trx, RpcSendTransactionConfig())
+        router.request("sendTransaction", params, String::class.java, onComplete)
     }
 }

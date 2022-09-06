@@ -3,7 +3,7 @@ package com.solana.core
 class TransactionBuilder {
     private val transaction: Transaction = Transaction()
     fun addInstruction(transactionInstruction: TransactionInstruction): TransactionBuilder {
-        transaction.addInstruction(transactionInstruction)
+        transaction.add(transactionInstruction)
         return this
     }
 

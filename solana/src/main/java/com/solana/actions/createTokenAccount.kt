@@ -25,14 +25,14 @@ fun Action.createTokenAccount(
                 TokenProgram.PROGRAM_ID
             )
 
-            transaction.addInstruction(createAccountInstruction)
+            transaction.add(createAccountInstruction)
             val initializeAccountInstruction = TokenProgram.initializeAccount(
                 account = newAccount.publicKey,
                 mint = mintAddress,
                 owner = account.publicKey
             )
 
-            transaction.addInstruction(initializeAccountInstruction)
+            transaction.add(initializeAccountInstruction)
             this.serializeAndSendWithFee(transaction, listOf(account,newAccount), null){ result ->
                 result.onSuccess { transactionId ->
                     onComplete(Result.success(Pair(transactionId, newAccount.publicKey)))
