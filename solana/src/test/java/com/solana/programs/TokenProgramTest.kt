@@ -33,7 +33,7 @@ class TokenProgramTest {
             TokenProgram.initializeMint(MINT_ACCOUNT_SIGNER.publicKey, 0, MINT_AUTHORITY_PUBLIC_KEY_9Aq6);
 
         val serializedTransaction = with(Transaction()) {
-            add(instruction)
+            addInstruction(instruction)
             setRecentBlockHash("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn")
             sign(MINT_ACCOUNT_SIGNER)
             serialize()
@@ -55,7 +55,7 @@ class TokenProgramTest {
         );
 
         val serializedTransaction = with(Transaction()) {
-            add(instruction)
+            addInstruction(instruction)
             setRecentBlockHash("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn")
             sign(MINT_ACCOUNT_SIGNER)
             serialize()
@@ -77,7 +77,7 @@ class TokenProgramTest {
         );
 
         val serializedTransaction = with(Transaction()) {
-            add(instruction)
+            addInstruction(instruction)
             setRecentBlockHash("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn")
             sign(MINT_ACCOUNT_SIGNER)
             serialize()
@@ -99,7 +99,7 @@ class TokenProgramTest {
         );
 
         val serializedTransaction = with(Transaction()) {
-            add(instruction)
+            addInstruction(instruction)
             setRecentBlockHash("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn")
             sign(MINT_AUTHORITY_KEYPAIR_CboH)
             serialize()
@@ -121,7 +121,7 @@ class TokenProgramTest {
         );
 
         val serializedTransaction = with(Transaction()) {
-            add(instruction)
+            addInstruction(instruction)
             setRecentBlockHash("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn")
             sign(MINT_AUTHORITY_KEYPAIR_CboH)
             serialize()
@@ -143,7 +143,7 @@ class TokenProgramTest {
         );
 
         val serializedTransaction = with(Transaction()) {
-            add(instruction)
+            addInstruction(instruction)
             setRecentBlockHash("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn")
             sign(MINT_AUTHORITY_KEYPAIR_CboH)
             serialize()

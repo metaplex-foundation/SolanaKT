@@ -1,12 +1,8 @@
 package com.solana.core
 
-import com.solana.api.Api
 import com.solana.vendor.*
 import org.bitcoinj.core.Base58
 import java.nio.ByteBuffer
-import java.util.*
-
-typealias Blockhash = String
 
 /**
  * Transaction signature as base-58 encoded string
@@ -91,23 +87,10 @@ data class SignaturePubkeyPair(
  */
 class NonceInformation(
     /** The current blockhash stored in the nonce */
-    val nonce: Blockhash,
+    val nonce: String,
     /** AdvanceNonceAccount Instruction */
     val nonceInstruction: TransactionInstruction
 )
-
-/*
-object TransactionSerializer :
-    JsonContentPolymorphicSerializer<Transaction>(
-        Transaction::class) {
-    override fun selectDeserializer(element: JsonElement) = when {
-        "message" in element.jsonObject -> Message.serializer()
-        element.jsonObject["err"] is JsonNull -> SignatureStatusResult.serializer()
-        else -> SignatureReceivedResult.serializer()
-    }
-}
-*/
-
 
 /**
  * Transaction class
@@ -137,17 +120,10 @@ class Transaction {
      * The instructions to atomically execute
      */
     val instructions = mutableListOf<TransactionInstruction>()
-
-    /**
-     * A recent transaction id. Must be populated by the caller
-     */
-    lateinit var recentBlockhash: Blockhash
-
-    /**
-     * Optional Nonce information. If populated, transaction will use a durable
-     * Nonce hash instead of a recentBlockhash. Must be populated by the caller
-     */
+    lateinit var recentBlockhash: String
     var nonceInfo: NonceInformation? = null
+
+    fun addInstruction(vararg instruction: TransactionInstruction) = add(*instruction)
 
     fun add(vararg instruction: TransactionInstruction): Transaction {
         require(instruction.isNotEmpty()) { "No instructions" }
