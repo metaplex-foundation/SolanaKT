@@ -121,7 +121,7 @@ repositories {
 	...
 	maven {
        name = "GitHubPackages"
-       url = "https://maven.pkg.github.com/ajamaica/SolanaKT"
+       url = "https://maven.pkg.github.com/metaplex-foundation/SolanaKT"
        credentials {
 		   username = "<YOUR_GITHUB_USERNAME>"
 		   password = "<YOUR_GITHUB_TOKENS>"
