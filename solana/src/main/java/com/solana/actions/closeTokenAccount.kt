@@ -18,7 +18,8 @@ fun Action.closeTokenAccount(
         destination = account.publicKey,
         owner= account.publicKey
     )
-    transaction.addInstruction(instruction)
+
+    transaction.add(instruction)
     api.sendTransaction(transaction, listOf(account)){ result ->
         result.onSuccess { transactionId ->
             onComplete(Result.success(Pair(transactionId, tokenPubkey)))

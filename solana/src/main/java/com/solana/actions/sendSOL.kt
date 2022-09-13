@@ -14,7 +14,7 @@ fun Action.sendSOL(
 ) {
     val instructions = SystemProgram.transfer(account.publicKey, destination, amount)
     val transaction = Transaction()
-    transaction.addInstruction(instructions)
+    transaction.add(instructions)
     this.serializeAndSendWithFee(transaction, listOf(account), null){ result ->
         result.onSuccess {
             onComplete(Result.success(it))

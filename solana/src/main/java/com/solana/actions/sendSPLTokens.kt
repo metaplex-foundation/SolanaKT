@@ -45,12 +45,12 @@ fun Action.sendSPLTokens(
                 owner = owner,
                 payer = account.publicKey
             )
-            transaction.addInstruction(createATokenInstruction)
+            transaction.add(createATokenInstruction)
         }
 
         // send instruction
         val sendInstruction = TokenProgram.transfer(fromPublicKey,toPublicKey, amount, account.publicKey)
-        transaction.addInstruction(sendInstruction)
+        transaction.add(sendInstruction)
         return@flatMap ContResult.success(transaction)
     }.flatMap { transaction ->
         return@flatMap ContResult<String, ResultError> { cb ->
