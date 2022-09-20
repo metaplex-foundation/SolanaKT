@@ -17,16 +17,19 @@ class Mnemonic(
         passphrase
     )
 
+    @Throws(RuntimeException::class)
     fun validate() {
         val joinedPhrase = phrase.joinToString(separator = " ") { word -> word }
         return MnemonicCode(joinedPhrase).validate()
     }
 
+    @Throws(RuntimeException::class)
     fun validateChecksum(): ByteArray{
         val joinedPhrase = phrase.joinToString(separator = " ") { word -> word }
         return MnemonicCode(joinedPhrase).validateChecksum()
     }
 
+    @Throws(RuntimeException::class)
     fun toEntropy(): ByteArray{
         val joinedPhrase = phrase.joinToString { word -> "$word " }
         return MnemonicCode(joinedPhrase).toEntropy()
@@ -242,19 +245,19 @@ private object Mnemonics {
             }
         }
     }
+}
 
-    object ChecksumException :
-        RuntimeException(
-            "Error: The checksum failed. Verify that none of the words have been transposed."
-        )
+object ChecksumException :
+    RuntimeException(
+        "Error: The checksum failed. Verify that none of the words have been transposed."
+    )
 
-    class WordCountException(count: Int) :
-        RuntimeException("Error: $count is an invalid word count.")
+class WordCountException(count: Int) :
+    RuntimeException("Error: $count is an invalid word count.")
 
-    class InvalidWordException : RuntimeException {
-        constructor(index: Int) : super("Error: invalid word encountered at index $index.")
-        constructor(word: String) : super("Error: <$word> was not found in the word list.")
-    }
+class InvalidWordException : RuntimeException {
+    constructor(index: Int) : super("Error: invalid word encountered at index $index.")
+    constructor(word: String) : super("Error: <$word> was not found in the word list.")
 }
 
 fun WordCount.toEntropy(): ByteArray = ByteArray(bitLength / 8).apply {
