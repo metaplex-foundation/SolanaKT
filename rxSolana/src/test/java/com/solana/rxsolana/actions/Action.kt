@@ -55,8 +55,6 @@ class Action {
             ), ""
             , DerivationPath.BIP44_M_44H_501H_0H_OH
         )
-        val auth = InMemoryAccountStorage(sender)
-        auth.save(sender)
         val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.action.createTokenAccount(sender, PublicKey("6AUM4fSvCAxCugrbJPFxTqYFp9r3axYx973yoSyzDYVH")).blockingGet()
         Assert.assertNotNull(result)

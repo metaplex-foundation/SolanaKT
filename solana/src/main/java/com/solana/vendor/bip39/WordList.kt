@@ -3,7 +3,9 @@ package com.solana.vendor.bip39
 import java.lang.UnsupportedOperationException
 import java.util.*
 
-class WordList internal constructor(val languageCode: String) {
+class WordList @Throws(UnsupportedOperationException::class) internal constructor(val languageCode: String) {
+
+    @Throws(UnsupportedOperationException::class)
     constructor(locale: Locale = Locale.ENGLISH) : this(locale.language)
 
     init {
@@ -18,6 +20,7 @@ class WordList internal constructor(val languageCode: String) {
 
         fun isSupported(languageCode: String): Boolean = languageCode == Locale.ENGLISH.language
 
+        @Throws(UnsupportedOperationException::class)
         fun validate(languageCode: String) {
             if (!isSupported(languageCode)) throw UnsupportedOperationException(
                 "The language <$languageCode> is not currently supported"
