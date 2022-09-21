@@ -17,19 +17,19 @@ class Mnemonic(
         passphrase
     )
 
-    @Throws(RuntimeException::class)
+    @Throws(MnemonicError::class)
     fun validate() {
         val joinedPhrase = phrase.joinToString(separator = " ") { word -> word }
         return MnemonicCode(joinedPhrase).validate()
     }
 
-    @Throws(RuntimeException::class)
+    @Throws(MnemonicError::class)
     fun validateChecksum(): ByteArray{
         val joinedPhrase = phrase.joinToString(separator = " ") { word -> word }
         return MnemonicCode(joinedPhrase).validateChecksum()
     }
 
-    @Throws(RuntimeException::class)
+    @Throws(MnemonicError::class)
     fun toEntropy(): ByteArray{
         val joinedPhrase = phrase.joinToString { word -> "$word " }
         return MnemonicCode(joinedPhrase).toEntropy()
@@ -125,7 +125,7 @@ private object Mnemonics {
             // verify: word count is supported
             wordCount.let { wordCount ->
                 if (WordCount.values().none { it.count == wordCount }) {
-                    throw WordCountException(wordCount)
+                    throw MnemonicError.WordCountException(wordCount)
                 }
             }
 
@@ -141,7 +141,7 @@ private object Mnemonics {
                     nextLetter = 0
                 } else {
                     sublist = sublist.filter { it.length > nextLetter && it[nextLetter] == c }
-                    if (sublist.isEmpty()) throw InvalidWordException(i)
+                    if (sublist.isEmpty()) throw MnemonicError.InvalidWordAtIndexException(i)
                     nextLetter++
                 }
             }
@@ -154,7 +154,10 @@ private object Mnemonics {
 
         @Suppress("ThrowsCount", "NestedBlockDepth")
         fun toEntropy(): ByteArray {
-            wordCount.let { if (it <= 0 || it % 3 > 0) throw WordCountException(wordCount) }
+            wordCount.let { if (it <= 0 || it % 3 > 0) throw MnemonicError.WordCountException(
+                wordCount
+            )
+            }
 
             // Look up all the words in the list and construct the
             // concatenation of the original entropy and the checksum.
@@ -170,7 +173,7 @@ private object Mnemonics {
             this.forEach {
                 words.binarySearch(it).let { phraseIndex ->
                     // fail if the word was not found on the list
-                    if (phraseIndex < 0) throw InvalidWordException(it)
+                    if (phraseIndex < 0) throw MnemonicError.InvalidWordException(it)
                     // for each of the 11 bits of the phraseIndex
                     (10 downTo 0).forEach { i ->
                         // isolate the next bit (starting from the big end)
@@ -195,7 +198,7 @@ private object Mnemonics {
             entropy.toSha256()[0].toBits().let { hashFirstByteBits ->
                 repeat(checksumLengthBits) { i ->
                     // failure means that each word was valid BUT they were in the wrong order
-                    if (hashFirstByteBits[i] != checksumBits[i]) throw ChecksumException
+                    if (hashFirstByteBits[i] != checksumBits[i]) throw MnemonicError.ChecksumException
                 }
             }
 
@@ -247,17 +250,11 @@ private object Mnemonics {
     }
 }
 
-object ChecksumException :
-    RuntimeException(
-        "Error: The checksum failed. Verify that none of the words have been transposed."
-    )
-
-class WordCountException(count: Int) :
-    RuntimeException("Error: $count is an invalid word count.")
-
-class InvalidWordException : RuntimeException {
-    constructor(index: Int) : super("Error: invalid word encountered at index $index.")
-    constructor(word: String) : super("Error: <$word> was not found in the word list.")
+sealed class MnemonicError(override val message: String?) : Exception(message) {
+    object ChecksumException : MnemonicError("Error: The checksum failed. Verify that none of the words have been transposed.")
+    data class WordCountException(val count: Int) : MnemonicError("Error: $count is an invalid word count.")
+    data class InvalidWordAtIndexException(val index: Int) : MnemonicError("Error: invalid word encountered at index $index.")
+    data class InvalidWordException(val word: String) : MnemonicError("Error: <$word> was not found in the word list.")
 }
 
 fun WordCount.toEntropy(): ByteArray = ByteArray(bitLength / 8).apply {
