@@ -1,18 +1,33 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.networking.models.RpcResultTypes
+import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.SolanaResponseSerializer
+import com.solana.networking.makeRequestResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.*
+
+class GetBalanceRequest(accountAddress: String,) : RpcRequestSerializable() {
+    override val method: String = "getBalance"
+    override val params = buildJsonArray {
+        add(accountAddress)
+    }
+}
+
+internal fun GetBalanceSerializer() = SolanaResponseSerializer(Long.serializer())
+
+suspend fun Api.getBalance(account: PublicKey): Result<Long> =
+    router.makeRequestResult(GetBalanceRequest(account.toBase58()), GetBalanceSerializer()).let { result ->
+        @Suppress("UNCHECKED_CAST")
+        if (result.isSuccess && result.getOrNull() == null)
+            Result.failure(Error("Account return Null"))
+        else result as Result<Long> // safe cast, null case handled above
+    }
 
 fun Api.getBalance(account: PublicKey, onComplete: ((Result<Long>) -> Unit)) {
-    val params: MutableList<Any> = ArrayList()
-    params.add(account.toString())
-    return router.request<RpcResultTypes.ValueLong>("getBalance", params, RpcResultTypes.ValueLong::class.java){ result ->
-        result.onSuccess {
-            onComplete(Result.success(it.value))
-            return@request
-        }.onFailure {
-            onComplete(Result.failure(RuntimeException(it)))
-            return@request
-        }
+    CoroutineScope(dispatcher).launch {
+        onComplete(getBalance(account))
     }
 }

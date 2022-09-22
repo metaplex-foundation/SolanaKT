@@ -142,6 +142,23 @@ data class PublicKey(val pubkey: ByteArray) : BorshCodable {
     }
 }
 
+class AccountPublicKeyRule(
+    override val clazz: Class<AccountPublicKey> = AccountPublicKey::class.java
+) : BorshRule<AccountPublicKey> {
+    override fun read(input: BorshInput): AccountPublicKey {
+        val publicKey = PublicKeyRule().read(input)
+        return AccountPublicKey(publicKey)
+    }
+
+    override fun <Self> write(obj: Any, output: BorshOutput<Self>): Self {
+        TODO("Not yet implemented")
+    }
+}
+
+data class AccountPublicKey (
+    val publicKey: PublicKey
+): BorshCodable
+
 class PublicKeyJsonAdapter {
     @FromJson
     fun fromJson(rawData: Any): PublicKey {

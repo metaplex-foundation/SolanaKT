@@ -1,60 +1,129 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.models.RPC
+import com.solana.models.RpcSendTransactionConfig
 import com.solana.models.buffer.BufferInfo
-import com.squareup.moshi.Types
-import java.lang.reflect.Type
+import com.solana.networking.*
+import com.solana.networking.SolanaAccountSerializer
+import com.solana.networking.serialization.serializers.legacy.BorshCodeableSerializer
 import com.solana.vendor.ResultError
+import com.solana.vendor.borshj.BorshCodable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.*
 
-fun <T>Api.getAccountInfo(account: PublicKey,
-                                        decodeTo: Class<T>,
-                                        onComplete: ((com.solana.vendor.Result<BufferInfo<T>, ResultError>) -> Unit)) {
+const val RPC_ACYNC_CALLBACK_INFO_DEPRECATION_MESSAGE =
+    "Aync-callback methods are obsolete and have been replaced by coroutine compatible suspend functions."
+
+class AccountRequest(
+    accountAddress: String,
+    encoding: RpcSendTransactionConfig.Encoding = RpcSendTransactionConfig.Encoding.base64,
+    commitment: String = "max",
+    length: Int? = null,
+    offset: Int? = length?.let { 0 }
+) : RpcRequestSerializable() {
+    override val method = "getAccountInfo"
+    override val params = buildJsonArray {
+        add(accountAddress)
+        addJsonObject {
+            put("encoding", encoding.getEncoding())
+            put("commitment", commitment)
+            length?.let {
+                putJsonObject("dataSlice") {
+                    put("length", length)
+                    put("offset", offset)
+                }
+            }
+        }
+    }
+}
+
+fun <T> Api.getAccountInfo(
+    serializer: KSerializer<T>,
+    account: PublicKey,
+    commitment: String = "max",
+    encoding: RpcSendTransactionConfig.Encoding = RpcSendTransactionConfig.Encoding.base64,
+    length: Int? = null,
+    offset: Int? = length?.let { 0 },
+    onComplete: ((Result<AccountInfo<T>>) -> Unit)
+) {
+    CoroutineScope(dispatcher).launch {
+        onComplete(getAccountInfo(serializer, account, commitment, encoding, length, offset))
+    }
+}
+
+suspend fun <A> Api.getAccountInfo(
+    serializer: KSerializer<A>,
+    account: PublicKey,
+    commitment: String = "max",
+    encoding: RpcSendTransactionConfig.Encoding = RpcSendTransactionConfig.Encoding.base64,
+    length: Int? = null,
+    offset: Int? = length?.let { 0 }
+): Result<AccountInfo<A>> =
+    router.makeRequestResult(
+        AccountRequest(
+            accountAddress = account.toBase58(),
+            encoding = encoding,
+            commitment = commitment,
+            length = length,
+            offset =  offset
+        ),
+        SolanaAccountSerializer(serializer)
+    ).let { result ->
+        @Suppress("UNCHECKED_CAST")
+        if (result.isSuccess && result.getOrNull() == null)
+            Result.failure(Error("Account return Null"))
+        else result as Result<AccountInfo<A>> // safe cast, null case handled above
+    }
+
+
+@Deprecated(RPC_ACYNC_CALLBACK_INFO_DEPRECATION_MESSAGE, ReplaceWith("getAccountInfo(serializer, account, commitment, length, offset, onComplete)"))
+fun <T: BorshCodable> Api.getAccountInfo(
+    account: PublicKey,
+    decodeTo: Class<T>,
+    onComplete: ((com.solana.vendor.Result<BufferInfo<T>, ResultError>) -> Unit)
+) {
     return getAccountInfo(account, HashMap(), decodeTo, onComplete)
 }
 
-fun <T> Api.getAccountInfo(account: PublicKey,
-                          additionalParams: Map<String, Any?>,
-                          decodeTo: Class<T>,
-                          onComplete: ((com.solana.vendor.Result<BufferInfo<T>, ResultError>) -> Unit)) {
+@Deprecated(RPC_ACYNC_CALLBACK_INFO_DEPRECATION_MESSAGE, ReplaceWith("getAccountInfo(serializer, account, commitment, encoding, length, offset, onComplete)"))
+fun <T: BorshCodable> Api.getAccountInfo(
+    account: PublicKey,
+    additionalParams: Map<String, Any?>,
+    decodeTo: Class<T>,
+    onComplete: ((com.solana.vendor.Result<BufferInfo<T>, ResultError>) -> Unit)
+) {
 
-
-    val params: MutableList<Any> = ArrayList()
-    val parameterMap: MutableMap<String, Any?> = HashMap()
-    parameterMap["commitment"] = additionalParams.getOrDefault("commitment", "max")
-    parameterMap["encoding"] = additionalParams.getOrDefault("encoding", "base64")
-
-    if (additionalParams.containsKey("dataSlice")) {
-        parameterMap["dataSlice"] = additionalParams["dataSlice"]
+    val commitment = additionalParams["commitment"] ?: "max"
+    val encoding = when (additionalParams["encoding"]) {
+        "base64" -> RpcSendTransactionConfig.Encoding.base64
+        "base58" -> RpcSendTransactionConfig.Encoding.base58
+        else -> RpcSendTransactionConfig.Encoding.base64
     }
-    params.add(account.toString())
-    params.add(parameterMap)
 
-    val type = Types.newParameterizedType(
-        RPC::class.java,
-        Types.newParameterizedType(
-            BufferInfo::class.java,
-            Type::class.java.cast(decodeTo)
-        )
-    )
+    var length: Int? = null
+    var offset: Int? = null
+    if (additionalParams.containsKey("dataSlice")) {
+        length = (additionalParams["dataSlice"] as Map<String, Int>)["length"]
+        offset = (additionalParams["dataSlice"] as Map<String, Int>)["offset"]
+    }
 
-    router.request<RPC<BufferInfo<T>?>>("getAccountInfo", params, type) { result ->
-        result
-            .map {
-                it.value
-            }
-            .onSuccess {
-                if(it != null){
-                    onComplete(com.solana.vendor.Result.success(it))
-                } else {
-                    onComplete(com.solana.vendor.Result.failure(nullValueError))
-                }
-            }
-            .onFailure {
-                onComplete(com.solana.vendor.Result.failure(ResultError(it)))
-            }
+    CoroutineScope(Dispatchers.IO).launch {
+        getAccountInfo(
+            serializer = BorshCodeableSerializer(decodeTo) as KSerializer<T>,
+            account= account,
+            commitment = commitment as String,
+            encoding = encoding,
+            length = length,
+            offset = offset
+        ).onSuccess {
+            onComplete(com.solana.vendor.Result.success(it.toBufferInfo()))
+        }.onFailure {
+            onComplete(com.solana.vendor.Result.failure(ResultError(it)))
+        }
     }
 }
 
 val nullValueError = ResultError("Account return Null")
-

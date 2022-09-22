@@ -1,6 +1,5 @@
 package com.solana.networking
 
-import com.solana.core.PublicKeyJsonAdapter
 import com.solana.core.PublicKeyRule
 import com.solana.models.buffer.AccountInfoRule
 import com.solana.models.buffer.MintRule
@@ -8,19 +7,21 @@ import com.solana.models.buffer.TokenSwapInfoRule
 import com.solana.models.buffer.moshi.AccountInfoJsonAdapter
 import com.solana.models.buffer.moshi.MintJsonAdapter
 import com.solana.models.buffer.moshi.TokenSwapInfoJsonAdapter
-import com.solana.networking.models.RPCError
-import com.solana.networking.models.RpcRequest
-import com.solana.networking.models.RpcResponse
+import com.solana.networking.models.*
 import com.solana.vendor.borshj.Borsh
 import com.solana.vendor.borshj.BorshRule
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.coroutines.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.Json
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.io.IOException
 import java.lang.reflect.Type
+import java.net.HttpURLConnection
 
 sealed class NetworkingError(override val message: String?) : Exception(message) {
     object invalidResponseNoData : NetworkingError("No data was returned.")
@@ -32,9 +33,12 @@ interface MoshiAdapterFactory {
     fun create(borsh: Borsh): Object
 }
 
-class NetworkingRouterConfig(val rules: List<BorshRule<*>> = listOf(), val moshiAdapters: List<MoshiAdapterFactory> = listOf())
+class NetworkingRouterConfig(
+    val rules: List<BorshRule<*>> = listOf(),
+    val moshiAdapters: List<MoshiAdapterFactory> = listOf()
+)
 
-interface NetworkingRouter {
+interface NetworkingRouter : JsonRpcDriver {
     val endpoint: RPCEndpoint
     fun <T> request(
         method: String,
@@ -50,16 +54,25 @@ class OkHttpNetworkingRouter(
     private val config: NetworkingRouterConfig? = null
 ) : NetworkingRouter {
 
+    private val json = Json {
+        encodeDefaults = true
+        ignoreUnknownKeys = true
+    }
+
     private fun borsh(): Borsh {
         val borsh = Borsh()
-        val rules = listOf(PublicKeyRule(), AccountInfoRule(), MintRule(), TokenSwapInfoRule()) + (config?.rules ?: listOf())
+        val rules = listOf(
+            PublicKeyRule(),
+            AccountInfoRule(),
+            MintRule(),
+            TokenSwapInfoRule()
+        ) + (config?.rules ?: listOf())
         borsh.setRules(rules)
         return borsh
     }
 
     private val moshi: Moshi by lazy {
         val moshiBuilder = Moshi.Builder()
-            .add(PublicKeyJsonAdapter())
             .add(MintJsonAdapter(borsh()))
             .add(TokenSwapInfoJsonAdapter(borsh()))
             .add(AccountInfoJsonAdapter(borsh()))
@@ -102,6 +115,7 @@ class OkHttpNetworkingRouter(
             override fun onFailure(call: Call, e: IOException) {
                 onComplete(Result.failure(RuntimeException(e)))
             }
+
             override fun onResponse(call: Call, response: Response) {
                 response.body?.let { body ->
                     val responses = body.string()
@@ -119,7 +133,7 @@ class OkHttpNetworkingRouter(
                             onComplete(Result.failure(it))
                             return
                         }
-                }?:run {
+                } ?: run {
                     onComplete(Result.failure(NetworkingError.invalidResponseNoData))
                 }
             }
@@ -140,5 +154,46 @@ class OkHttpNetworkingRouter(
             Result.failure(NetworkingError.decodingError(e))
         }
     }
+
+    override suspend fun <R> makeRequest(
+        request: RpcRequestSerializable,
+        resultSerializer: KSerializer<R>
+    ): RpcResponseSerializable<R> =
+        suspendCancellableCoroutine { continuation ->
+            val url = endpoint.url
+            with(url.openConnection() as HttpURLConnection) {
+                // config
+                setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                requestMethod = "POST"
+                doOutput = true
+
+                // cancellation
+                continuation.invokeOnCancellation { disconnect() }
+
+                // send request body
+                outputStream.write(
+                    json.encodeToString(RpcRequestSerializable.serializer(), request).toByteArray()
+                )
+                outputStream.close()
+
+                // read response
+                val responseString = inputStream.bufferedReader().use { it.readText() }
+
+                // TODO: should check response code and/or errorStream for errors
+                println("URL : $url")
+                println("Response Code : $responseCode")
+                println("input stream : $responseString")
+
+                continuation.resumeWith(
+                    Result.success(
+                        json.decodeFromString(
+                            RpcResponseSerializable.serializer(resultSerializer),
+                            responseString
+                        )
+                    )
+                )
+            }
+        }
+
 }
 
