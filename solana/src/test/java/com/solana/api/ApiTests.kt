@@ -97,4 +97,18 @@ class ApiTests {
         val result = solana.api.getEpochSchedule().getOrThrow()
         Assert.assertNotNull(result)
     }
+
+    @Test
+    fun TestGetFeeCalculatorForBlockhash() = runTest {
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
+        val blockhash = solana.api.getRecentBlockhash().getOrThrow()
+        val result = solana.api.getFeeCalculatorForBlockhash(blockhash).getOrThrow()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetFeeRateGovernor() = runTest {
+        val result = solana.api.getFeeRateGovernor().getOrThrow()
+        Assert.assertNotNull(result)
+    }
 }
