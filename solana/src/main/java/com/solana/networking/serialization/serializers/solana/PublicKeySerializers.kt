@@ -28,3 +28,11 @@ object PublicKeyAs32ByteSerializer : KSerializer<PublicKey> {
         if (decoder is BorshDecoder) PublicKey((0 until 32).map { decoder.decodeByte() }.toByteArray())
         else PublicKey(decoder.decodeSerializableValue(ByteArraySerializer()))
 }
+
+object PublicKeyAsStringSerializer : KSerializer<PublicKey> {
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("PublicKey")
+
+    override fun serialize(encoder: Encoder, value: PublicKey) = encoder.encodeString(value.toString())
+
+    override fun deserialize(decoder: Decoder): PublicKey = PublicKey(decoder.decodeString())
+}

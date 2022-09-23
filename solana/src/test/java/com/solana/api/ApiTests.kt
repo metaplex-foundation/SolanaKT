@@ -45,4 +45,10 @@ class ApiTests {
         val result = solana.api.getBlockTime(height)
         Assert.assertNotNull(result)
     }
+
+    @Test
+    fun TestGetClusterNodes() = runTest {
+        val result = solana.api.getClusterNodes()
+        Assert.assertNotNull(result)
+    }
 }
