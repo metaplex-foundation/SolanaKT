@@ -1,6 +1,5 @@
 package com.solana.api
 
-import com.solana.models.BlockCommitment
 import com.solana.networking.RpcRequestSerializable
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope

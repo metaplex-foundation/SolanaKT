@@ -16,7 +16,7 @@ class RecentBlockhashRequest : RpcRequestSerializable() {
 @Serializable
 internal data class BlockhashResponse(val blockhash: String, val feeCalculator: JsonElement)
 
-internal fun BlockhashSerializer() = BlockhashResponse.serializer()
+internal fun BlockhashSerializer() = SolanaResponseSerializer(BlockhashResponse.serializer())
 
 suspend fun Api.getRecentBlockhash(): Result<String> =
     router.makeRequestResult(RecentBlockhashRequest(), BlockhashSerializer()).let { result ->
