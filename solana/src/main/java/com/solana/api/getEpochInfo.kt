@@ -5,7 +5,6 @@ import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.serializer
 
 class GetEpochInfoRequest : RpcRequestSerializable() {
     override val method: String = "getEpochInfo"

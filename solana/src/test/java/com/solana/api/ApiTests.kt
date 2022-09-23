@@ -82,4 +82,10 @@ class ApiTests {
         val result = solana.api.getEpochInfo().getOrThrow()
         Assert.assertNotNull(result)
     }
+
+    @Test
+    fun TestGetEpochSchedule() = runTest {
+        val result = solana.api.getEpochSchedule().getOrThrow()
+        Assert.assertNotNull(result)
+    }
 }
