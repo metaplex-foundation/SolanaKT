@@ -24,7 +24,7 @@ class Methods {
         Assert.assertTrue(result > 0)
     }
 
-    @Test
+    /*@Test
     fun TestGetConfirmedTransaction() {
         val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
 
@@ -34,7 +34,7 @@ class Methods {
         val result = solana.api.getConfirmedTransaction(signature).blockingGet()
         Assert.assertTrue(result.slot!! > 0)
         Assert.assertEquals(result.transaction!!.signatures[0], signature)
-    }
+    }*/
 
     @Test
     fun TestGetVoteAccounts() {

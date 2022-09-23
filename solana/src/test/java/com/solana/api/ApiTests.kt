@@ -2,8 +2,6 @@
 
 package com.solana.api
 import com.solana.Solana
-import com.solana.core.PublicKey
-import com.solana.models.buffer.AccountInfo
 import com.solana.networking.OkHttpNetworkingRouter
 import com.solana.networking.RPCEndpoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,25 +15,25 @@ class ApiTests {
 
     @Test
     fun TestGetRecentBlockhash() = runTest {
-        val result: Any = solana.api.getRecentBlockhash()
+        val result = solana.api.getRecentBlockhash().getOrThrow()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetBlock() = runTest {
-        val result: Any = solana.api.getBlock(164039401)
+        val result = solana.api.getBlock(164039401).getOrThrow()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetBlockCommitment() = runTest {
-        val result: Any = solana.api.getBlockCommitment(82493733)
+        val result = solana.api.getBlockCommitment(82493733).getOrThrow()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetBlockHeight() = runTest {
-        val result: Any = solana.api.getBlockHeight()
+        val result = solana.api.getBlockHeight().getOrThrow()
         Assert.assertNotNull(result)
     }
 
@@ -48,7 +46,27 @@ class ApiTests {
 
     @Test
     fun TestGetClusterNodes() = runTest {
-        val result = solana.api.getClusterNodes()
+        val result = solana.api.getClusterNodes().getOrThrow()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetConfirmedBlock() = runTest {
+        val slot = solana.api.getSnapshotSlot().getOrThrow()
+        val result: Any = solana.api.getConfirmedBlock(slot)
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestSnapshotSlotBlock() = runTest {
+        val result = solana.api.getSnapshotSlot().getOrThrow()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetConfirmedBlocks() = runTest {
+        val height = solana.api.getBlockHeight().getOrThrow()
+        val result = solana.api.getConfirmedBlocks(height, height - 10).getOrThrow()
         Assert.assertNotNull(result)
     }
 }
