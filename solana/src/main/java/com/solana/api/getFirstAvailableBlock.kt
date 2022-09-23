@@ -3,6 +3,8 @@ package com.solana.api
 import com.solana.networking.RpcRequestSerializable
 import com.solana.networking.SolanaResponseSerializer
 import com.solana.networking.makeRequestResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.serializer
 
 class GetFirstAvailableBlockRequest : RpcRequestSerializable() {
@@ -12,7 +14,9 @@ class GetFirstAvailableBlockRequest : RpcRequestSerializable() {
 internal fun GetFirstAvailableBlockSerializer() = Long.serializer()
 
 fun Api.getFirstAvailableBlock(onComplete: ((Result<Long>) -> Unit)){
-    router.request("getFirstAvailableBlock", ArrayList(), Long::class.javaObjectType, onComplete)
+    CoroutineScope(dispatcher).launch {
+        onComplete(getFirstAvailableBlock())
+    }
 }
 
 suspend fun Api.getFirstAvailableBlock(): Result<Long> =

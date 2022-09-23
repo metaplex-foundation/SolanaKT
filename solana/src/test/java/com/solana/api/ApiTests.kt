@@ -123,4 +123,10 @@ class ApiTests {
         val result = solana.api.getFirstAvailableBlock().getOrThrow()
         Assert.assertNotNull(result)
     }
+
+    @Test
+    fun TestGetGenesisHash() = runTest {
+        val result = solana.api.getGenesisHash().getOrThrow()
+        Assert.assertNotNull(result)
+    }
 }
