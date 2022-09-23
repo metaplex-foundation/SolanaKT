@@ -38,4 +38,11 @@ class ApiTests {
         val result: Any = solana.api.getBlockHeight()
         Assert.assertNotNull(result)
     }
+
+    @Test
+    fun TestGetBlockTime() = runTest {
+        val height = solana.api.getBlockHeight().getOrThrow()
+        val result = solana.api.getBlockTime(height)
+        Assert.assertNotNull(result)
+    }
 }

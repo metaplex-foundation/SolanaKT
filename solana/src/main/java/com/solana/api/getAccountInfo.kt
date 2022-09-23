@@ -1,5 +1,6 @@
 package com.solana.api
 
+import com.solana.RPC_ACYNC_CALLBACK_INFO_DEPRECATION_MESSAGE
 import com.solana.core.PublicKey
 import com.solana.models.RpcSendTransactionConfig
 import com.solana.models.buffer.Buffer
@@ -17,9 +18,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
-
-const val RPC_ACYNC_CALLBACK_INFO_DEPRECATION_MESSAGE =
-    "Aync-callback methods are obsolete and have been replaced by coroutine compatible suspend functions."
 
 class AccountRequest(
     accountAddress: String,
