@@ -206,7 +206,7 @@ fun Api.getFeeCalculatorForBlockhash(blockhash: String): Single<FeeCalculatorInf
     }
 }
 
-fun Api.getBlockCommitment(block: Long): Single<BlockCommitment> {
+fun Api.getBlockCommitment(block: Long): Single<GetBlockCommitmentResponse> {
     return Single.create { emitter ->
         this.getBlockCommitment(block) { result ->
             result.onSuccess {

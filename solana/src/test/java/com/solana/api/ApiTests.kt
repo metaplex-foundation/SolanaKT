@@ -26,4 +26,10 @@ class ApiTests {
         val result: Any = solana.api.getBlock(164039401)
         Assert.assertNotNull(result)
     }
+
+    @Test
+    fun TestGetBlockCommitment() = runTest {
+        val result: Any = solana.api.getBlockCommitment(82493733)
+        Assert.assertNotNull(result)
+    }
 }

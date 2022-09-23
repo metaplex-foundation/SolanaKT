@@ -334,5 +334,4 @@ class Methods {
         val result = solana.api.getBlock(slot.toInt()).blockingGet()
         Assert.assertNotNull(result)
     }
-
 }
