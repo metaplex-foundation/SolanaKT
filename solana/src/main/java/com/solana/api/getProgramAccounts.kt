@@ -3,10 +3,18 @@ package com.solana.api
 import com.solana.core.PublicKey
 import com.solana.models.*
 import com.solana.models.buffer.BufferInfo
+import com.solana.networking.AccountInfoWithPublicKey
+import com.solana.networking.ProgramAccountsSerializer
 import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.makeRequestResult
+import com.solana.networking.serialization.serializers.legacy.BorshCodeableSerializer
+import com.solana.vendor.ResultError
 import com.solana.vendor.borshj.Borsh
 import com.solana.vendor.borshj.BorshCodable
 import com.squareup.moshi.Types
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.*
 import java.lang.reflect.Type
 import java.util.function.Consumer
@@ -63,131 +71,130 @@ class ProgramAccountRequest(
     }
 }
 
-fun <T: BorshCodable>Api.getProgramAccounts(
+fun <T : BorshCodable> Api.getProgramAccounts(
     account: PublicKey,
     offset: Long,
     bytes: String,
     decodeTo: Class<T>,
     onComplete: (Result<List<ProgramAccount<T>>>) -> Unit
-){
+) {
     val filters: MutableList<Any> = ArrayList()
     filters.add(Filter(Memcmp(offset, bytes)))
     val programAccountConfig = ProgramAccountConfig(filters = filters)
     return getProgramAccounts(account, programAccountConfig, decodeTo, onComplete)
 }
 
-fun <T: BorshCodable> Api.getProgramAccounts(account: PublicKey,
-                               decodeTo: Class<T>,
-                               onComplete: (Result<List<ProgramAccount<T>>>) -> Unit
+fun <T : BorshCodable> Api.getProgramAccounts(
+    account: PublicKey,
+    decodeTo: Class<T>,
+    onComplete: (Result<List<ProgramAccount<T>>>) -> Unit
 ) {
-    return getProgramAccounts(account, ProgramAccountConfig(RpcSendTransactionConfig.Encoding.base64), decodeTo, onComplete)
+    return getProgramAccounts(
+        account,
+        ProgramAccountConfig(RpcSendTransactionConfig.Encoding.base64),
+        decodeTo,
+        onComplete
+    )
 }
 
-fun <T: BorshCodable> Api.getProgramAccounts(
+fun <T : BorshCodable> Api.getProgramAccounts(
     account: PublicKey,
     programAccountConfig: ProgramAccountConfig?,
     decodeTo: Class<T>,
     onComplete: (Result<List<ProgramAccount<T>>>) -> Unit
 ) {
-    val params: MutableList<Any> = ArrayList()
-    params.add(account.toString())
-    if (programAccountConfig != null) {
-        params.add(programAccountConfig)
-    }
-    val type = Types.newParameterizedType(
-        List::class.java,
-        Types.newParameterizedType(
-            ProgramAccount::class.java,
-            Type::class.java.cast(decodeTo)
+    CoroutineScope(dispatcher).launch {
+        onComplete(getProgramAccounts(
+            BorshCodeableSerializer(decodeTo),
+            account,
+            programAccountConfig ?: ProgramAccountConfig()
         )
-    )
-    router.request<List<ProgramAccount<T>>>(
-        "getProgramAccounts", params,
-        type
-    ){ result ->
-        result.onSuccess {
-            onComplete(Result.success(it))
-        }.onFailure {
-            onComplete(Result.failure(it))
-        }
+            .map { programAccount ->
+                programAccount.map {
+                    ProgramAccount(it.account.toBufferInfo(), it.publicKey)
+                }
+            })
     }
 }
 
-fun <T :BorshCodable> Api.getProgramAccounts(
+fun <T : BorshCodable> Api.getProgramAccounts(
     account: PublicKey,
     memcmpList: List<Memcmp>,
     dataSize: Int,
     decodeTo: Class<T>,
     onComplete: (Result<List<ProgramAccount<T>>>) -> Unit
 ) {
-    val params: MutableList<Any> = ArrayList()
-    params.add(account.toString())
     val filters: MutableList<Any> = ArrayList()
-    memcmpList.forEach(Consumer { memcmp: Memcmp ->
+    memcmpList.forEach {
         filters.add(
             Filter(
-                memcmp
+                it
             )
         )
-    })
+    }
+
     filters.add(DataSize(dataSize.toLong()))
     val programAccountConfig = ProgramAccountConfig(filters = filters)
-    params.add(programAccountConfig)
 
-    val type = Types.newParameterizedType(
-        List::class.java,
-        Types.newParameterizedType(
-            ProgramAccount::class.java,
-            Type::class.java.cast(decodeTo)
+    CoroutineScope(dispatcher).launch {
+        onComplete(getProgramAccounts(
+            BorshCodeableSerializer(decodeTo),
+            account,
+            programAccountConfig
         )
-    )
-
-    router.request<List<ProgramAccount<T>>>(
-        "getProgramAccounts", params,
-        type
-    ) { result ->
-        result.onSuccess {
-            onComplete(Result.success(it))
-        }.onFailure {
-            onComplete(Result.failure(it))
-        }
+            .map { programAccount ->
+                programAccount.map {
+                    ProgramAccount(it.account.toBufferInfo(), it.publicKey)
+                }
+            })
     }
 }
 
-fun <T :BorshCodable>Api.getProgramAccounts(account: PublicKey,
-                                            memcmpList: List<Memcmp>,
-                                            decodeTo: Class<T>,
-                                            onComplete: (Result<List<ProgramAccount<T>>>) -> Unit
+fun <T : BorshCodable> Api.getProgramAccounts(
+    account: PublicKey,
+    memcmpList: List<Memcmp>,
+    decodeTo: Class<T>,
+    onComplete: (Result<List<ProgramAccount<T>>>) -> Unit
 ) {
-    val params: MutableList<Any> = ArrayList()
-    params.add(account.toString())
     val filters: MutableList<Any> = ArrayList()
-    memcmpList.forEach(Consumer { memcmp: Memcmp ->
+    memcmpList.forEach {
         filters.add(
             Filter(
-                memcmp
+                it
             )
         )
-    })
+    }
 
-    val type = Types.newParameterizedType(
-        List::class.java,
-        Types.newParameterizedType(
-            ProgramAccount::class.java,
-            Type::class.java.cast(decodeTo)
-        )
-    )
 
     val programAccountConfig = ProgramAccountConfig(filters = filters)
-    params.add(programAccountConfig)
-    router.request<List<ProgramAccount<T>>>(
-        "getProgramAccounts", params,
-        type
-    ){ result ->
-        result.onSuccess {
-            onComplete(Result.success(it))
-        }.onFailure {
-            onComplete(Result.failure(it))
-        }
+    CoroutineScope(dispatcher).launch {
+        onComplete(getProgramAccounts(
+            BorshCodeableSerializer(decodeTo),
+            account,
+            programAccountConfig
+        )
+            .map { programAccount ->
+                programAccount.map {
+                    ProgramAccount(it.account.toBufferInfo(), it.publicKey)
+                }
+            })
     }
 }
+
+suspend fun <A> Api.getProgramAccounts(
+    serializer: KSerializer<A>,
+    account: PublicKey,
+    programAccountConfig: ProgramAccountConfig
+): Result<List<AccountInfoWithPublicKey<A>>> =
+    router.makeRequestResult(
+        ProgramAccountRequest(
+            account.toString(),
+            programAccountConfig.encoding, programAccountConfig.filters,
+            programAccountConfig.dataSlice, programAccountConfig.commitment
+        ),
+        ProgramAccountsSerializer(serializer)
+    ).let { result ->
+        @Suppress("UNCHECKED_CAST")
+        if (result.isSuccess && result.getOrNull() == null) Result.success(listOf())
+        else result as Result<List<AccountInfoWithPublicKey<A>>> // safe cast, null case handled above
+    }
