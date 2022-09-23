@@ -23,7 +23,7 @@ suspend fun Api.getRecentBlockhash(): Result<String> =
         @Suppress("UNCHECKED_CAST")
         if (result.isSuccess && result.getOrNull() == null)
             Result.failure(Error("Can not be null"))
-        else result as Result<String> // safe cast, null case handled above
+        else result.map { it!!.blockhash } as Result<String> // safe cast, null case handled above
     }
 
 fun Api.getRecentBlockhash(onComplete: ((Result<String>) -> Unit)) {
