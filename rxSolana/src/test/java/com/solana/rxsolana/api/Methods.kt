@@ -187,14 +187,13 @@ class Methods {
         Assert.assertNotNull(result)
     }
 
-    /*@Test
-    Double Wrapping of result does allow the test to pas
+    @Test
     fun TestGetConfirmedBlock() {
         val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val slot = solana.api.getSnapshotSlot().blockingGet()
         val result = solana.api.getConfirmedBlock(slot.toInt()).blockingGet()
         Assert.assertNotNull(result)
-    }*/
+    }
 
     @Test
     fun TestGetSnapshotSlot() {
