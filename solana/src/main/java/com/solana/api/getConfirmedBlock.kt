@@ -62,7 +62,9 @@ suspend fun Api.getConfirmedBlock(
     )
         .let { result ->
             @Suppress("UNCHECKED_CAST")
-            if (result.isSuccess && result.getOrNull() == null)
+            if (result.isSuccess && result.getOrNull() == null) {
                 Result.failure(Error("Can not be null"))
-            else result as Result<ConfirmedBlock> // safe cast, null case handled above
+            } else {
+                result as Result<ConfirmedBlock> // safe cast, null case handled above
+            }
         }

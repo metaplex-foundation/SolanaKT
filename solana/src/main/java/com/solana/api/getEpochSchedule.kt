@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
-
 class GetEpochScheduleRequest : RpcRequestSerializable() {
     override val method: String = "getEpochSchedule"
 }

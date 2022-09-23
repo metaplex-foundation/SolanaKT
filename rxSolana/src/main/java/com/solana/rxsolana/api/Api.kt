@@ -4,6 +4,8 @@ import com.solana.api.*
 import com.solana.api.Block
 import com.solana.api.ClusterNode
 import com.solana.api.ConfirmedBlock
+import com.solana.api.EpochInfo
+import com.solana.api.EpochSchedule
 import com.solana.api.SignatureInformation
 import com.solana.core.Account
 import com.solana.core.PublicKey
@@ -40,7 +42,7 @@ fun Api.getBalance(account: PublicKey): Single<Long> {
     }
 }
 
-fun Api.getConfirmedTransaction(signature: String): Single<ConfirmedTransaction> {
+fun Api.getConfirmedTransaction(signature: String): Single<ConfirmedTransactionSerializable> {
     return Single.create { emitter ->
         this.getConfirmedTransaction(signature,) { result ->
             result.onSuccess {

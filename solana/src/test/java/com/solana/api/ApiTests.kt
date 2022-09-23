@@ -54,8 +54,17 @@ class ApiTests {
     @Test
     fun TestGetConfirmedBlock() = runTest {
         val slot = solana.api.getSnapshotSlot().getOrThrow()
+        // there is a weird bug in the testing framework (or possibly in suspendCoroutine) that
+        // is causing the Result.exceptionOrNull() (and similar Result methods) to crash due to
+        // a cast exceptions (Result<Result<T>> cant be cast to Result<T>). For some reason,
+        // using Any as the type here and removing the getOrNull() call allows the test to pass.
+        // This is weird behavior, that will likely be fixed when we upgrade our Kotlin version.
+        // There is a similar bug reported here: https://youtrack.jetbrains.com/issue/KT-41163
+        // TODO: Revert the commented code here
+        // val result = solana.api.getConfirmedBlock(slot).getOrThrow()
         val result: Any = solana.api.getConfirmedBlock(slot)
-        Assert.assertNotNull(result)
+        val tempFixConfirmBlock = result as ConfirmedBlock
+        Assert.assertNotNull(tempFixConfirmBlock)
     }
 
     @Test
@@ -73,8 +82,17 @@ class ApiTests {
 
     @Test
     fun TestGetConfirmedSignaturesForAddress2() = runTest {
-        val result = solana.api.getConfirmedSignaturesForAddress2(PublicKey("5Zzguz4NsSRFxGkHfM4FmsFpGZiCDtY72zH2jzMcqkJx"), 10).getOrThrow()
-        Assert.assertNotNull(result)
+        // there is a weird bug in the testing framework (or possibly in suspendCoroutine) that
+        // is causing the Result.exceptionOrNull() (and similar Result methods) to crash due to
+        // a cast exceptions (Result<Result<T>> cant be cast to Result<T>). For some reason,
+        // using Any as the type here and removing the getOrNull() call allows the test to pass.
+        // This is weird behavior, that will likely be fixed when we upgrade our Kotlin version.
+        // There is a similar bug reported here: https://youtrack.jetbrains.com/issue/KT-41163
+        // TODO: Revert the commented code here
+        // val result = solana.api.getConfirmedSignaturesForAddress2(PublicKey("5Zzguz4NsSRFxGkHfM4FmsFpGZiCDtY72zH2jzMcqkJx"), 10).getOrThrow()
+        val result: Any = solana.api.getConfirmedSignaturesForAddress2(PublicKey("5Zzguz4NsSRFxGkHfM4FmsFpGZiCDtY72zH2jzMcqkJx"), 10)
+        val tempFixConfirmBlock = result as List<SignatureInformation>
+        Assert.assertNotNull(tempFixConfirmBlock)
     }
 
     @Test
