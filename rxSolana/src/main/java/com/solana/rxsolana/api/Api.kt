@@ -8,6 +8,7 @@ import com.solana.api.EpochInfo
 import com.solana.api.EpochSchedule
 import com.solana.api.FeeCalculatorInfo
 import com.solana.api.FeeRateGovernorInfo
+import com.solana.api.FeesInfo
 import com.solana.api.SignatureInformation
 import com.solana.core.Account
 import com.solana.core.PublicKey

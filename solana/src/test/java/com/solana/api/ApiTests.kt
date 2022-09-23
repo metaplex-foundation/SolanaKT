@@ -111,4 +111,10 @@ class ApiTests {
         val result = solana.api.getFeeRateGovernor().getOrThrow()
         Assert.assertNotNull(result)
     }
+
+    @Test
+    fun TestGetFees() = runTest {
+        val result = solana.api.getFees().getOrThrow()
+        Assert.assertNotNull(result)
+    }
 }
