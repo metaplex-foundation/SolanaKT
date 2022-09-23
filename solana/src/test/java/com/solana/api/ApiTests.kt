@@ -129,4 +129,11 @@ class ApiTests {
         val result = solana.api.getGenesisHash().getOrThrow()
         Assert.assertNotNull(result)
     }
+
+    @Test
+    fun TestGetIdentity() = runTest {
+        val result = solana.api.getIdentity().getOrThrow()
+        Assert.assertNotNull(result)
+    }
+
 }
