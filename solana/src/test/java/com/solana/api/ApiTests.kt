@@ -2,13 +2,18 @@
 
 package com.solana.api
 import com.solana.Solana
+import com.solana.core.HotAccount
 import com.solana.core.PublicKey
-import com.solana.networking.OkHttpNetworkingRouter
-import com.solana.networking.RPCEndpoint
+import com.solana.models.ProgramAccountConfig
+import com.solana.networking.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.serializer
 import org.junit.Assert
 import org.junit.Test
+import java.lang.Error
 
 class ApiTests {
 
@@ -54,17 +59,8 @@ class ApiTests {
     @Test
     fun TestGetConfirmedBlock() = runTest {
         val slot = solana.api.getSnapshotSlot().getOrThrow()
-        // there is a weird bug in the testing framework (or possibly in suspendCoroutine) that
-        // is causing the Result.exceptionOrNull() (and similar Result methods) to crash due to
-        // a cast exceptions (Result<Result<T>> cant be cast to Result<T>). For some reason,
-        // using Any as the type here and removing the getOrNull() call allows the test to pass.
-        // This is weird behavior, that will likely be fixed when we upgrade our Kotlin version.
-        // There is a similar bug reported here: https://youtrack.jetbrains.com/issue/KT-41163
-        // TODO: Revert the commented code here
-        // val result = solana.api.getConfirmedBlock(slot).getOrThrow()
-        val result: Any = solana.api.getConfirmedBlock(slot)
-        val tempFixConfirmBlock = result as ConfirmedBlock
-        Assert.assertNotNull(tempFixConfirmBlock)
+        val result = solana.api.getConfirmedBlock(slot).getOrThrow()
+        Assert.assertNotNull(result)
     }
 
     @Test
@@ -136,4 +132,98 @@ class ApiTests {
         Assert.assertNotNull(result)
     }
 
+
+    //region getProgramAccounts
+    @Test
+    fun testGetProgramAccountsReturnsValidAccountInfo() = runTest {
+        // given
+        val account = "accountAddress"
+        val request = ProgramAccountRequest(account)
+        val expectedAccounts = listOf(AccountInfoWithPublicKey(
+            AccountInfo("programAccount", false, 0, "", 0),
+            account
+        ))
+
+        val solanaDriver = Api(MockRpcDriver().apply {
+            willReturn(request, expectedAccounts)
+        })
+
+        // when
+        val actualAccounts = solanaDriver
+            .getProgramAccounts(String.serializer(), PublicKey(account), ProgramAccountConfig())
+            .getOrDefault(listOf())
+
+        // then
+        Assert.assertEquals(expectedAccounts, actualAccounts)
+    }
+
+    @Test
+    fun testGetProgramAccountsReturnsEmptyListForUnknownAccount() = runTest {
+        // given
+        val account = "accountAddress"
+        val expectedAccounts = listOf<AccountInfoWithPublicKey<String>>()
+        val solanaDriver = Api(MockRpcDriver())
+
+        // when
+        val actualAccounts = solanaDriver
+            .getProgramAccounts(String.serializer(), PublicKey(account), ProgramAccountConfig())
+            .getOrNull()
+
+        // then
+        Assert.assertEquals(expectedAccounts, actualAccounts)
+    }
+
+    @Test
+    fun testGetProgramAccountsReturnsErrorForInvalidParams() = runTest {
+        // given
+        val account = "accountAddress"
+        val expectedErrorMessage = "Error Message"
+        val expectedResult = Result.failure<String>(Error(expectedErrorMessage))
+        val solanaDriver = Api(MockRpcDriver().apply {
+            willError(ProgramAccountRequest(account), RpcError(1234, expectedErrorMessage))
+        })
+
+        // when
+        val actualResult = solanaDriver.getProgramAccounts(
+            String.serializer(), PublicKey(account), ProgramAccountConfig()
+        )
+
+        // then
+        Assert.assertEquals(expectedResult.isFailure, actualResult.isFailure)
+        Assert.assertEquals(expectedErrorMessage, actualResult.exceptionOrNull()?.message)
+    }
+    //endregion
+
+    //region getMultipleAccountsInfo
+    @Test
+    fun testGetMultipleAccountsInfoReturnsValidAccountInfo() = runTest {
+        // given
+        val accounts = listOf(HotAccount().publicKey)
+        val accountsRequest = MultipleAccountsRequest(accounts.map { it.toBase58() })
+        val expectedAccountInfo = listOf(AccountInfo("testAccount", false, 0, "", 0))
+        val solanaDriver = Api(MockRpcDriver().apply {
+            willReturn(accountsRequest, expectedAccountInfo)
+        })
+
+        // when
+        val actualAccountInfo = solanaDriver.getMultipleAccountsInfo<String>(serializer(), accounts).getOrNull()
+
+        // then
+        Assert.assertEquals(expectedAccountInfo, actualAccountInfo)
+    }
+
+    @Test
+    fun testGetMultipleAccountsInfoReturnsEmptyListForNullAccount() = runTest {
+        // given
+        val accounts = listOf(HotAccount().publicKey)
+        val expectedAccountInfo = listOf<String>()
+        val solanaDriver = Api(MockRpcDriver())
+
+        // when
+        val actualAccountInfo = solanaDriver.getMultipleAccountsInfo<String>(serializer(), accounts).getOrNull()
+
+        // then
+        Assert.assertEquals(expectedAccountInfo, actualAccountInfo)
+    }
+    //endregion
 }
