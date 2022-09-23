@@ -2,6 +2,7 @@
 
 package com.solana.api
 import com.solana.Solana
+import com.solana.core.PublicKey
 import com.solana.networking.OkHttpNetworkingRouter
 import com.solana.networking.RPCEndpoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -67,6 +68,12 @@ class ApiTests {
     fun TestGetConfirmedBlocks() = runTest {
         val height = solana.api.getBlockHeight().getOrThrow()
         val result = solana.api.getConfirmedBlocks(height, height - 10).getOrThrow()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetConfirmedSignaturesForAddress2() = runTest {
+        val result = solana.api.getConfirmedSignaturesForAddress2(PublicKey("5Zzguz4NsSRFxGkHfM4FmsFpGZiCDtY72zH2jzMcqkJx"), 10).getOrThrow()
         Assert.assertNotNull(result)
     }
 }

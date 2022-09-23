@@ -25,7 +25,7 @@ fun Api.getConfirmedBlocks(start: Int, end: Int? = null, onComplete: (Result<Lis
     }
 }
 
-suspend fun Api.getConfirmedBlocks(start: Long, end: Long? = null,): Result<List<Double>> =
+suspend fun Api.getConfirmedBlocks(start: Long, end: Long? = null): Result<List<Double>> =
     router.makeRequestResult(GetConfirmedBlocksRequest(start, end), GetConfirmedBlocksSerializer())
         .let { result ->
             @Suppress("UNCHECKED_CAST")
