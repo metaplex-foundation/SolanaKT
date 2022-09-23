@@ -152,7 +152,7 @@ class Methods {
 
     @Test
     fun TestGetSupply() {
-        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.mainnetBetaSolana))
         val result = solana.api.getSupply().blockingGet()
         Assert.assertNotNull(result)
     }
@@ -326,13 +326,13 @@ class Methods {
     }
     */
 
-    /*
-    Not available yet
+
     @Test
     fun TestGetBlock() {
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getBlock(64199425).blockingGet()
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
+        val slot = solana.api.getSlot().blockingGet()
+        val result = solana.api.getBlock(slot.toInt()).blockingGet()
         Assert.assertNotNull(result)
     }
-    */
+
 }

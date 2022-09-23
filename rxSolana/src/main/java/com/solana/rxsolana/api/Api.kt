@@ -1,6 +1,7 @@
 package com.solana.rxsolana.api
 
 import com.solana.api.*
+import com.solana.api.Block
 import com.solana.core.Account
 import com.solana.core.PublicKey
 import com.solana.core.Transaction

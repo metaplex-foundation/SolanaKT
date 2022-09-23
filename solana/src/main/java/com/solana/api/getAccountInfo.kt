@@ -2,16 +2,20 @@ package com.solana.api
 
 import com.solana.core.PublicKey
 import com.solana.models.RpcSendTransactionConfig
+import com.solana.models.buffer.Buffer
 import com.solana.models.buffer.BufferInfo
 import com.solana.networking.*
-import com.solana.networking.SolanaAccountSerializer
+import com.solana.networking.serialization.serializers.base64.BorshAsBase64JsonArraySerializer
 import com.solana.networking.serialization.serializers.legacy.BorshCodeableSerializer
+import com.solana.networking.serialization.serializers.solana.AnchorAccountSerializer
+import com.solana.networking.serialization.serializers.solana.SolanaResponseSerializer
 import com.solana.vendor.ResultError
 import com.solana.vendor.borshj.BorshCodable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 
 const val RPC_ACYNC_CALLBACK_INFO_DEPRECATION_MESSAGE =
@@ -39,6 +43,26 @@ class AccountRequest(
         }
     }
 }
+
+@Serializable
+data class AccountInfo<D>(val data: D?, val executable: Boolean,
+                          val lamports: Long, val owner: String?, val rentEpoch: Long)
+
+internal fun <D, T: BorshCodable> AccountInfo<D>.toBufferInfo() =
+    BufferInfo(data?.let { Buffer(data as T) }, executable, lamports, owner, rentEpoch)
+
+internal fun <A> SolanaAccountSerializer(serializer: KSerializer<A>) =
+    AccountInfoSerializer(
+        BorshAsBase64JsonArraySerializer(
+            AnchorAccountSerializer(serializer.descriptor.serialName, serializer)
+        )
+    )
+
+private fun <D> AccountInfoSerializer(serializer: KSerializer<D>) =
+    SolanaResponseSerializer(AccountInfo.serializer(serializer))
+
+internal inline fun <reified A> SolanaAccountSerializer() =
+    AccountInfoSerializer<A?>(BorshAsBase64JsonArraySerializer(AnchorAccountSerializer()))
 
 fun <T> Api.getAccountInfo(
     serializer: KSerializer<T>,

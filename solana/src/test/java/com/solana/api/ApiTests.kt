@@ -20,4 +20,10 @@ class ApiTests {
         val result: Any = solana.api.getRecentBlockhash()
         Assert.assertNotNull(result)
     }
+
+    @Test
+    fun TestGetBlock() = runTest {
+        val result: Any = solana.api.getBlock(164039401)
+        Assert.assertNotNull(result)
+    }
 }

@@ -16,13 +16,13 @@ class RecentBlockhashRequest : RpcRequestSerializable() {
 @Serializable
 internal data class BlockhashResponse(val blockhash: String, val feeCalculator: JsonElement)
 
-internal fun BlockhashSerializer() = SolanaResponseSerializer(BlockhashResponse.serializer())
+internal fun BlockhashSerializer() = BlockhashResponse.serializer()
 
 suspend fun Api.getRecentBlockhash(): Result<String> =
     router.makeRequestResult(RecentBlockhashRequest(), BlockhashSerializer()).let { result ->
         @Suppress("UNCHECKED_CAST")
         if (result.isSuccess && result.getOrNull() == null)
-            Result.failure(Error("Account return Null"))
+            Result.failure(Error("Can not be null"))
         else result as Result<String> // safe cast, null case handled above
     }
 
