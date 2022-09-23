@@ -113,7 +113,8 @@ class Methods {
     @Test
     fun TestGetFeeCalculatorForBlockhash() {
         val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getFeeCalculatorForBlockhash("3pkUeCqmzESag2V2upuvxsFqbAmejBerWNMCSvUTeTQt").blockingGet()
+        val blockhash = solana.api.getRecentBlockhash().blockingGet()
+        val result = solana.api.getFeeCalculatorForBlockhash(blockhash).blockingGet()
         Assert.assertNotNull(result)
     }
 
