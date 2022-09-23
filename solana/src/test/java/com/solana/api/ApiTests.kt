@@ -117,4 +117,10 @@ class ApiTests {
         val result = solana.api.getFees().getOrThrow()
         Assert.assertNotNull(result)
     }
+
+    @Test
+    fun TestGetFirstAvailableBlock() = runTest {
+        val result = solana.api.getFirstAvailableBlock().getOrThrow()
+        Assert.assertNotNull(result)
+    }
 }
