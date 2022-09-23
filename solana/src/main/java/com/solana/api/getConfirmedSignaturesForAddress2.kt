@@ -73,7 +73,7 @@ suspend fun Api.getConfirmedSignaturesForAddress2(
         ), GetConfirmedSignaturesForAddress2Serializer()
     ).let { result ->
         @Suppress("UNCHECKED_CAST")
-        if (result.isSuccess && result.getOrNull() == null)
+        if (result.isSuccess && result.getOrNull() == null) {
             Result.failure(Error("Can not be null"))
-        else result as Result<List<SignatureInformation>> // safe cast, null case handled above
+        } else { result as Result<List<SignatureInformation>> } // safe cast, null case handled above
     }

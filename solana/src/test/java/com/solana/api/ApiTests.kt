@@ -76,4 +76,10 @@ class ApiTests {
         val result = solana.api.getConfirmedSignaturesForAddress2(PublicKey("5Zzguz4NsSRFxGkHfM4FmsFpGZiCDtY72zH2jzMcqkJx"), 10).getOrThrow()
         Assert.assertNotNull(result)
     }
+
+    @Test
+    fun TestGetEpochInfo() = runTest {
+        val result = solana.api.getEpochInfo().getOrThrow()
+        Assert.assertNotNull(result)
+    }
 }
