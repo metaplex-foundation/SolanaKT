@@ -1,7 +1,6 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.models.VoteAccountConfig
 import com.solana.networking.RpcRequestSerializable
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope

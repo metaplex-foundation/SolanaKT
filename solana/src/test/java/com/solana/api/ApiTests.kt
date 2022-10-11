@@ -211,6 +211,18 @@ class ApiTests {
         Assert.assertNotNull(result)
     }
 
+    @Test
+    fun TestRequestAirdrop() = runTest {
+        val result = solana.api.requestAirdrop(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV"), 1010)
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestMinimumLedgerSlot() = runTest {
+        val result = solana.api.minimumLedgerSlot()
+        Assert.assertNotNull(result)
+    }
+
     //region getProgramAccounts
     @Test
     fun testGetProgramAccountsReturnsValidAccountInfo() = runTest {

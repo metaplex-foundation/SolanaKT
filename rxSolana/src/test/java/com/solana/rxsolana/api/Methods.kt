@@ -59,13 +59,12 @@ class Methods {
         Assert.assertNotNull(result)
     }
 
-    /*@Test
-    Doesnt work on CI
+    @Test
     fun TestRequestAirdrop() {
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.requestAirdrop(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV"), 1010).blockingGet()
         Assert.assertNotNull(result)
-    }*/
+    }
 
     @Test
     fun TestGetMinimumBalanceForRentExemption() {
