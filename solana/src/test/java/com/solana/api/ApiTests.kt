@@ -150,6 +150,12 @@ class ApiTests {
         Assert.assertNotNull(result)
     }
 
+    @Test
+    fun TestGetMinimumBalanceForRentExemption() = runTest {
+        val result = solana.api.getMinimumBalanceForRentExemption(32000)
+        Assert.assertNotNull(result)
+    }
+
     //region getProgramAccounts
     @Test
     fun testGetProgramAccountsReturnsValidAccountInfo() = runTest {

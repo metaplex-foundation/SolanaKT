@@ -8,7 +8,6 @@ import kotlinx.serialization.builtins.serializer
 
 class GetMaxShredInsertSlotRequest() : RpcRequestSerializable() {
     override val method: String = "getMaxShredInsertSlot"
-
 }
 
 internal fun GetMaxShredInsertSlotSerializer() = Long.serializer()
