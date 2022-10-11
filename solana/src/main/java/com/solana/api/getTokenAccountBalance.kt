@@ -1,7 +1,6 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.models.RPC
 import com.solana.networking.RpcRequestSerializable
 import com.solana.networking.SolanaResponseSerializer
 import com.solana.networking.makeRequestResult

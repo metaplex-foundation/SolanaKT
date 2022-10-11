@@ -488,7 +488,7 @@ fun Api.getTokenAccountBalance(tokenMint: PublicKey): Single<TokenAmountInfoResp
     }
 }
 
-fun Api.getTokenSupply(tokenMint: PublicKey): Single<TokenResultObjects.TokenAmountInfo> {
+fun Api.getTokenSupply(tokenMint: PublicKey): Single<TokenAmountInfoResponse> {
     return Single.create { emitter ->
         this.getTokenSupply(tokenMint) { result ->
             result.onSuccess {
