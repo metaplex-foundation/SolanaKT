@@ -138,6 +138,12 @@ class ApiTests {
         Assert.assertNotNull(result)
     }
 
+    @Test
+    fun TestGetMaxRetransmitSlot() = runTest {
+        val result = solana.api.getMaxRetransmitSlot()
+        Assert.assertNotNull(result)
+    }
+
     //region getProgramAccounts
     @Test
     fun testGetProgramAccountsReturnsValidAccountInfo() = runTest {

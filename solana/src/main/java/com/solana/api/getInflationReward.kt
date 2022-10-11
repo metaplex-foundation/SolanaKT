@@ -13,7 +13,7 @@ import kotlinx.serialization.json.*
 
 class GetInflationRewardRequest(val addresses: List<PublicKey>,
                                 val epoch: Long? = null,
-                                val commitment: String? = null,) : RpcRequestSerializable() {
+                                val commitment: String? = null) : RpcRequestSerializable() {
     override val method: String = "getInflationReward"
     override val params = buildJsonArray {
         addJsonArray {
