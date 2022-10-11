@@ -12,6 +12,7 @@ import com.solana.api.FeesInfo
 import com.solana.api.SignatureInformation
 import com.solana.api.SolanaVersion
 import com.solana.api.Supply
+import com.solana.api.VoteAccounts
 import com.solana.core.Account
 import com.solana.core.PublicKey
 import com.solana.core.Transaction
