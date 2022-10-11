@@ -10,7 +10,6 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
 
-
 class GetSlotLeadersRequest(startSlot: Long, limit: Long) : RpcRequestSerializable() {
     override val method: String = "getSlotLeaders"
     override val params = buildJsonArray {

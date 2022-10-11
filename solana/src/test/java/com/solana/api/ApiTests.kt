@@ -181,6 +181,12 @@ class ApiTests {
         Assert.assertNotNull(result)
     }
 
+    @Test
+    fun TestGetTokenAccountBalance() = runTest {
+        val result = solana.api.getTokenAccountBalance(PublicKey("FzhfekYF625gqAemjNZxjgTZGwfJpavMZpXCLFdypRFD"))
+        Assert.assertNotNull(result)
+    }
+
     //region getProgramAccounts
     @Test
     fun testGetProgramAccountsReturnsValidAccountInfo() = runTest {

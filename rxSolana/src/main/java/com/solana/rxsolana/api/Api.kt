@@ -475,7 +475,7 @@ fun Api.getClusterNodes(): Single<List<ClusterNode>> {
     }
 }
 
-fun Api.getTokenAccountBalance(tokenMint: PublicKey): Single<TokenResultObjects.TokenAmountInfo> {
+fun Api.getTokenAccountBalance(tokenMint: PublicKey): Single<TokenAmountInfoResponse> {
     return Single.create { emitter ->
         this.getTokenAccountBalance(tokenMint) { result ->
             result.onSuccess {
