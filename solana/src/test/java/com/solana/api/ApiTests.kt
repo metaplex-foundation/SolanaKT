@@ -132,6 +132,11 @@ class ApiTests {
         Assert.assertNotNull(result)
     }
 
+    @Test
+    fun TestGetInflationRewardNullable() = runTest {
+        val result = solana.api.getInflationReward(listOf(PublicKey("5U3bH5b6XtG99aVWLqwVzYPVpQiFHytBD68Rz2eFPZd7")))
+        Assert.assertNotNull(result)
+    }
 
     //region getProgramAccounts
     @Test

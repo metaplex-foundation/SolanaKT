@@ -529,7 +529,7 @@ fun Api.getConfirmedSignaturesForAddress2(account: PublicKey,
     }
 }
 
-fun Api.getInflationReward(addresses: List<PublicKey>): Single<List<InflationReward>> {
+fun Api.getInflationReward(addresses: List<PublicKey>): Single<List<InflationRewardResponse>> {
     return Single.create { emitter ->
         this.getInflationReward(addresses) { result ->
             result.onSuccess {
