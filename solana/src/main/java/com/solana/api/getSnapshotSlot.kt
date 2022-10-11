@@ -6,7 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.serializer
 
-class GetSnapshotSlot: RpcRequestSerializable() {
+class GetSnapshotSlotRequest: RpcRequestSerializable() {
     override val method: String = "getSnapshotSlot"
 }
 
@@ -19,7 +19,7 @@ fun Api.getSnapshotSlot(onComplete: (Result<Long>) -> Unit) {
 }
 
 suspend fun Api.getSnapshotSlot(): Result<Long> =
-    router.makeRequestResult(GetSnapshotSlot(), GetSnapshotSlotSerializer())
+    router.makeRequestResult(GetSnapshotSlotRequest(), GetSnapshotSlotSerializer())
         .let { result ->
             @Suppress("UNCHECKED_CAST")
             if (result.isSuccess && result.getOrNull() == null)

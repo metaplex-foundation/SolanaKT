@@ -193,6 +193,12 @@ class ApiTests {
         Assert.assertNotNull(result)
     }
 
+    @Test
+    fun TestGetTransactionCount() = runTest {
+        val result = solana.api.getTransactionCount()
+        Assert.assertNotNull(result)
+    }
+
     //region getProgramAccounts
     @Test
     fun testGetProgramAccountsReturnsValidAccountInfo() = runTest {
