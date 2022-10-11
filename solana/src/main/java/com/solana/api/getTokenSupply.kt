@@ -1,18 +1,14 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.models.RPC
-import com.solana.models.TokenResultObjects
-import com.solana.models.buffer.BufferInfo
+
 import com.solana.networking.RpcRequestSerializable
 import com.solana.networking.SolanaResponseSerializer
 import com.solana.networking.makeRequestResult
-import com.squareup.moshi.Types
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
-import java.lang.reflect.Type
 
 class GetTokenSupplyRequest(tokenMint: PublicKey) : RpcRequestSerializable() {
     override val method: String = "getTokenSupply"

@@ -3,7 +3,6 @@ package com.solana.api
 import com.solana.core.PublicKey
 import com.solana.models.RPC
 import com.solana.models.TokenAccountInfo
-import com.solana.models.TokenResultObjects
 import com.squareup.moshi.Types
 
 fun Api.getTokenAccountsByOwner(owner: PublicKey, tokenMint: PublicKey, onComplete: (Result<PublicKey>) -> Unit) {
