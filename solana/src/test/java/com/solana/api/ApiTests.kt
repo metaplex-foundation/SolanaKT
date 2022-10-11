@@ -5,6 +5,7 @@ import com.solana.Solana
 import com.solana.core.HotAccount
 import com.solana.core.PublicKey
 import com.solana.models.ProgramAccountConfig
+import com.solana.models.SignatureStatusRequestConfiguration
 import com.solana.networking.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -220,6 +221,12 @@ class ApiTests {
     @Test
     fun TestMinimumLedgerSlot() = runTest {
         val result = solana.api.minimumLedgerSlot()
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetSignatureStatuses() = runTest {
+        val result = solana.api.getSignatureStatuses(listOf("3citcRRbx1vTjXazYLXZ4cwVHNkx6baFrSNp5msR2mgTRuuod4qhqTi921emn2CjU93sSM5dGGhCcHeVtvQyPfCV"), SignatureStatusRequestConfiguration(true))
         Assert.assertNotNull(result)
     }
 

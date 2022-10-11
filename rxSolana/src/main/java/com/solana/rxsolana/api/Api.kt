@@ -10,6 +10,7 @@ import com.solana.api.FeeCalculatorInfo
 import com.solana.api.FeeRateGovernorInfo
 import com.solana.api.FeesInfo
 import com.solana.api.SignatureInformation
+import com.solana.api.SignatureStatus
 import com.solana.api.SolanaVersion
 import com.solana.api.Supply
 import com.solana.api.VoteAccounts
@@ -412,7 +413,7 @@ fun Api.getSlot(): Single<Long> {
     }
 }
 
-fun Api.getSignatureStatuses(signatures: List<String>, configs: SignatureStatusRequestConfiguration? = SignatureStatusRequestConfiguration()): Single<SignatureStatus> {
+fun Api.getSignatureStatuses(signatures: List<String>, configs: SignatureStatusRequestConfiguration? = SignatureStatusRequestConfiguration()): Single<List<SignatureStatus>> {
     return Single.create { emitter ->
         this.getSignatureStatuses(signatures, configs) { result ->
             result.onSuccess {
