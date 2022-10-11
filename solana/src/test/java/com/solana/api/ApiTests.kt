@@ -168,6 +168,13 @@ class ApiTests {
         Assert.assertNotNull(result)
     }
 
+    @Test
+    fun TestGetSlotLeaders() = runTest {
+        val slot = solana.api.getSlot().getOrThrow()
+        val result = solana.api.getSlotLeaders(slot, 10)
+        Assert.assertNotNull(result)
+    }
+
     //region getProgramAccounts
     @Test
     fun testGetProgramAccountsReturnsValidAccountInfo() = runTest {
