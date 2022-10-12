@@ -230,6 +230,12 @@ class ApiTests {
         Assert.assertNotNull(result)
     }
 
+    @Test
+    fun TestGetStakeActivation() = runTest {
+        val result = solana.api.getStakeActivation(PublicKey("HDDhNo3H2t3XbLmRswHdTu5L8SvSMypz9UVFu68Wgmaf"))
+        Assert.assertNotNull(result)
+    }
+
     //region getProgramAccounts
     @Test
     fun testGetProgramAccountsReturnsValidAccountInfo() = runTest {
