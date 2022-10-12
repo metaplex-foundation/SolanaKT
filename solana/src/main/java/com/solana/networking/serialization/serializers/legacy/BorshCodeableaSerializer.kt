@@ -20,7 +20,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 @Serializer(forClass = BorshCodable::class)
-internal class BorshCodeableSerializer<T>(val clazz: Class<T>) : KSerializer<BorshCodable?> {
+class BorshCodeableSerializer<T>(val clazz: Class<T>) : KSerializer<BorshCodable?> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor(clazz.simpleName) {}
 
     val rule = listOf(

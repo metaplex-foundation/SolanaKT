@@ -25,8 +25,6 @@ data class AccountInfoWithPublicKey<P>(val account: AccountInfo<P>, @SerialName(
 @Serializable
 data class AccountPublicKey(@Serializable(with = PublicKeyAs32ByteSerializer::class) val publicKey: PublicKey)
 
-
-
 internal fun <A> MultipleAccountsSerializer(serializer: KSerializer<A>) =
     MultipleAccountsInfoSerializer(
         BorshAsBase64JsonArraySerializer(
@@ -41,11 +39,8 @@ internal fun <A> ProgramAccountsSerializer(serializer: KSerializer<A>) =
         ).nullable
     )
 
-
-
 internal inline fun <reified A> MultipleAccountsSerializer() =
     MultipleAccountsInfoSerializer<A?>(BorshAsBase64JsonArraySerializer(AnchorAccountSerializer()))
-
 
 
 private fun <D> MultipleAccountsInfoSerializer(serializer: KSerializer<D>) =

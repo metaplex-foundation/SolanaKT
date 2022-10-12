@@ -236,6 +236,13 @@ class ApiTests {
         Assert.assertNotNull(result)
     }
 
+    @Test
+    fun TestGetSplTokenAccountInfo() = runTest {
+        val mainnetSolana = Solana(OkHttpNetworkingRouter(RPCEndpoint.mainnetBetaSolana))
+        val result = mainnetSolana.api.getSplTokenAccountInfo(PublicKey("D3PSQUMEYyDWvNxaPrAhv2ZxMcrCMRqTUD5LHm4HLrAR"))
+        Assert.assertNotNull(result)
+    }
+
     //region getProgramAccounts
     @Test
     fun testGetProgramAccountsReturnsValidAccountInfo() = runTest {

@@ -12,6 +12,7 @@ import com.solana.api.FeesInfo
 import com.solana.api.SignatureInformation
 import com.solana.api.SignatureStatus
 import com.solana.api.SolanaVersion
+import com.solana.api.SplTokenAccountInfo
 import com.solana.api.StakeActivation
 import com.solana.api.Supply
 import com.solana.api.VoteAccounts
@@ -114,8 +115,8 @@ fun Api.getStakeActivation(publicKey: PublicKey, epoch: Long): Single<StakeActiv
     }
 }
 
-fun <T: BorshCodable>Api.getAccountInfo(publicKey: PublicKey,
-                                        decodeTo: Class<T>,
+inline fun <reified T: BorshCodable>Api.getAccountInfo(publicKey: PublicKey,
+                                                       decodeTo: Class<T>,
 ): Single<BufferInfo<T>> {
     return Single.create { emitter ->
         this.getAccountInfo(publicKey, decodeTo) { result ->

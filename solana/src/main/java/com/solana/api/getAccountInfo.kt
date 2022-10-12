@@ -46,44 +46,44 @@ class AccountRequest(
 data class AccountInfo<D>(val data: D?, val executable: Boolean,
                           val lamports: Long, val owner: String?, val rentEpoch: Long)
 
-internal fun <D, T: BorshCodable> AccountInfo<D>.toBufferInfo() =
+fun <D, T: BorshCodable> AccountInfo<D>.toBufferInfo() =
     BufferInfo(data?.let { Buffer(data as T) }, executable, lamports, owner, rentEpoch)
 
-internal fun <A> SolanaAccountSerializer(serializer: KSerializer<A>) =
+fun <A> SolanaAccountSerializer(serializer: KSerializer<A>) =
     AccountInfoSerializer(
         BorshAsBase64JsonArraySerializer(
             AnchorAccountSerializer(serializer.descriptor.serialName, serializer)
         )
     )
 
-private fun <D> AccountInfoSerializer(serializer: KSerializer<D>) =
+fun <D> AccountInfoSerializer(serializer: KSerializer<D>) =
     SolanaResponseSerializer(AccountInfo.serializer(serializer))
 
-internal inline fun <reified A> SolanaAccountSerializer() =
+inline fun <reified A> SolanaAccountSerializer() =
     AccountInfoSerializer<A?>(BorshAsBase64JsonArraySerializer(AnchorAccountSerializer()))
 
-fun <T> Api.getAccountInfo(
+inline fun <reified T> Api.getAccountInfo(
     serializer: KSerializer<T>,
     account: PublicKey,
     commitment: String = "max",
     encoding: RpcSendTransactionConfig.Encoding = RpcSendTransactionConfig.Encoding.base64,
     length: Int? = null,
     offset: Int? = length?.let { 0 },
-    onComplete: ((Result<AccountInfo<T>>) -> Unit)
+    crossinline onComplete: ((Result<T>) -> Unit)
 ) {
     CoroutineScope(dispatcher).launch {
         onComplete(getAccountInfo(serializer, account, commitment, encoding, length, offset))
     }
 }
 
-suspend fun <A> Api.getAccountInfo(
+suspend inline fun <reified A> Api.getAccountInfo(
     serializer: KSerializer<A>,
     account: PublicKey,
     commitment: String = "max",
     encoding: RpcSendTransactionConfig.Encoding = RpcSendTransactionConfig.Encoding.base64,
     length: Int? = null,
     offset: Int? = length?.let { 0 }
-): Result<AccountInfo<A>> =
+): Result<A> =
     router.makeRequestResult(
         AccountRequest(
             accountAddress = account.toBase58(),
@@ -92,30 +92,30 @@ suspend fun <A> Api.getAccountInfo(
             length = length,
             offset =  offset
         ),
-        SolanaAccountSerializer(serializer)
+        serializer
     ).let { result ->
         @Suppress("UNCHECKED_CAST")
         if (result.isSuccess && result.getOrNull() == null)
             Result.failure(Error("Account return Null"))
-        else result as Result<AccountInfo<A>> // safe cast, null case handled above
+        else result as Result<A> // safe cast, null case handled above
     }
 
 
 @Deprecated(RPC_ACYNC_CALLBACK_INFO_DEPRECATION_MESSAGE, ReplaceWith("getAccountInfo(serializer, account, commitment, length, offset, onComplete)"))
-fun <T: BorshCodable> Api.getAccountInfo(
+inline fun <reified T: BorshCodable> Api.getAccountInfo(
     account: PublicKey,
     decodeTo: Class<T>,
-    onComplete: ((com.solana.vendor.Result<BufferInfo<T>, ResultError>) -> Unit)
+    crossinline onComplete: ((com.solana.vendor.Result<BufferInfo<T>, ResultError>) -> Unit)
 ) {
     return getAccountInfo(account, HashMap(), decodeTo, onComplete)
 }
 
 @Deprecated(RPC_ACYNC_CALLBACK_INFO_DEPRECATION_MESSAGE, ReplaceWith("getAccountInfo(serializer, account, commitment, encoding, length, offset, onComplete)"))
-fun <T: BorshCodable> Api.getAccountInfo(
+inline fun <reified T: BorshCodable> Api.getAccountInfo(
     account: PublicKey,
     additionalParams: Map<String, Any?>,
     decodeTo: Class<T>,
-    onComplete: ((com.solana.vendor.Result<BufferInfo<T>, ResultError>) -> Unit)
+    crossinline onComplete: ((com.solana.vendor.Result<BufferInfo<T>, ResultError>) -> Unit)
 ) {
 
     val commitment = additionalParams["commitment"] ?: "max"
@@ -134,7 +134,7 @@ fun <T: BorshCodable> Api.getAccountInfo(
 
     CoroutineScope(Dispatchers.IO).launch {
         getAccountInfo(
-            serializer = BorshCodeableSerializer(decodeTo) as KSerializer<T>,
+            serializer = BorshCodeableSerializer(decodeTo) as KSerializer<AccountInfo<T>>,
             account= account,
             commitment = commitment as String,
             encoding = encoding,

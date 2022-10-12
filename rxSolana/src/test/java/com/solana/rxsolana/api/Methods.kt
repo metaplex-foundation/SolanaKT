@@ -226,8 +226,8 @@ class Methods {
 
     @Test
     fun TestGetSplTokenAccountInfo() {
-        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getSplTokenAccountInfo(PublicKey("EJwZgeZrdC8TXTQbQBoL6bfuAnFUUy1PVCMB4DYPzVaS")).blockingGet()
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.mainnetBetaSolana))
+        val result = solana.api.getSplTokenAccountInfo(PublicKey("D3PSQUMEYyDWvNxaPrAhv2ZxMcrCMRqTUD5LHm4HLrAR")).blockingGet()
         Assert.assertNotNull(result)
     }
 

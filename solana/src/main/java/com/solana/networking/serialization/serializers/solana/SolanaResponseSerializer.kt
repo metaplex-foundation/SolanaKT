@@ -13,7 +13,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-internal class SolanaResponseSerializer<R>(dataSerializer: KSerializer<R>)
+class SolanaResponseSerializer<R>(dataSerializer: KSerializer<R>)
     : KSerializer<R?> {
     private val serializer = WrappedValue.serializer(dataSerializer)
     override val descriptor: SerialDescriptor = serializer.descriptor
