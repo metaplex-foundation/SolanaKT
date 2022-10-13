@@ -8,6 +8,10 @@
 package com.solana.networking.serialization.serializers.legacy
 
 import com.solana.core.AccountPublicKeyRule
+import com.solana.core.PublicKeyRule
+import com.solana.models.buffer.AccountInfoRule
+import com.solana.models.buffer.MintRule
+import com.solana.models.buffer.TokenSwapInfoRule
 import com.solana.networking.serialization.format.BorshDecoder
 import com.solana.networking.serialization.format.BorshEncoder
 import com.solana.vendor.borshj.BorshBuffer
@@ -25,6 +29,10 @@ class BorshCodeableSerializer<T>(val clazz: Class<T>) : KSerializer<BorshCodable
 
     val rule = listOf(
         AccountPublicKeyRule(),
+        PublicKeyRule(),
+        AccountInfoRule(),
+        MintRule(),
+        TokenSwapInfoRule()
     ).find { it.clazz == clazz }
 
     override fun deserialize(decoder: Decoder): BorshCodable? =

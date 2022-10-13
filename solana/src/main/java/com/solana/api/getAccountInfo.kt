@@ -1,19 +1,16 @@
 package com.solana.api
 
-import com.solana.RPC_ACYNC_CALLBACK_INFO_DEPRECATION_MESSAGE
 import com.solana.core.PublicKey
 import com.solana.models.RpcSendTransactionConfig
 import com.solana.models.buffer.Buffer
 import com.solana.models.buffer.BufferInfo
 import com.solana.networking.*
 import com.solana.networking.serialization.serializers.base64.BorshAsBase64JsonArraySerializer
-import com.solana.networking.serialization.serializers.legacy.BorshCodeableSerializer
 import com.solana.networking.serialization.serializers.solana.AnchorAccountSerializer
 import com.solana.networking.serialization.serializers.solana.SolanaResponseSerializer
 import com.solana.vendor.ResultError
 import com.solana.vendor.borshj.BorshCodable
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -101,7 +98,7 @@ suspend inline fun <reified A> Api.getAccountInfo(
     }
 
 
-@Deprecated(RPC_ACYNC_CALLBACK_INFO_DEPRECATION_MESSAGE, ReplaceWith("getAccountInfo(serializer, account, commitment, length, offset, onComplete)"))
+/*@Deprecated(RPC_ACYNC_CALLBACK_INFO_DEPRECATION_MESSAGE, ReplaceWith("getAccountInfo(serializer, account, commitment, length, offset, onComplete)"))
 inline fun <reified T: BorshCodable> Api.getAccountInfo(
     account: PublicKey,
     decodeTo: Class<T>,
@@ -134,18 +131,18 @@ inline fun <reified T: BorshCodable> Api.getAccountInfo(
 
     CoroutineScope(Dispatchers.IO).launch {
         getAccountInfo(
-            serializer = BorshCodeableSerializer(decodeTo) as KSerializer<AccountInfo<T>>,
+            serializer = SolanaAccountSerializer(BorshCodeableSerializer(decodeTo)),
             account= account,
             commitment = commitment as String,
             encoding = encoding,
             length = length,
             offset = offset
         ).onSuccess {
-            onComplete(com.solana.vendor.Result.success(it.toBufferInfo()))
+            onComplete(com.solana.vendor.Result.success(it!!.toBufferInfo()))
         }.onFailure {
             onComplete(com.solana.vendor.Result.failure(ResultError(it)))
         }
     }
-}
+}*/
 
 val nullValueError = ResultError("Account return Null")

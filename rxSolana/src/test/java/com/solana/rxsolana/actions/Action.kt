@@ -35,14 +35,9 @@ class Action {
 
     @Test
     fun TestGetTokenWallets() {
-        val sender: HotAccount = HotAccount.fromMnemonic(listOf(
-            "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
-        ), "")
-        val auth = InMemoryAccountStorage(sender)
-        auth.save(sender)
-        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.mainnetBetaSerum))
         val result = solana.action.getTokenWallets(
-            sender.publicKey
+            PublicKey("3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG"),
         ).blockingGet()
         Assert.assertNotNull(result)
     }
@@ -175,7 +170,7 @@ class Action {
             mintAddress = mintAddress,
             fromPublicKey = source,
             destinationAddress = destination,
-            allowUnfundedRecipient = false,
+            allowUnfundedRecipient = true,
             1
         ).blockingGet()
         Assert.assertNotNull(transactionId)

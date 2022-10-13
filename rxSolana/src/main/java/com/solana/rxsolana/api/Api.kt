@@ -24,6 +24,7 @@ import com.solana.models.buffer.BufferInfo
 import com.solana.vendor.borshj.BorshCodable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposables
+import kotlinx.serialization.KSerializer
 
 fun Api.getRecentBlockhash(): Single<String> {
     return Single.create { emitter ->
@@ -115,11 +116,12 @@ fun Api.getStakeActivation(publicKey: PublicKey, epoch: Long): Single<StakeActiv
     }
 }
 
-inline fun <reified T: BorshCodable>Api.getAccountInfo(publicKey: PublicKey,
-                                                       decodeTo: Class<T>,
-): Single<BufferInfo<T>> {
+inline fun <reified T>Api.getAccountInfo(
+    serializer: KSerializer<T>,
+    publicKey: PublicKey
+): Single<T> {
     return Single.create { emitter ->
-        this.getAccountInfo(publicKey, decodeTo) { result ->
+        this.getAccountInfo(serializer, publicKey) { result ->
             result.onSuccess {
                 emitter.onSuccess(it)
             }.onFailure {

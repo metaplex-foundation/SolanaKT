@@ -2,6 +2,7 @@ package com.solana.rxsolana.api
 
 import com.solana.Solana
 import com.solana.api.ConfirmedBlock
+import com.solana.api.SolanaAccountSerializer
 import com.solana.core.PublicKey
 import com.solana.models.SignatureStatusRequestConfiguration
 import com.solana.models.buffer.AccountInfo
@@ -83,8 +84,8 @@ class Methods {
 
     @Test
     fun TestGetAccountInfo() {
-        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getAccountInfo(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV"), AccountInfo::class.java).blockingGet()
+        val solanaDevNet = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
+        val result = solanaDevNet.api.getAccountInfo(SolanaAccountSerializer(AccountInfo.serializer()), PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV")).blockingGet()
         Assert.assertNotNull(result)
     }
 

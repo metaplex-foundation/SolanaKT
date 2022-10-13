@@ -4,20 +4,24 @@ import com.solana.core.PublicKey
 import com.solana.core.PublicKeyRule
 import com.solana.models.RPC
 import com.solana.models.TokenAccountInfo
+import com.solana.networking.serialization.serializers.solana.PublicKeyAs32ByteSerializer
+import com.solana.networking.serialization.serializers.solana.PublicKeyAsStringSerializer
 import com.solana.vendor.borshj.BorshCodable
 import com.solana.vendor.borshj.BorshInput
 import com.solana.vendor.borshj.BorshOutput
 import com.solana.vendor.borshj.BorshRule
 import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 import java.lang.Exception
 
+@Serializable
 @JsonClass(generateAdapter = true)
 data class AccountInfo(
-    val mint: PublicKey,
-    val owner: PublicKey,
+    @Serializable(with = PublicKeyAs32ByteSerializer::class) val mint: PublicKey,
+    @Serializable(with = PublicKeyAs32ByteSerializer::class) val owner: PublicKey,
     val lamports: Long,
     val delegateOption: Int,
-    var delegate: PublicKey?,
+    @Serializable(with = PublicKeyAs32ByteSerializer::class) val delegate: PublicKey?,
     val isInitialized: Boolean,
     val isFrozen: Boolean,
     val state: Int,
@@ -25,9 +29,9 @@ data class AccountInfo(
     val rentExemptReserve: Long?,
     val isNativeRaw: Long,
     val isNative: Boolean,
-    var delegatedAmount: Long,
+    val delegatedAmount: Long,
     val closeAuthorityOption: Int,
-    var closeAuthority: PublicKey?
+    @Serializable(with = PublicKeyAs32ByteSerializer::class) val closeAuthority: PublicKey?
 ) : BorshCodable
 
 class AccountInfoRule(

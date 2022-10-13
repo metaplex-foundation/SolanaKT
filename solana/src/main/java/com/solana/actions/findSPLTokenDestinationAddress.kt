@@ -1,6 +1,7 @@
 package com.solana.actions
 
 import com.solana.api.getAccountInfo
+import com.solana.api.getSplTokenAccountInfo
 import com.solana.api.nullValueError
 import com.solana.core.PublicKey
 import com.solana.core.PublicKey.Companion.createProgramAddress
@@ -52,17 +53,14 @@ private fun Action.checkSPLTokenAccountExistence(
 
     var hasAssociatedTokenAccount = false
     associatedTokenAddress?.let {
-        this.api.getAccountInfo(
-            associatedTokenAddress,
-            AccountInfo::class.java
-        ) { result ->
+        this.api.getSplTokenAccountInfo(it) { result ->
             result.onSuccess {
                 hasAssociatedTokenAccount = true
-            }.onFailure {
-                if(it == nullValueError){
+            }.onFailure { error ->
+                if(error == nullValueError){
                     hasAssociatedTokenAccount = false
                 } else {
-                    onComplete(Result.failure(it))
+                    onComplete(Result.failure(error.message!!))
                     return@onFailure
                 }
             }
