@@ -20,8 +20,6 @@ import com.solana.core.Account
 import com.solana.core.PublicKey
 import com.solana.core.Transaction
 import com.solana.models.*
-import com.solana.models.buffer.BufferInfo
-import com.solana.vendor.borshj.BorshCodable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposables
 import kotlinx.serialization.KSerializer
@@ -549,35 +547,6 @@ fun Api.getInflationReward(addresses: List<PublicKey>): Single<List<InflationRew
         Disposables.empty()
     }
 }
-
-fun Api.getTokenAccountsByOwner(address: PublicKey, tokenMint: PublicKey): Single<PublicKey> {
-    return Single.create { emitter ->
-        this.getTokenAccountsByOwner(address, tokenMint) { result ->
-            result.onSuccess {
-                emitter.onSuccess(it)
-            }.onFailure {
-                emitter.onError(it)
-            }
-        }
-        Disposables.empty()
-    }
-}
-
-fun Api.getTokenAccountsByDelegate(accountDelegate: PublicKey,
-                                requiredParams: Map<String, Any>,
-                                optionalParams: Map<String, Any>?): Single<TokenAccountInfo> {
-    return Single.create { emitter ->
-        this.getTokenAccountsByDelegate(accountDelegate, requiredParams, optionalParams) { result ->
-            result.onSuccess {
-                emitter.onSuccess(it)
-            }.onFailure {
-                emitter.onError(it)
-            }
-        }
-        Disposables.empty()
-    }
-}
-
 
 fun Api.getIdentity(): Single<PublicKey> {
     return Single.create { emitter ->
