@@ -1,9 +1,9 @@
 package com.solana.models
 
 import com.solana.models.TokenResultObjects.TokenAmountInfo
-import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
+@Deprecated("Use the Kotlin serializer object")
 @JsonClass(generateAdapter = true)
 data class ConfirmedTransaction(
     val meta: Meta?,

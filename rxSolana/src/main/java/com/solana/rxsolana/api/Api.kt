@@ -506,7 +506,7 @@ fun Api.getTokenSupply(tokenMint: PublicKey): Single<TokenAmountInfoResponse> {
     }
 }
 
-fun Api.getTokenLargestAccounts(tokenMint: PublicKey): Single<List<TokenResultObjects.TokenAccount>> {
+fun Api.getTokenLargestAccounts(tokenMint: PublicKey): Single<List<TokenAccount>> {
     return Single.create { emitter ->
         this.getTokenLargestAccounts(tokenMint) { result ->
             result.onSuccess {

@@ -2,6 +2,7 @@ package com.solana.models
 
 import com.squareup.moshi.Json
 
+@Deprecated("Please use the Koltin Serializer Objects")
 class TokenResultObjects {
     open class TokenAmountInfo(
         @Json(name = "amount") var amount: String?,
