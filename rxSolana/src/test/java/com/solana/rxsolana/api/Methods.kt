@@ -231,22 +231,6 @@ class Methods {
     }
 
     @Test
-    fun TestGetTokenAccountsByOwner() {
-        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solana.api.getTokenAccountsByOwner(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV"), PublicKey("EJwZgeZrdC8TXTQbQBoL6bfuAnFUUy1PVCMB4DYPzVaS")).blockingGet()
-        Assert.assertNotNull(result)
-    }
-
-    /*@Test
-    fun TestGetTokenAccountsByDelegate() {
-        val solana = Solana(NetworkingRouter(RPCEndpoint.devnetSolana))
-        val requiredParams = Map.of<String, Any>("mint", "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
-        val result = solana.api.getTokenAccountsByDelegate(PublicKey.valueOf(
-            "AoUnMozL1ZF4TYyVJkoxQWfjgKKtu8QUK9L4wFdEJick"), requiredParams , mapOf()).blockingGet()
-        Assert.assertNotNull(result)
-    }*/
-
-    @Test
     fun TestGetSlotLeader() {
         val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getSlotLeader().blockingGet()
