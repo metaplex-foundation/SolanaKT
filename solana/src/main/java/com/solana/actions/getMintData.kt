@@ -1,6 +1,5 @@
 package com.solana.actions
 
-import com.solana.api.AccountInfo
 import com.solana.api.SolanaAccountSerializer
 import com.solana.api.getAccountInfo
 import com.solana.api.getMultipleAccounts

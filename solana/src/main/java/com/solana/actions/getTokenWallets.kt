@@ -3,7 +3,7 @@ package com.solana.actions
 import com.solana.api.getProgramAccounts
 import com.solana.core.PublicKey
 import com.solana.models.*
-import com.solana.models.buffer.AccountInfo
+import com.solana.models.buffer.AccountInfoData
 import com.solana.programs.TokenProgram
 
 fun Action.getTokenWallets(
@@ -13,7 +13,7 @@ fun Action.getTokenWallets(
     val memcmp = listOf(
         Memcmp(32, account.toBase58())
     )
-    api.getProgramAccounts(AccountInfo.serializer(), TokenProgram.PROGRAM_ID, memcmp, 165) { result ->
+    api.getProgramAccounts(AccountInfoData.serializer(), TokenProgram.PROGRAM_ID, memcmp, 165) { result ->
         result.onSuccess { accounts ->
             val accountsValues = accounts.map { if(it.account.data != null) { it } else { null } }.filterNotNull()
             val pubkeyValue = accountsValues.map { Pair(it.pubkey, it.account) }

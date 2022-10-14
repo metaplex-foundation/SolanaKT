@@ -36,7 +36,7 @@ data class SplTokenAccountValue (
 
 suspend fun Api.getSplTokenAccountInfo(account: PublicKey): Result<SplTokenAccountInfo> =
     this.getAccountInfo(SolanaResponseSerializer(SplTokenAccountValue.serializer()), account, encoding = RpcSendTransactionConfig.Encoding.jsonParsed).map { result ->
-        (result!!.data ?: throw Error("Can not be null"))
+        (result?.data ?: throw Error("Can not be null"))
     }
 
 fun Api.getSplTokenAccountInfo(account: PublicKey, onComplete: (Result<SplTokenAccountInfo>) -> Unit) {

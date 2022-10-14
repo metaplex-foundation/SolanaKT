@@ -6,7 +6,10 @@ import com.solana.core.HotAccount
 import com.solana.core.PublicKey
 import com.solana.models.ProgramAccountConfig
 import com.solana.models.SignatureStatusRequestConfiguration
+import com.solana.models.buffer.AccountInfoData
 import com.solana.networking.*
+import com.solana.networking.serialization.serializers.base64.BorshAsBase64JsonArraySerializer
+import com.solana.programs.TokenProgram
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
@@ -241,6 +244,16 @@ class ApiTests {
         val mainnetSolana = Solana(OkHttpNetworkingRouter(RPCEndpoint.mainnetBetaSolana))
         val result = mainnetSolana.api.getSplTokenAccountInfo(PublicKey("D3PSQUMEYyDWvNxaPrAhv2ZxMcrCMRqTUD5LHm4HLrAR"))
         Assert.assertNotNull(result)
+    }
+
+    @Test
+    fun TestGetAccountInfoData() = runTest {
+        val account = solana.api.getAccountInfo(AccountInfoSerializer(BorshAsBase64JsonArraySerializer((AccountInfoData.serializer()))),
+            PublicKey("8hoBQbSFKfDK3Mo7Wwc15Pp2bbkYuJE8TdQmnHNDjXoQ"),
+        ).getOrThrow()
+        Assert.assertNotNull(account)
+        Assert.assertEquals(account!!.owner, TokenProgram.PROGRAM_ID.toBase58())
+        Assert.assertEquals(PublicKey("5Zzguz4NsSRFxGkHfM4FmsFpGZiCDtY72zH2jzMcqkJx"), account.data!!.owner, )
     }
 
     //region getProgramAccounts

@@ -162,16 +162,16 @@ class Action {
             ), ""
             , DerivationPath.BIP44_M_44H_501H_0H_OH
         )
+        val receiver = HotAccount()
         val mintAddress = PublicKey("6AUM4fSvCAxCugrbJPFxTqYFp9r3axYx973yoSyzDYVH")
         val source =  PublicKey("8hoBQbSFKfDK3Mo7Wwc15Pp2bbkYuJE8TdQmnHNDjXoQ")
-        val destination =  PublicKey("8Poh9xusEcKtmYZ9U4FSfjrrrQR155TLWGAsyFWjjKxB")
+        val destination =  PublicKey("8hoBQbSFKfDK3Mo7Wwc15Pp2bbkYuJE8TdQmnHNDjXoQ")
         val transactionId = solana.action.sendSPLTokens(
             feePayer,
             mintAddress = mintAddress,
             fromPublicKey = source,
             destinationAddress = destination,
-            allowUnfundedRecipient = true,
-            1
+            amount = 1
         ).blockingGet()
         Assert.assertNotNull(transactionId)
     }
@@ -189,7 +189,7 @@ class Action {
         )
         val mintAddress = PublicKey("6AUM4fSvCAxCugrbJPFxTqYFp9r3axYx973yoSyzDYVH")
         val source =  PublicKey("8hoBQbSFKfDK3Mo7Wwc15Pp2bbkYuJE8TdQmnHNDjXoQ")
-        val destination =  PublicKey("PBVmekuqJtZhWqwcXhgjTJREJx5ogUSBNAz3631QQxg")
+        val destination =  HotAccount().publicKey
         val transactionId = solana.action.sendSPLTokens(
             feePayer,
             mintAddress = mintAddress,

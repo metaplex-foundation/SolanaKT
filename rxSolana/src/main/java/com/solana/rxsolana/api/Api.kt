@@ -621,11 +621,9 @@ fun Api.simulateTransaction(transaction: String,
     }
 }
 
-fun <T: BorshCodable>Api.getProgramAccounts(address: PublicKey,
-                           decodeTo: Class<T>,
-): Single<List<ProgramAccount<T>>> {
+fun <T>Api.getProgramAccounts(serializer: KSerializer<T>, address: PublicKey): Single<List<ProgramAccountSerialized<T>>> {
     return Single.create { emitter ->
-        this.getProgramAccounts(address, decodeTo) { result ->
+        this.getProgramAccounts(serializer, address) { result ->
             result.onSuccess {
                 emitter.onSuccess(it)
             }.onFailure {

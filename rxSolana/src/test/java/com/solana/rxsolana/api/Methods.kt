@@ -1,14 +1,12 @@
 package com.solana.rxsolana.api
 
 import com.solana.Solana
-import com.solana.api.ConfirmedBlock
 import com.solana.api.SolanaAccountSerializer
 import com.solana.core.PublicKey
 import com.solana.models.SignatureStatusRequestConfiguration
-import com.solana.models.buffer.AccountInfo
+import com.solana.models.buffer.AccountInfoData
 import com.solana.networking.OkHttpNetworkingRouter
 import com.solana.networking.RPCEndpoint
-import io.reactivex.Single
 import org.junit.Assert
 import org.junit.Test
 import kotlin.collections.listOf
@@ -85,7 +83,7 @@ class Methods {
     @Test
     fun TestGetAccountInfo() {
         val solanaDevNet = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solanaDevNet.api.getAccountInfo(SolanaAccountSerializer(AccountInfo.serializer()), PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV")).blockingGet()
+        val result = solanaDevNet.api.getAccountInfo(SolanaAccountSerializer(AccountInfoData.serializer()), PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV")).blockingGet()
         Assert.assertNotNull(result)
     }
 

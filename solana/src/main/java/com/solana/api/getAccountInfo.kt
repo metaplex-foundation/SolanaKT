@@ -18,11 +18,15 @@ import kotlinx.serialization.json.*
 
 class AccountRequest(
     accountAddress: String,
-    encoding: RpcSendTransactionConfig.Encoding = RpcSendTransactionConfig.Encoding.base64,
-    commitment: String = "max",
+    encoding: Encoding = Encoding.base64,
+    commitment: String = Commitment.MAX.toString(),
     length: Int? = null,
     offset: Int? = length?.let { 0 }
 ) : RpcRequestSerializable() {
+
+    constructor(account: String, transactionOptions: TransactionOptions) : this(account,
+        transactionOptions.encoding, commitment = transactionOptions.commitment.toString())
+
     override val method = "getAccountInfo"
     override val params = buildJsonArray {
         add(accountAddress)
@@ -62,8 +66,8 @@ inline fun <reified A> SolanaAccountSerializer() =
 inline fun <reified T> Api.getAccountInfo(
     serializer: KSerializer<T>,
     account: PublicKey,
-    commitment: String = "max",
-    encoding: RpcSendTransactionConfig.Encoding = RpcSendTransactionConfig.Encoding.base64,
+    commitment: Commitment = Commitment.MAX,
+    encoding: RpcSendTransactionConfig.Encoding = Encoding.base64,
     length: Int? = null,
     offset: Int? = length?.let { 0 },
     crossinline onComplete: ((Result<T>) -> Unit)
@@ -76,73 +80,27 @@ inline fun <reified T> Api.getAccountInfo(
 suspend inline fun <reified A> Api.getAccountInfo(
     serializer: KSerializer<A>,
     account: PublicKey,
-    commitment: String = "max",
-    encoding: RpcSendTransactionConfig.Encoding = RpcSendTransactionConfig.Encoding.base64,
+    commitment: Commitment = Commitment.MAX,
+    encoding: Encoding = Encoding.base64,
     length: Int? = null,
     offset: Int? = length?.let { 0 }
-): Result<A> =
-    router.makeRequestResult(
+): Result<A> {
+
+
+    return router.makeRequestResult(
         AccountRequest(
             accountAddress = account.toBase58(),
             encoding = encoding,
-            commitment = commitment,
+            commitment = commitment.toString(),
             length = length,
-            offset =  offset
+            offset = offset
         ),
         serializer
     ).let { result ->
         @Suppress("UNCHECKED_CAST")
         if (result.isSuccess && result.getOrNull() == null)
-            Result.failure(Error("Account return Null"))
+            Result.failure(nullValueError)
         else result as Result<A> // safe cast, null case handled above
     }
-
-
-/*@Deprecated(RPC_ACYNC_CALLBACK_INFO_DEPRECATION_MESSAGE, ReplaceWith("getAccountInfo(serializer, account, commitment, length, offset, onComplete)"))
-inline fun <reified T: BorshCodable> Api.getAccountInfo(
-    account: PublicKey,
-    decodeTo: Class<T>,
-    crossinline onComplete: ((com.solana.vendor.Result<BufferInfo<T>, ResultError>) -> Unit)
-) {
-    return getAccountInfo(account, HashMap(), decodeTo, onComplete)
 }
-
-@Deprecated(RPC_ACYNC_CALLBACK_INFO_DEPRECATION_MESSAGE, ReplaceWith("getAccountInfo(serializer, account, commitment, encoding, length, offset, onComplete)"))
-inline fun <reified T: BorshCodable> Api.getAccountInfo(
-    account: PublicKey,
-    additionalParams: Map<String, Any?>,
-    decodeTo: Class<T>,
-    crossinline onComplete: ((com.solana.vendor.Result<BufferInfo<T>, ResultError>) -> Unit)
-) {
-
-    val commitment = additionalParams["commitment"] ?: "max"
-    val encoding = when (additionalParams["encoding"]) {
-        "base64" -> RpcSendTransactionConfig.Encoding.base64
-        "base58" -> RpcSendTransactionConfig.Encoding.base58
-        else -> RpcSendTransactionConfig.Encoding.base64
-    }
-
-    var length: Int? = null
-    var offset: Int? = null
-    if (additionalParams.containsKey("dataSlice")) {
-        length = (additionalParams["dataSlice"] as Map<String, Int>)["length"]
-        offset = (additionalParams["dataSlice"] as Map<String, Int>)["offset"]
-    }
-
-    CoroutineScope(Dispatchers.IO).launch {
-        getAccountInfo(
-            serializer = SolanaAccountSerializer(BorshCodeableSerializer(decodeTo)),
-            account= account,
-            commitment = commitment as String,
-            encoding = encoding,
-            length = length,
-            offset = offset
-        ).onSuccess {
-            onComplete(com.solana.vendor.Result.success(it!!.toBufferInfo()))
-        }.onFailure {
-            onComplete(com.solana.vendor.Result.failure(ResultError(it)))
-        }
-    }
-}*/
-
 val nullValueError = ResultError("Account return Null")
