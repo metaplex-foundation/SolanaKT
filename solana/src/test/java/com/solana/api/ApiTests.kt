@@ -12,7 +12,6 @@ import com.solana.networking.serialization.serializers.base64.BorshAsBase64JsonA
 import com.solana.programs.TokenProgram
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.serializer
 import org.junit.Assert
@@ -21,7 +20,7 @@ import java.lang.Error
 
 class ApiTests {
 
-    val solana: Solana get() = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
+    val solana: Solana get() = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
 
     @Test
     fun TestGetRecentBlockhash() = runTest {
@@ -100,7 +99,7 @@ class ApiTests {
 
     @Test
     fun TestGetFeeCalculatorForBlockhash() = runTest {
-        val solana = Solana(OkHttpNetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val blockhash = solana.api.getRecentBlockhash().getOrThrow()
         val result = solana.api.getFeeCalculatorForBlockhash(blockhash).getOrThrow()
         Assert.assertNotNull(result)
@@ -241,7 +240,7 @@ class ApiTests {
 
     @Test
     fun TestGetSplTokenAccountInfo() = runTest {
-        val mainnetSolana = Solana(OkHttpNetworkingRouter(RPCEndpoint.mainnetBetaSolana))
+        val mainnetSolana = Solana(HttpNetworkingRouter(RPCEndpoint.mainnetBetaSolana))
         val result = mainnetSolana.api.getSplTokenAccountInfo(PublicKey("D3PSQUMEYyDWvNxaPrAhv2ZxMcrCMRqTUD5LHm4HLrAR"))
         Assert.assertNotNull(result)
     }

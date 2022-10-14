@@ -20,15 +20,6 @@ class MockRpcDriver(override val endpoint: RPCEndpoint = RPCEndpoint.devnetSolan
         this.willError[forRequest] = willError
     }
 
-    override fun <T> request(
-        method: String,
-        params: List<Any>?,
-        clazz: Type?,
-        onComplete: (Result<T>) -> Unit
-    ) {
-        throw Error("Not yet implemented")
-    }
-
     override suspend fun <R> makeRequest(
         request: RpcRequestSerializable,
         resultSerializer: KSerializer<R>
