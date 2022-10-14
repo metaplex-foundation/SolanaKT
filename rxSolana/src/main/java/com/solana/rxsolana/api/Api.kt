@@ -577,7 +577,7 @@ fun Api.getSlotLeaders(startSlot: Long,
 
 
 fun Api.simulateTransaction(transaction: String,
-                            addresses: List<PublicKey>,): Single<SimulatedTransaction> {
+                            addresses: List<PublicKey>,): Single<SimulateTransactionValue> {
     return Single.create { emitter ->
         this.simulateTransaction(transaction, addresses) { result ->
             result.onSuccess {

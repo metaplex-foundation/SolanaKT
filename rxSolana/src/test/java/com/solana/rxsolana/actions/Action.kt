@@ -1,6 +1,7 @@
 package com.solana.rxsolana.actions
 
 import com.solana.Solana
+import com.solana.api.SimulateTransactionValue
 import com.solana.core.HotAccount
 import com.solana.core.DerivationPath
 import com.solana.core.PublicKey
@@ -77,9 +78,9 @@ class Action {
         val transaction =
             "ASdDdWBaKXVRA+6flVFiZokic9gK0+r1JWgwGg/GJAkLSreYrGF4rbTCXNJvyut6K6hupJtm72GztLbWNmRF1Q4BAAEDBhrZ0FOHFUhTft4+JhhJo9+3/QL6vHWyI8jkatuFPQzrerzQ2HXrwm2hsYGjM5s+8qMWlbt6vbxngnO8rc3lqgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAy+KIwZmU8DLmYglP3bPzrlpDaKkGu6VIJJwTOYQmRfUBAgIAAQwCAAAAuAsAAAAAAAA="
         val addresses = listOf(PublicKey.valueOf("QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo"))
-        val simulatedTransaction: SimulatedTransaction =
+        val simulatedTransaction: SimulateTransactionValue =
             solana.api.simulateTransaction(transaction, addresses).blockingGet()
-        Assert.assertTrue(simulatedTransaction.value.logs.size > 0)
+        Assert.assertTrue(simulatedTransaction.logs.isNotEmpty())
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.solana.models
 
 import com.squareup.moshi.JsonClass
 
+@Deprecated("Use the Koltin Serializer Version")
 @JsonClass(generateAdapter = true)
 data class SimulatedTransaction(
     override val value: Value
@@ -14,6 +15,7 @@ data class SimulatedTransaction(
     )
 }
 
+@Deprecated("Use the Koltin Serializer Version")
 @JsonClass(generateAdapter = true)
 data class SimulatedAccount(
     override val value: Value
