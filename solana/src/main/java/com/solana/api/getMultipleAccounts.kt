@@ -2,13 +2,10 @@ package com.solana.api
 
 import com.solana.core.PublicKey
 import com.solana.models.RpcSendTransactionConfig
-import com.solana.models.buffer.BufferInfo
 import com.solana.networking.MultipleAccountsSerializer
 import com.solana.networking.RpcRequestSerializable
 import com.solana.networking.makeRequestResult
-import com.solana.networking.serialization.serializers.legacy.BorshCodeableSerializer
 import com.solana.vendor.ResultError
-import com.solana.vendor.borshj.BorshCodable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
@@ -41,18 +38,18 @@ class MultipleAccountsRequest(
     }
 }
 
-fun <T: BorshCodable> Api.getMultipleAccounts(
+fun <A> Api.getMultipleAccounts(
+    serializer: KSerializer<A>,
     accounts: List<PublicKey>,
-    decodeTo: Class<T>,
-    onComplete: ((Result<List<BufferInfo<T>?>>) -> Unit)
+    onComplete: ((Result<List<AccountInfo<A>?>>) -> Unit)
 ) {
     CoroutineScope(dispatcher).launch {
         getMultipleAccountsInfo(
-            serializer= BorshCodeableSerializer(decodeTo),
+            serializer= serializer,
             accounts
         ).onSuccess {
-            val buffers: List<BufferInfo<T>?> = it.map { account ->
-                account?.toBufferInfo()
+            val buffers = it.map { account ->
+                account
             }
             onComplete(Result.success(buffers))
         }.onFailure {

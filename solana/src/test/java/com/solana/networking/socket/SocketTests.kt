@@ -139,7 +139,7 @@ class SocketTests {
         }
         delegate.onAccountNotification = { notification ->
             latch.countDown()
-            Assert.assertNotNull(notification.result)
+            Assert.assertNotNull(notification.params)
             socket.stop()
         }
         socket.start(delegate)
@@ -209,7 +209,7 @@ class SocketTests {
         }
         delegate.onLogsNotification = { notification ->
             latch.countDown()
-            Assert.assertNotNull(notification.result)
+            Assert.assertNotNull(notification.params)
             socket.stop()
         }
         socket.start(delegate)
@@ -276,7 +276,7 @@ class SocketTests {
         }
         delegate.onProgramNotification = { notification ->
             latch.countDown()
-            Assert.assertNotNull(notification.result)
+            Assert.assertNotNull(notification.params)
             socket.stop()
         }
         socket.start(delegate)

@@ -2,7 +2,6 @@ package com.solana.api
 
 import com.solana.models.*
 import com.solana.networking.*
-import com.squareup.moshi.Json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable

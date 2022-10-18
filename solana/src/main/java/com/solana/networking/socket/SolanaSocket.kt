@@ -5,7 +5,6 @@ import com.solana.api.AccountInfoSerializer
 import com.solana.api.ProgramAccountSerialized
 import com.solana.models.buffer.*
 import com.solana.networking.*
-import com.solana.networking.serialization.serializers.base58.BorshAsBase58JsonArraySerializer
 import com.solana.networking.serialization.serializers.base64.BorshAsBase64JsonArraySerializer
 import com.solana.networking.socket.models.*
 import kotlinx.serialization.Serializable
