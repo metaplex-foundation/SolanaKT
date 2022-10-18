@@ -259,15 +259,7 @@ class Transaction {
             }
             // Otherwise, sort by pubkey, stringwise.
             return@sortWith collator.compare(x.publicKey.toBase58(), y.publicKey.toBase58())
-//            return@sortWith x.publicKey.toBase58().com(y.publicKey.toBase58(), ignoreCase = true)
         }
-//            compareBy(
-//                { !it.isWritable and !it.isSigner },
-//                { !it.isSigner },
-//                { !it.isWritable },
-//                { it.publicKey.toBase58() },
-//            )
-//        )
 
         // Move fee payer to the front
         val feePayerIndex = uniqueMetas.indexOfFirst { it.publicKey.equals(feePayer) }
