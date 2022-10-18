@@ -4,6 +4,8 @@ package com.solana.core
 import com.solana.vendor.*
 import org.bitcoinj.core.Base58
 import java.nio.ByteBuffer
+import java.text.Collator
+import java.util.*
 
 val DEFAULT_SIGNATURE = ByteArray(0)
 
@@ -231,21 +233,11 @@ class Transaction {
             )
         }
 
-        // Sort. Prioritizing first by signer, then by writable
-        accountMetas.sortWith(
-            compareBy(
-                { !it.isWritable and !it.isSigner },
-                { !it.isSigner },
-                { !it.isWritable },
-                { it.publicKey.toBase58() },
-            )
-        )
-
         // Cull duplicate account metas
         val uniqueMetas = mutableListOf<AccountMeta>()
         for (accountMeta in accountMetas) {
-            val pubkeyString = accountMeta.publicKey
-            val uniqueIndex = uniqueMetas.indexOfFirst { it.publicKey == pubkeyString }
+            val pubkeyString = accountMeta.publicKey.toBase58()
+            val uniqueIndex = uniqueMetas.indexOfFirst { it.publicKey.toBase58() == pubkeyString }
             if (uniqueIndex > -1) {
                 uniqueMetas[uniqueIndex].isWritable =
                     uniqueMetas[uniqueIndex].isWritable || accountMeta.isWritable
@@ -253,6 +245,29 @@ class Transaction {
                 uniqueMetas.add(accountMeta)
             }
         }
+
+        val collator = Collator.getInstance(Locale.ENGLISH)
+        // Sort. Prioritizing first by signer, then by writable
+        uniqueMetas.sortWith { x, y ->
+            if (x.isSigner != y.isSigner) {
+                // Signers always come before non-signers
+                return@sortWith if (x.isSigner) -1 else  1
+            }
+            if (x.isWritable != y.isWritable) {
+                // Writable accounts always come before read-only accounts
+                return@sortWith if (x.isWritable) -1 else 1
+            }
+            // Otherwise, sort by pubkey, stringwise.
+            return@sortWith collator.compare(x.publicKey.toBase58(), y.publicKey.toBase58())
+//            return@sortWith x.publicKey.toBase58().com(y.publicKey.toBase58(), ignoreCase = true)
+        }
+//            compareBy(
+//                { !it.isWritable and !it.isSigner },
+//                { !it.isSigner },
+//                { !it.isWritable },
+//                { it.publicKey.toBase58() },
+//            )
+//        )
 
         // Move fee payer to the front
         val feePayerIndex = uniqueMetas.indexOfFirst { it.publicKey.equals(feePayer) }
