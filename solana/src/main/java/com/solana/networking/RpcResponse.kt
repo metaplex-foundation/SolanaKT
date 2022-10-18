@@ -16,10 +16,29 @@ typealias DefaultRpcResponse = RpcResponseSerializable<JsonElement>
 data class RpcError(val code: Int, val message: String)
 
 @Serializable
-open class RpcResponseSerializable<R>(
-    open val result: R? = null,
-    open val error: RpcError? = null,
-    val id: String? = null
+data class RpcResponseSerializable<R>(
+    val result: R? = null,
+    val error: RpcError? = null,
+    val id: String? = null,
+
+    // Sockets
+    val params: Params<R>? = null
 ) {
     val jsonrpc = "2.0"
 }
+
+@Serializable
+data class Context (val slot: Long)
+
+@Serializable
+data class  RPC<R>(
+    val context: Context?,
+    val value: R? = null
+)
+
+@Serializable
+data class Params<R> (
+    val result: RPC<R>?,
+    val subscription: Int
+)
+

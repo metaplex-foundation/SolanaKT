@@ -12,9 +12,9 @@ import kotlinx.serialization.json.*
 import java.util.*
 
 @Serializable
-open class RpcRequestSerializable {
-    open val method: String = ""
-    open val params: JsonElement? = null
-    val jsonrpc = "2.0"
+open class RpcRequestSerializable (
+    open val method: String = "",
+    open val params: JsonElement? = null,
+    val jsonrpc: String = "2.0",
     val id: String = UUID.randomUUID().toString()
-}
+)

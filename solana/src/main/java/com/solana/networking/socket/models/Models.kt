@@ -1,7 +1,7 @@
 package com.solana.networking.socket.models
 
-import com.solana.core.PublicKey
 import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
 enum class SocketMethod(val string: String) {
     accountNotification("accountNotification"), accountSubscribe("accountSubscribe"), accountUnsubscribe("accountUnsubscribe"),
@@ -11,6 +11,7 @@ enum class SocketMethod(val string: String) {
     slotSubscribe("slotSubscribe"), slotNotification("slotNotification"), slotUnsubscribe("slotUnsubscribe")
 }
 
+@Serializable
 @JsonClass(generateAdapter = true)
 data class SocketSubscription(
     val jsonrpc: String,
@@ -18,36 +19,42 @@ data class SocketSubscription(
     val result: Long
 )
 
+@Serializable
 @JsonClass(generateAdapter = true)
 data class TokenAccountNotificationData (
     val program: String,
     val parsed: TokenAccountNotificationDataParsed
 )
 
+@Serializable
 @JsonClass(generateAdapter = true)
 data class TokenAccountNotificationDataParsed (
     val type: String,
     val info: TokenAccountNotificationDataInfo
 )
 
+@Serializable
 @JsonClass(generateAdapter = true)
 data class TokenAccountNotificationDataInfo (
     val tokenAmount: TokenAmount
 )
 
+@Serializable
 @JsonClass(generateAdapter = true)
 data class TokenAmount (
-    val address: String?,
+    val address: String? = null,
     val amount: String,
     val decimals: Int,
     val uiAmount: Float
 )
 
+@Serializable
 @JsonClass(generateAdapter = true)
 data class  SignatureNotification (
     val err: ResponseError?
 )
 
+@Serializable
 @JsonClass(generateAdapter = true)
 data class ResponseError (
     val code: Int?,
@@ -55,11 +62,13 @@ data class ResponseError (
     val data: ResponseErrorData?
 )
 
+@Serializable
 @JsonClass(generateAdapter = true)
 data class  ResponseErrorData (
     val logs: List<String>
 )
 
+@Serializable
 @JsonClass(generateAdapter = true)
 data class LogsNotification (
     val signature: String,

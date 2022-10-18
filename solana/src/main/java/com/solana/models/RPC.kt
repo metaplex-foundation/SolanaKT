@@ -1,7 +1,7 @@
 package com.solana.models
 
 import com.squareup.moshi.JsonClass
-
+/*
 @JsonClass(generateAdapter = true)
 open class RPC<T>(
     open var context: Context?,
@@ -11,3 +11,4 @@ open class RPC<T>(
     class Context (val slot: Long)
 }
 
+*/

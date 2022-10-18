@@ -1,7 +1,6 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.models.RPC
 import com.solana.models.RpcSendTransactionConfig
 import com.solana.models.buffer.BufferInfo
 import com.solana.networking.MultipleAccountsSerializer
@@ -10,12 +9,10 @@ import com.solana.networking.makeRequestResult
 import com.solana.networking.serialization.serializers.legacy.BorshCodeableSerializer
 import com.solana.vendor.ResultError
 import com.solana.vendor.borshj.BorshCodable
-import com.squareup.moshi.Types
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.*
-import java.lang.reflect.Type
 
 class MultipleAccountsRequest(
     accounts: List<String>,
