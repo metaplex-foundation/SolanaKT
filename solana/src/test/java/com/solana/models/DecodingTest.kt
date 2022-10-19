@@ -109,7 +109,7 @@ class DecodingTests {
             "BhrZ0FOHFUhTft4+JhhJo9+3/QL6vHWyI8jkatuFPQwCqmOzhzy1ve5l2AqL0ottCChJZ1XSIW3k3C7TaBQn7aCGAQAAAAAAAQAAAOt6vNDYdevCbaGxgaMzmz7yoxaVu3q9vGeCc7ytzeWqAQAAAAAAAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
             "base64"
         )
-        val buffer = Buffer.create(borsh, rawData, AccountInfo::class.java)
+        val buffer = Buffer.create(borsh, rawData, AccountInfoData::class.java)
         assertNotNull(buffer.value)
         val accountInfo = buffer.value!!
         assertEquals("QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo", accountInfo.mint.toBase58())
@@ -127,7 +127,7 @@ class DecodingTests {
 
         val serialized = borsh.serialize(accountInfo)
 
-        val deserialized = borsh.deserialize(serialized, AccountInfo::class.java)
+        val deserialized = borsh.deserialize(serialized, AccountInfoData::class.java)
 
         assertEquals(deserialized.mint.toBase58(), accountInfo.mint.toBase58())
         assertEquals(deserialized.owner.toBase58(), accountInfo.owner.toBase58())
@@ -151,7 +151,7 @@ class DecodingTests {
             "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAOt6vNDYdevCbaGxgaMzmz7yoxaVu3q9vGeCc7ytzeWq",
             "base64"
         )
-        val buffer = Buffer.create(borsh, string, AccountInfo::class.java)
+        val buffer = Buffer.create(borsh, string, AccountInfoData::class.java)
         assertNotNull(buffer.value)
         val accountInfo = buffer.value!!
 
@@ -170,7 +170,7 @@ class DecodingTests {
             "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAOt6vNDYdevCbaGxgaMzmz7yoxaVu3q9vGeCc7ytzeWq",
             "base64"
         )
-        val buffer2 = Buffer.create(borsh, string2, AccountInfo::class.java)
+        val buffer2 = Buffer.create(borsh, string2, AccountInfoData::class.java)
         assertNotNull(buffer.value)
         val accountInfo2 = buffer2.value!!
         assertEquals(true, accountInfo2.isFrozen)
@@ -233,12 +233,12 @@ class DecodingTests {
                     "rentEpoch":153
                 }
             }"""
-        val adapter: JsonAdapter<RPC<BufferInfo<AccountInfo>>> = moshi.adapter(
+        val adapter: JsonAdapter<RPC<BufferInfo<AccountInfoData>>> = moshi.adapter(
             Types.newParameterizedType(
                 RPC::class.java,
                 Types.newParameterizedType(
                     BufferInfo::class.java,
-                    AccountInfo::class.java
+                    AccountInfoData::class.java
                 )
             )
         )
@@ -267,12 +267,12 @@ class DecodingTests {
                     "rentEpoch":153
                 }
             }""".trimIndent()
-        val adapter: JsonAdapter<RPC<BufferInfo<AccountInfo>>> = moshi.adapter(
+        val adapter: JsonAdapter<RPC<BufferInfo<AccountInfoData>>> = moshi.adapter(
             Types.newParameterizedType(
                 RPC::class.java,
                 Types.newParameterizedType(
                     BufferInfo::class.java,
-                    AccountInfo::class.java
+                    AccountInfoData::class.java
                 )
             )
         )
@@ -408,14 +408,14 @@ class DecodingTests {
                },
                "id":"3618d086-1562-41b6-ad5e-f387b67d4bf9"
             }""".trimIndent()
-        val adapter: JsonAdapter<RpcResponse<RPC<BufferInfo<AccountInfo>>>> = moshi.adapter(
+        val adapter: JsonAdapter<RpcResponse<RPC<BufferInfo<AccountInfoData>>>> = moshi.adapter(
             Types.newParameterizedType(
                 RpcResponse::class.java,
                 Types.newParameterizedType(
                     RPC::class.java,
                     Types.newParameterizedType(
                         BufferInfo::class.java,
-                        AccountInfo::class.java
+                        AccountInfoData::class.java
                     )
                 )
             )

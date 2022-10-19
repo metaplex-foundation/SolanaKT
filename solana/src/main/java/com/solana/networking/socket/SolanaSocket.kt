@@ -27,8 +27,8 @@ sealed class SolanaSocketError: Exception() {
 
 interface SolanaSocketEventsDelegate {
     fun connected()
-    fun accountNotification(notification: RpcResponse<BufferInfo<AccountInfo>>)
-    fun programNotification(notification: RpcResponse<ProgramAccount<AccountInfo>>)
+    fun accountNotification(notification: RpcResponse<BufferInfo<AccountInfoData>>)
+    fun programNotification(notification: RpcResponse<ProgramAccount<AccountInfoData>>)
     fun signatureNotification(notification: RpcResponse<SignatureNotification>)
     fun logsNotification(notification: RpcResponse<LogsNotification>)
     fun unsubscribed(id: String)
@@ -162,12 +162,12 @@ class SolanaSocket(
             methodString?.let {
                 when(it){
                     SocketMethod.accountNotification.string -> {
-                        val subscriptionAdapter: JsonAdapter<RpcResponse<BufferInfo<AccountInfo>>> = moshi.adapter(
+                        val subscriptionAdapter: JsonAdapter<RpcResponse<BufferInfo<AccountInfoData>>> = moshi.adapter(
                             Types.newParameterizedType(
                                 RpcResponse::class.java,
                                 Types.newParameterizedType(
                                     BufferInfo::class.java,
-                                    AccountInfo::class.java
+                                    AccountInfoData::class.java
                                 )
                             )
                         )
@@ -198,12 +198,12 @@ class SolanaSocket(
                         }
                     }
                     SocketMethod.programNotification.string -> {
-                        val subscriptionAdapter: JsonAdapter<RpcResponse<ProgramAccount<AccountInfo>>> = moshi.adapter(
+                        val subscriptionAdapter: JsonAdapter<RpcResponse<ProgramAccount<AccountInfoData>>> = moshi.adapter(
                             Types.newParameterizedType(
                                 RpcResponse::class.java,
                                 Types.newParameterizedType(
                                     ProgramAccount::class.java,
-                                    AccountInfo::class.java
+                                    AccountInfoData::class.java
                                 )
                             )
                         )

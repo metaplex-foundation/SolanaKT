@@ -2,8 +2,21 @@ package com.solana.api
 
 import com.solana.core.Account
 import com.solana.core.Transaction
-import com.solana.models.RpcSendTransactionConfig
-import java.util.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+
+suspend fun Api.sendTransaction(
+    transaction: Transaction,
+    signers: List<Account>,
+    recentBlockHash: String? = null
+): Result<String> {
+    val blockHash = recentBlockHash ?: getRecentBlockhash().getOrThrow()
+    transaction.setRecentBlockHash(blockHash)
+    transaction.sign(signers)
+    val serialized = transaction.serialize()
+
+    return sendRawTransaction(serialized)
+}
 
 fun Api.sendTransaction(
     transaction: Transaction,
@@ -11,20 +24,8 @@ fun Api.sendTransaction(
     recentBlockHash: String? = null,
     onComplete: ((Result<String>) -> Unit)
 ) {
-    if (recentBlockHash == null) {
-        getRecentBlockhash { result ->
-            result.map { recentBlockHash ->
-                transaction.setRecentBlockHash(recentBlockHash)
-                transaction.sign(signers)
-                val serialized = transaction.serialize()
-                sendRawTransaction(serialized, onComplete = onComplete)
-            }
-        }
-    } else {
-        transaction.setRecentBlockHash(recentBlockHash)
-        transaction.sign(signers)
-        val serialized = transaction.serialize()
-
-        sendRawTransaction(serialized, onComplete = onComplete)
+    CoroutineScope(dispatcher).launch {
+        onComplete(sendTransaction(transaction, signers, recentBlockHash))
     }
 }
+
