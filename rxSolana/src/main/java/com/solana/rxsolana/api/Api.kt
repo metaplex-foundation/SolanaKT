@@ -1,14 +1,28 @@
 package com.solana.rxsolana.api
 
 import com.solana.api.*
+import com.solana.api.Block
+import com.solana.api.ClusterNode
+import com.solana.api.ConfirmedBlock
+import com.solana.api.EpochInfo
+import com.solana.api.EpochSchedule
+import com.solana.api.FeeCalculatorInfo
+import com.solana.api.FeeRateGovernorInfo
+import com.solana.api.FeesInfo
+import com.solana.api.SignatureInformation
+import com.solana.api.SignatureStatus
+import com.solana.api.SolanaVersion
+import com.solana.api.SplTokenAccountInfo
+import com.solana.api.StakeActivation
+import com.solana.api.Supply
+import com.solana.api.VoteAccounts
 import com.solana.core.Account
 import com.solana.core.PublicKey
 import com.solana.core.Transaction
 import com.solana.models.*
-import com.solana.models.buffer.BufferInfo
-import com.solana.vendor.borshj.BorshCodable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposables
+import kotlinx.serialization.KSerializer
 
 fun Api.getRecentBlockhash(): Single<String> {
     return Single.create { emitter ->
@@ -36,7 +50,7 @@ fun Api.getBalance(account: PublicKey): Single<Long> {
     }
 }
 
-fun Api.getConfirmedTransaction(signature: String): Single<ConfirmedTransaction> {
+fun Api.getConfirmedTransaction(signature: String): Single<ConfirmedTransactionSerializable> {
     return Single.create { emitter ->
         this.getConfirmedTransaction(signature,) { result ->
             result.onSuccess {
@@ -100,11 +114,12 @@ fun Api.getStakeActivation(publicKey: PublicKey, epoch: Long): Single<StakeActiv
     }
 }
 
-fun <T: BorshCodable>Api.getAccountInfo(publicKey: PublicKey,
-                                        decodeTo: Class<T>,
-): Single<BufferInfo<T>> {
+inline fun <reified T>Api.getAccountInfo(
+    serializer: KSerializer<T>,
+    publicKey: PublicKey
+): Single<T> {
     return Single.create { emitter ->
-        this.getAccountInfo(publicKey, decodeTo) { result ->
+        this.getAccountInfo(serializer, publicKey) { result ->
             result.onSuccess {
                 emitter.onSuccess(it)
             }.onFailure {
@@ -205,7 +220,7 @@ fun Api.getFeeCalculatorForBlockhash(blockhash: String): Single<FeeCalculatorInf
     }
 }
 
-fun Api.getBlockCommitment(block: Long): Single<BlockCommitment> {
+fun Api.getBlockCommitment(block: Long): Single<GetBlockCommitmentResponse> {
     return Single.create { emitter ->
         this.getBlockCommitment(block) { result ->
             result.onSuccess {
@@ -400,7 +415,7 @@ fun Api.getSlot(): Single<Long> {
     }
 }
 
-fun Api.getSignatureStatuses(signatures: List<String>, configs: SignatureStatusRequestConfiguration? = SignatureStatusRequestConfiguration()): Single<SignatureStatus> {
+fun Api.getSignatureStatuses(signatures: List<String>, configs: SignatureStatusRequestConfiguration? = SignatureStatusRequestConfiguration()): Single<List<SignatureStatus>> {
     return Single.create { emitter ->
         this.getSignatureStatuses(signatures, configs) { result ->
             result.onSuccess {
@@ -465,7 +480,7 @@ fun Api.getClusterNodes(): Single<List<ClusterNode>> {
     }
 }
 
-fun Api.getTokenAccountBalance(tokenMint: PublicKey): Single<TokenResultObjects.TokenAmountInfo> {
+fun Api.getTokenAccountBalance(tokenMint: PublicKey): Single<TokenAmountInfoResponse> {
     return Single.create { emitter ->
         this.getTokenAccountBalance(tokenMint) { result ->
             result.onSuccess {
@@ -478,7 +493,7 @@ fun Api.getTokenAccountBalance(tokenMint: PublicKey): Single<TokenResultObjects.
     }
 }
 
-fun Api.getTokenSupply(tokenMint: PublicKey): Single<TokenResultObjects.TokenAmountInfo> {
+fun Api.getTokenSupply(tokenMint: PublicKey): Single<TokenAmountInfoResponse> {
     return Single.create { emitter ->
         this.getTokenSupply(tokenMint) { result ->
             result.onSuccess {
@@ -491,7 +506,7 @@ fun Api.getTokenSupply(tokenMint: PublicKey): Single<TokenResultObjects.TokenAmo
     }
 }
 
-fun Api.getTokenLargestAccounts(tokenMint: PublicKey): Single<List<TokenResultObjects.TokenAccount>> {
+fun Api.getTokenLargestAccounts(tokenMint: PublicKey): Single<List<TokenAccount>> {
     return Single.create { emitter ->
         this.getTokenLargestAccounts(tokenMint) { result ->
             result.onSuccess {
@@ -520,7 +535,7 @@ fun Api.getConfirmedSignaturesForAddress2(account: PublicKey,
     }
 }
 
-fun Api.getInflationReward(addresses: List<PublicKey>): Single<List<InflationReward>> {
+fun Api.getInflationReward(addresses: List<PublicKey>): Single<List<InflationRewardResponse>> {
     return Single.create { emitter ->
         this.getInflationReward(addresses) { result ->
             result.onSuccess {
@@ -532,35 +547,6 @@ fun Api.getInflationReward(addresses: List<PublicKey>): Single<List<InflationRew
         Disposables.empty()
     }
 }
-
-fun Api.getTokenAccountsByOwner(address: PublicKey, tokenMint: PublicKey): Single<PublicKey> {
-    return Single.create { emitter ->
-        this.getTokenAccountsByOwner(address, tokenMint) { result ->
-            result.onSuccess {
-                emitter.onSuccess(it)
-            }.onFailure {
-                emitter.onError(it)
-            }
-        }
-        Disposables.empty()
-    }
-}
-
-fun Api.getTokenAccountsByDelegate(accountDelegate: PublicKey,
-                                requiredParams: Map<String, Any>,
-                                optionalParams: Map<String, Any>?): Single<TokenAccountInfo> {
-    return Single.create { emitter ->
-        this.getTokenAccountsByDelegate(accountDelegate, requiredParams, optionalParams) { result ->
-            result.onSuccess {
-                emitter.onSuccess(it)
-            }.onFailure {
-                emitter.onError(it)
-            }
-        }
-        Disposables.empty()
-    }
-}
-
 
 fun Api.getIdentity(): Single<PublicKey> {
     return Single.create { emitter ->
@@ -591,7 +577,7 @@ fun Api.getSlotLeaders(startSlot: Long,
 
 
 fun Api.simulateTransaction(transaction: String,
-                            addresses: List<PublicKey>,): Single<SimulatedTransaction> {
+                            addresses: List<PublicKey>,): Single<SimulateTransactionValue> {
     return Single.create { emitter ->
         this.simulateTransaction(transaction, addresses) { result ->
             result.onSuccess {
@@ -604,11 +590,9 @@ fun Api.simulateTransaction(transaction: String,
     }
 }
 
-fun <T: BorshCodable>Api.getProgramAccounts(address: PublicKey,
-                           decodeTo: Class<T>,
-): Single<List<ProgramAccount<T>>> {
+fun <T>Api.getProgramAccounts(serializer: KSerializer<T>, address: PublicKey): Single<List<ProgramAccountSerialized<T>>> {
     return Single.create { emitter ->
-        this.getProgramAccounts(address, decodeTo) { result ->
+        this.getProgramAccounts(serializer, address) { result ->
             result.onSuccess {
                 emitter.onSuccess(it)
             }.onFailure {

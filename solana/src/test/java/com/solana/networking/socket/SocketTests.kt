@@ -23,10 +23,10 @@ import java.util.concurrent.TimeUnit
 class MockSolanaLiveEventsDelegate: SolanaSocketEventsDelegate {
     var onConected: (() -> Unit)? = null
     var onDisconnected: (() -> Unit)? = null
-    var onAccountNotification: ((RpcResponse<BufferInfo<AccountInfo>>) -> Unit)? = null
+    var onAccountNotification: ((RpcResponse<BufferInfo<AccountInfoData>>) -> Unit)? = null
     var onSignatureNotification: ((RpcResponse<SignatureNotification>) -> Unit)? = null
     var onLogsNotification: ((RpcResponse<LogsNotification>) -> Unit)? = null
-    var onProgramNotification: ((RpcResponse<ProgramAccount<AccountInfo>>) -> Unit)? = null
+    var onProgramNotification: ((RpcResponse<ProgramAccount<AccountInfoData>>) -> Unit)? = null
     var onSubscribed: ((Int, String) -> Unit)? = null
     var onUnsubscribed: ((String) -> Unit)? = null
 
@@ -34,11 +34,11 @@ class MockSolanaLiveEventsDelegate: SolanaSocketEventsDelegate {
         onConected?.let { it() }
     }
 
-    override fun accountNotification(notification: RpcResponse<BufferInfo<AccountInfo>>) {
+    override fun accountNotification(notification: RpcResponse<BufferInfo<AccountInfoData>>) {
         onAccountNotification?.let { it(notification) }
     }
 
-    override fun programNotification(notification: RpcResponse<ProgramAccount<AccountInfo>>) {
+    override fun programNotification(notification: RpcResponse<ProgramAccount<AccountInfoData>>) {
         onProgramNotification?.let { it(notification) }
     }
 
@@ -380,12 +380,12 @@ class SocketTests {
              }
         """.trimIndent()
 
-        val unSubscriptionAdapter: JsonAdapter<RpcResponse<BufferInfo<AccountInfo>>> = moshi.adapter(
+        val unSubscriptionAdapter: JsonAdapter<RpcResponse<BufferInfo<AccountInfoData>>> = moshi.adapter(
             Types.newParameterizedType(
                 RpcResponse::class.java,
                 Types.newParameterizedType(
                     BufferInfo::class.java,
-                    AccountInfo::class.java
+                    AccountInfoData::class.java
                 )
             )
         )
@@ -422,12 +422,12 @@ class SocketTests {
                }
             }
         """.trimIndent()
-        val unSubscriptionAdapter: JsonAdapter<RpcResponse<ProgramAccount<AccountInfo>>> = moshi.adapter(
+        val unSubscriptionAdapter: JsonAdapter<RpcResponse<ProgramAccount<AccountInfoData>>> = moshi.adapter(
             Types.newParameterizedType(
                 RpcResponse::class.java,
                 Types.newParameterizedType(
                     ProgramAccount::class.java,
-                    AccountInfo::class.java
+                    AccountInfoData::class.java
                 )
             )
         )

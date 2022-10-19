@@ -1,14 +1,10 @@
 package com.solana.core
 
-import com.solana.models.buffer.Buffer
-import com.solana.models.buffer.Mint
 import com.solana.programs.TokenProgram
 import com.solana.vendor.ByteUtils
 import com.solana.vendor.TweetNaclFast
 import com.solana.vendor.borshj.*
 import com.squareup.moshi.FromJson
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
 import org.bitcoinj.core.Base58
 import org.bitcoinj.core.Sha256Hash
 import java.io.ByteArrayOutputStream
@@ -141,6 +137,23 @@ data class PublicKey(val pubkey: ByteArray) : BorshCodable {
         }
     }
 }
+
+class AccountPublicKeyRule(
+    override val clazz: Class<AccountPublicKey> = AccountPublicKey::class.java
+) : BorshRule<AccountPublicKey> {
+    override fun read(input: BorshInput): AccountPublicKey {
+        val publicKey = PublicKeyRule().read(input)
+        return AccountPublicKey(publicKey)
+    }
+
+    override fun <Self> write(obj: Any, output: BorshOutput<Self>): Self {
+        TODO("Not yet implemented")
+    }
+}
+
+data class AccountPublicKey (
+    val publicKey: PublicKey
+): BorshCodable
 
 class PublicKeyJsonAdapter {
     @FromJson

@@ -2,17 +2,20 @@ package com.solana.models.buffer
 
 import com.solana.core.PublicKey
 import com.solana.core.PublicKeyRule
+import com.solana.networking.serialization.serializers.solana.PublicKeyAs32ByteSerializer
 import com.solana.vendor.borshj.*
+import kotlinx.serialization.Serializable
 import java.lang.Exception
 
+@Serializable
 data class Mint(
     val mintAuthorityOption: Int,
-    var mintAuthority: PublicKey?,
+    @Serializable(with = PublicKeyAs32ByteSerializer::class) val mintAuthority: PublicKey?,
     val supply: Long,
     val decimals: Int,
     val isInitialized: Boolean,
     val freezeAuthorityOption: Int,
-    var freezeAuthority: PublicKey?
+    @Serializable(with = PublicKeyAs32ByteSerializer::class) val freezeAuthority: PublicKey?
 ) : BorshCodable
 
 class MintRule(override val clazz: Class<Mint> = Mint::class.java): BorshRule<Mint> {

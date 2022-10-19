@@ -2,6 +2,9 @@ package com.solana.networking.models
 
 import com.solana.models.RPC
 import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
+import java.util.*
 
 @JsonClass(generateAdapter = true)
 data class RPCError(

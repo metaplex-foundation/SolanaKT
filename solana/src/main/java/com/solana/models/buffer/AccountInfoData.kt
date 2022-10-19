@@ -2,22 +2,23 @@ package com.solana.models.buffer
 
 import com.solana.core.PublicKey
 import com.solana.core.PublicKeyRule
-import com.solana.models.RPC
-import com.solana.models.TokenAccountInfo
+import com.solana.networking.serialization.serializers.solana.PublicKeyAs32ByteSerializer
 import com.solana.vendor.borshj.BorshCodable
 import com.solana.vendor.borshj.BorshInput
 import com.solana.vendor.borshj.BorshOutput
 import com.solana.vendor.borshj.BorshRule
 import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 import java.lang.Exception
 
+@Serializable
 @JsonClass(generateAdapter = true)
-data class AccountInfo(
-    val mint: PublicKey,
-    val owner: PublicKey,
+data class AccountInfoData(
+    @Serializable(with = PublicKeyAs32ByteSerializer::class) val mint: PublicKey,
+    @Serializable(with = PublicKeyAs32ByteSerializer::class) val owner: PublicKey,
     val lamports: Long,
     val delegateOption: Int,
-    var delegate: PublicKey?,
+    @Serializable(with = PublicKeyAs32ByteSerializer::class) val delegate: PublicKey?,
     val isInitialized: Boolean,
     val isFrozen: Boolean,
     val state: Int,
@@ -25,15 +26,15 @@ data class AccountInfo(
     val rentExemptReserve: Long?,
     val isNativeRaw: Long,
     val isNative: Boolean,
-    var delegatedAmount: Long,
+    val delegatedAmount: Long,
     val closeAuthorityOption: Int,
-    var closeAuthority: PublicKey?
+    @Serializable(with = PublicKeyAs32ByteSerializer::class) val closeAuthority: PublicKey?
 ) : BorshCodable
 
 class AccountInfoRule(
-    override val clazz: Class<AccountInfo> = AccountInfo::class.java
-) : BorshRule<AccountInfo> {
-    override fun read(input: BorshInput): AccountInfo {
+    override val clazz: Class<AccountInfoData> = AccountInfoData::class.java
+) : BorshRule<AccountInfoData> {
+    override fun read(input: BorshInput): AccountInfoData {
         val mint: PublicKey = PublicKeyRule().read(input)
         val owner: PublicKey = PublicKeyRule().read(input)
         val lamports: Long = input.readU64()
@@ -79,7 +80,7 @@ class AccountInfoRule(
             closeAuthority = null
         }
 
-        return AccountInfo(
+        return AccountInfoData(
             mint,
             owner,
             lamports,
@@ -100,7 +101,7 @@ class AccountInfoRule(
 
 
     override fun <Self> write(obj: Any, output: BorshOutput<Self>): Self {
-        val accountInfo = obj as AccountInfo
+        val accountInfo = obj as AccountInfoData
         PublicKeyRule().write(accountInfo.mint, output)
         PublicKeyRule().write(accountInfo.owner, output)
         output.writeU64(accountInfo.lamports)

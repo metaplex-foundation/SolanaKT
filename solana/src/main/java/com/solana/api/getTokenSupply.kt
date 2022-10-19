@@ -1,31 +1,35 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.models.RPC
-import com.solana.models.TokenResultObjects
-import com.solana.models.buffer.BufferInfo
-import com.squareup.moshi.Types
-import java.lang.reflect.Type
 
-fun Api.getTokenSupply(tokenMint: PublicKey,
-                   onComplete: (Result<TokenResultObjects.TokenAmountInfo>) -> Unit) {
-    val params: MutableList<Any> = ArrayList()
-    params.add(tokenMint.toString())
-    val type = Types.newParameterizedType(
-        RPC::class.java,
-        TokenResultObjects.TokenAmountInfo::class.java
-    )
-    router.request<RPC<TokenResultObjects.TokenAmountInfo>>(
-        "getTokenSupply",
-        params,
-        type
-    ){ result ->
-        result.map {
-            it.value!!
-        }.onSuccess {
-            onComplete(Result.success(it))
-        }.onFailure {
-            onComplete(Result.failure(it))
+import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.SolanaResponseSerializer
+import com.solana.networking.makeRequestResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonArray
+
+class GetTokenSupplyRequest(tokenMint: PublicKey) : RpcRequestSerializable() {
+    override val method: String = "getTokenSupply"
+    override val params = buildJsonArray {
+        add(tokenMint.toString())
+    }
+}
+
+internal fun GetTokenSupplySerializer() = SolanaResponseSerializer(TokenAmountInfoResponse.serializer())
+
+suspend fun Api.getTokenSupply(tokenMint: PublicKey): Result<TokenAmountInfoResponse> =
+    router.makeRequestResult(GetTokenSupplyRequest(tokenMint), GetTokenSupplySerializer())
+        .let { result ->
+            @Suppress("UNCHECKED_CAST")
+            if (result.isSuccess && result.getOrNull() == null)
+                Result.failure(Error("Can not be null"))
+            else result as Result<TokenAmountInfoResponse> // safe cast, null case handled above
         }
+
+fun Api.getTokenSupply(tokenMint: PublicKey, onComplete: (Result<TokenAmountInfoResponse>) -> Unit) {
+    CoroutineScope(dispatcher).launch {
+        onComplete(getTokenSupply(tokenMint))
     }
 }
