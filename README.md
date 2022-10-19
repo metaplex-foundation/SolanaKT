@@ -71,7 +71,7 @@ Gets kotlin
 
 ### Actions
 
-Actions are predifined program interfaces that construct the required inputs for the most common tasks in Solana ecosystems. You can see them as bunch of code that implements solana task using rpc calls.
+Actions are predefined program interfaces that construct the required inputs for the most common tasks in Solana ecosystems. You can see them as bunch of code that implements solana task using rpc calls.
 
 We support 9.
 - closeTokenAccount: Closes token account
@@ -111,7 +111,7 @@ let transactionId = try! solana.action.sendSOL(
 
 ## Installation
 
-I recomend using the github recomended way to load Artifacts. First get a Github Token from your [account settings](https://github.com/settings/tokens).
+I recommend using the github recommended way to load Artifacts. First get a Github Token from your [account settings](https://github.com/settings/tokens).
 
 
 Inside settings.gradle add a maven repository:
