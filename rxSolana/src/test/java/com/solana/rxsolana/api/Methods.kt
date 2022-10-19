@@ -189,7 +189,8 @@ class Methods {
     @Test
     fun TestGetConfirmedBlock() {
         val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
-        val slot = solana.api.getSnapshotSlot().blockingGet()
+//        val slot = solana.api.getSnapshotSlot().blockingGet()
+        val slot = 169877548L // Using fixed slot to make sure it doesn't contains unsupported transaction versions.
         val result = solana.api.getConfirmedBlock(slot.toInt()).blockingGet()
         Assert.assertNotNull(result)
     }
