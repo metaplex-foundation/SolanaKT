@@ -1,13 +1,12 @@
 package com.solana.api
 
-import com.solana.networking.RpcRequestSerializable
-import com.solana.networking.SolanaResponseSerializer
+import com.solana.networking.RpcRequest
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.serializer
 
-class GetFirstAvailableBlockRequest : RpcRequestSerializable() {
+class GetFirstAvailableBlockRequest : RpcRequest() {
     override val method: String = "getFirstAvailableBlock"
 }
 

@@ -2,7 +2,7 @@ package com.solana.api
 
 import com.solana.core.PublicKey
 
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.SolanaResponseSerializer
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
 
-class GetTokenSupplyRequest(tokenMint: PublicKey) : RpcRequestSerializable() {
+class GetTokenSupplyRequest(tokenMint: PublicKey) : RpcRequest() {
     override val method: String = "getTokenSupply"
     override val params = buildJsonArray {
         add(tokenMint.toString())

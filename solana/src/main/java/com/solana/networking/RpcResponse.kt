@@ -10,13 +10,13 @@ package com.solana.networking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 
-typealias DefaultRpcResponse = RpcResponseSerializable<JsonElement>
+typealias DefaultRpcResponse = RpcResponse<JsonElement>
 
 @Serializable
 data class RpcError(val code: Int, val message: String)
 
 @Serializable
-data class RpcResponseSerializable<R>(
+data class RpcResponse<R>(
     val result: R? = null,
     val error: RpcError? = null,
     val id: String? = null,

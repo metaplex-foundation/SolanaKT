@@ -1,14 +1,14 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 
-class GetVoteAccountsRequest(votePubkey: PublicKey? = null) : RpcRequestSerializable() {
+class GetVoteAccountsRequest(votePubkey: PublicKey? = null) : RpcRequest() {
     override val method: String = "getVoteAccounts"
     override val params = buildJsonArray {
         addJsonObject {

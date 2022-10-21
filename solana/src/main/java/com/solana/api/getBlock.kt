@@ -15,7 +15,7 @@ class GetBlockRequest(
     commitment: String = "max",
     length: Int? = null,
     offset: Int? = length?.let { 0 }
-) : RpcRequestSerializable() {
+) : RpcRequest() {
     override val method: String = "getBlock"
     override val params = buildJsonArray {
         add(slot)

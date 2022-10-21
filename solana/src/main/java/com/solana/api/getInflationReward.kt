@@ -2,7 +2,7 @@ package com.solana.api
 
 import com.solana.core.PublicKey
 import com.solana.models.RpcEpochConfig
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -13,7 +13,7 @@ import kotlinx.serialization.json.*
 
 class GetInflationRewardRequest(val addresses: List<PublicKey>,
                                 val epoch: Long? = null,
-                                val commitment: String? = null) : RpcRequestSerializable() {
+                                val commitment: String? = null) : RpcRequest() {
     override val method: String = "getInflationReward"
     override val params = buildJsonArray {
         addJsonArray {

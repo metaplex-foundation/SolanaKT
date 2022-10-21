@@ -1,7 +1,6 @@
 package com.solana.networking.socket
 
 import com.solana.api.AccountInfo
-import com.solana.api.AccountInfoSerializer
 import com.solana.api.ProgramAccountSerialized
 import com.solana.models.buffer.*
 import com.solana.networking.*
@@ -22,10 +21,10 @@ sealed class SolanaSocketError : Exception() {
 
 interface SolanaSocketEventsDelegate {
     fun connected()
-    fun accountNotification(notification: RpcResponseSerializable<AccountInfo<AccountInfoData?>>)
-    fun programNotification(notification: RpcResponseSerializable<ProgramAccountSerialized<AccountInfo<AccountInfoData?>>>)
-    fun signatureNotification(notification: RpcResponseSerializable<SignatureNotification>)
-    fun logsNotification(notification: RpcResponseSerializable<LogsNotification>)
+    fun accountNotification(notification: RpcResponse<AccountInfo<AccountInfoData?>>)
+    fun programNotification(notification: RpcResponse<ProgramAccountSerialized<AccountInfo<AccountInfoData?>>>)
+    fun signatureNotification(notification: RpcResponse<SignatureNotification>)
+    fun logsNotification(notification: RpcResponse<LogsNotification>)
     fun unsubscribed(id: String)
     fun subscribed(socketId: Int, id: String)
     fun disconnecting(code: Int, reason: String)
@@ -67,7 +66,7 @@ class SolanaSocket(
             })
         }
         val rpcRequest =
-            RpcRequestSerializable(method = SocketMethod.accountSubscribe.string, params)
+            RpcRequest(method = SocketMethod.accountSubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
@@ -76,7 +75,7 @@ class SolanaSocket(
             add(socketId)
         }
         val rpcRequest =
-            RpcRequestSerializable(method = SocketMethod.accountUnsubscribe.string, params)
+            RpcRequest(method = SocketMethod.accountUnsubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
@@ -94,7 +93,7 @@ class SolanaSocket(
                 put("commitment", Commitment.RECENT.value)
             })
         }
-        val rpcRequest = RpcRequestSerializable(method = SocketMethod.logsSubscribe.string, params)
+        val rpcRequest = RpcRequest(method = SocketMethod.logsSubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
@@ -106,7 +105,7 @@ class SolanaSocket(
                 put("commitment", Commitment.RECENT.value)
             })
         }
-        val rpcRequest = RpcRequestSerializable(method = SocketMethod.logsSubscribe.string, params)
+        val rpcRequest = RpcRequest(method = SocketMethod.logsSubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
@@ -115,7 +114,7 @@ class SolanaSocket(
             add(socketId)
         }
         val rpcRequest =
-            RpcRequestSerializable(method = SocketMethod.logsUnsubscribe.string, params)
+            RpcRequest(method = SocketMethod.logsUnsubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
@@ -128,7 +127,7 @@ class SolanaSocket(
             })
         }
         val rpcRequest =
-            RpcRequestSerializable(method = SocketMethod.programSubscribe.string, params)
+            RpcRequest(method = SocketMethod.programSubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
@@ -137,7 +136,7 @@ class SolanaSocket(
             add(socketId)
         }
         val rpcRequest =
-            RpcRequestSerializable(method = SocketMethod.programUnsubscribe.string, params)
+            RpcRequest(method = SocketMethod.programUnsubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
@@ -150,7 +149,7 @@ class SolanaSocket(
             })
         }
         val rpcRequest =
-            RpcRequestSerializable(method = SocketMethod.signatureSubscribe.string, params)
+            RpcRequest(method = SocketMethod.signatureSubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
@@ -159,12 +158,12 @@ class SolanaSocket(
             add(socketId)
         }
         val rpcRequest =
-            RpcRequestSerializable(method = SocketMethod.signatureUnsubscribe.string, params)
+            RpcRequest(method = SocketMethod.signatureUnsubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
-    fun writeToSocket(request: RpcRequestSerializable): Result<String> {
-        val json = json.encodeToString(RpcRequestSerializable.serializer(), request)
+    fun writeToSocket(request: RpcRequest): Result<String> {
+        val json = json.encodeToString(RpcRequest.serializer(), request)
         if (socket?.send(json) != true) {
             return Result.failure(SolanaSocketError.couldNotWrite)
         }
@@ -190,7 +189,7 @@ class SolanaSocket(
             methodString?.let {
                 when (it) {
                     SocketMethod.accountNotification.string -> {
-                        val serializer = RpcResponseSerializable.serializer(
+                        val serializer = RpcResponse.serializer(
                             AccountInfo.serializer(BorshAsBase64JsonArraySerializer(AccountInfoData.serializer()))
                         )
                         json.decodeFromString(serializer, text).let { response ->
@@ -198,7 +197,7 @@ class SolanaSocket(
                         }
                     }
                     SocketMethod.signatureNotification.string -> {
-                        val serializer = RpcResponseSerializable.serializer(
+                        val serializer = RpcResponse.serializer(
                             (SignatureNotification.serializer())
                         )
                         json.decodeFromString(serializer, text).let { response ->
@@ -206,7 +205,7 @@ class SolanaSocket(
                         }
                     }
                     SocketMethod.logsNotification.string -> {
-                        val serializer = RpcResponseSerializable.serializer(
+                        val serializer = RpcResponse.serializer(
                             (LogsNotification.serializer())
                         )
                         json.decodeFromString(serializer, text).let { response ->
@@ -214,7 +213,7 @@ class SolanaSocket(
                         }
                     }
                     SocketMethod.programNotification.string -> {
-                        val serializer = RpcResponseSerializable.serializer(
+                        val serializer = RpcResponse.serializer(
                             ProgramAccountSerialized.serializer(
                                 AccountInfo.serializer(
                                     BorshAsBase64JsonArraySerializer(AccountInfoData.serializer().nullable)
@@ -230,7 +229,7 @@ class SolanaSocket(
                 }
             } ?: run {
                 if (dictJson.result?.intOrNull is Int) {
-                    val serializer = RpcResponseSerializable.serializer(Int.serializer())
+                    val serializer = RpcResponse.serializer(Int.serializer())
 
                     json.decodeFromString(serializer, text).let { response ->
                         response.result?.let { result ->
@@ -245,7 +244,7 @@ class SolanaSocket(
                 }
 
                 if (dictJson.result?.booleanOrNull is Boolean) {
-                    val serializer = RpcResponseSerializable.serializer(Boolean.serializer())
+                    val serializer = RpcResponse.serializer(Boolean.serializer())
                     json.decodeFromString(serializer, text).let { response ->
                         response.id?.let { delegate?.unsubscribed(it) }
                     }

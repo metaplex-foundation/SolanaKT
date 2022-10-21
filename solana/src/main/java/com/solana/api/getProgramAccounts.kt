@@ -4,7 +4,7 @@ import com.solana.core.PublicKey
 import com.solana.models.*
 import com.solana.networking.AccountInfoWithPublicKey
 import com.solana.networking.ProgramAccountsSerializer
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -19,7 +19,7 @@ class ProgramAccountRequest(
     filters: List<Any>? = null,
     dataSlice: DataSlice? = null,
     commitment: String = "processed"
-) : RpcRequestSerializable() {
+) : RpcRequest() {
     override val method = "getProgramAccounts"
     override val params = buildJsonArray {
         add(account)

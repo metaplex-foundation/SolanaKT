@@ -19,7 +19,7 @@ class AccountRequest(
     commitment: String = Commitment.MAX.toString(),
     length: Int? = null,
     offset: Int? = length?.let { 0 }
-) : RpcRequestSerializable() {
+) : RpcRequest() {
 
     constructor(account: String, transactionOptions: TransactionOptions) : this(account,
         transactionOptions.encoding, commitment = transactionOptions.commitment.toString())

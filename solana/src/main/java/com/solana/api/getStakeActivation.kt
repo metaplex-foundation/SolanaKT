@@ -1,7 +1,7 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -11,7 +11,7 @@ import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.put
 
-class GetStakeActivationRequest(publicKey: PublicKey, epoch: Long? = null) : RpcRequestSerializable() {
+class GetStakeActivationRequest(publicKey: PublicKey, epoch: Long? = null) : RpcRequest() {
     override val method: String = "getStakeActivation"
     override val params = buildJsonArray {
         add(publicKey.toBase58())

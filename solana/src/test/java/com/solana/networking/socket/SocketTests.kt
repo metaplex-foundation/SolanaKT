@@ -4,7 +4,7 @@ import com.solana.api.AccountInfo
 import com.solana.api.ProgramAccountSerialized
 import com.solana.models.buffer.*
 import com.solana.networking.RPCEndpoint
-import com.solana.networking.RpcResponseSerializable
+import com.solana.networking.RpcResponse
 import com.solana.networking.socket.models.*
 import org.junit.Assert
 import org.junit.Test
@@ -14,11 +14,11 @@ import java.util.concurrent.TimeUnit
 class MockSolanaLiveEventsDelegate : SolanaSocketEventsDelegate {
     var onConected:  (() -> Unit)? = null
     var onDisconnected: (() -> Unit)? = null
-    var onAccountNotification: ((RpcResponseSerializable<AccountInfo<AccountInfoData?>>) -> Unit)? =
+    var onAccountNotification: ((RpcResponse<AccountInfo<AccountInfoData?>>) -> Unit)? =
         null
-    var onSignatureNotification: ((RpcResponseSerializable<SignatureNotification>) -> Unit)? = null
-    var onLogsNotification: ((RpcResponseSerializable<LogsNotification>) -> Unit)? = null
-    var onProgramNotification: ((RpcResponseSerializable<ProgramAccountSerialized<AccountInfo<AccountInfoData?>>>) -> Unit)? =
+    var onSignatureNotification: ((RpcResponse<SignatureNotification>) -> Unit)? = null
+    var onLogsNotification: ((RpcResponse<LogsNotification>) -> Unit)? = null
+    var onProgramNotification: ((RpcResponse<ProgramAccountSerialized<AccountInfo<AccountInfoData?>>>) -> Unit)? =
         null
     var onSubscribed: ((Int, String) -> Unit)? = null
     var onUnsubscribed: ((String) -> Unit)? = null
@@ -27,19 +27,19 @@ class MockSolanaLiveEventsDelegate : SolanaSocketEventsDelegate {
         onConected?.let { it() }
     }
 
-    override fun accountNotification(notification: RpcResponseSerializable<AccountInfo<AccountInfoData?>>) {
+    override fun accountNotification(notification: RpcResponse<AccountInfo<AccountInfoData?>>) {
         onAccountNotification?.let { it(notification) }
     }
 
-    override fun programNotification(notification: RpcResponseSerializable<ProgramAccountSerialized<AccountInfo<AccountInfoData?>>>) {
+    override fun programNotification(notification: RpcResponse<ProgramAccountSerialized<AccountInfo<AccountInfoData?>>>) {
         onProgramNotification?.let { it(notification) }
     }
 
-    override fun signatureNotification(notification: RpcResponseSerializable<SignatureNotification>) {
+    override fun signatureNotification(notification: RpcResponse<SignatureNotification>) {
         onSignatureNotification?.let { it(notification) }
     }
 
-    override fun logsNotification(notification: RpcResponseSerializable<LogsNotification>) {
+    override fun logsNotification(notification: RpcResponse<LogsNotification>) {
         onLogsNotification?.let { it(notification) }
     }
 

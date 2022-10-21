@@ -1,6 +1,6 @@
 package com.solana.api
 
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.SolanaResponseSerializer
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
 
-class GetFeeCalculatorForBlockhashRequest(blockhash: String) : RpcRequestSerializable() {
+class GetFeeCalculatorForBlockhashRequest(blockhash: String) : RpcRequest() {
     override val method: String = "getFeeCalculatorForBlockhash"
     override val params = buildJsonArray {
         add(blockhash)

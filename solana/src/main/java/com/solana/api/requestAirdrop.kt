@@ -1,7 +1,7 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -9,7 +9,7 @@ import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
 
-class RequestAirdropSlotRequest(address: PublicKey, lamports: Long) : RpcRequestSerializable() {
+class RequestAirdropSlotRequest(address: PublicKey, lamports: Long) : RpcRequest() {
     override val method: String = "requestAirdrop"
     override val params = buildJsonArray {
         add(address.toBase58())

@@ -3,7 +3,7 @@ package com.solana.networking.socket
 import com.solana.api.AccountInfo
 import com.solana.api.ProgramAccountSerialized
 import com.solana.models.buffer.*
-import com.solana.networking.RpcResponseSerializable
+import com.solana.networking.RpcResponse
 import com.solana.networking.serialization.serializers.base58.BorshAsBase58JsonArraySerializer
 import com.solana.networking.serialization.serializers.base64.BorshAsBase64JsonArraySerializer
 import com.solana.networking.socket.models.*
@@ -30,7 +30,7 @@ class SocketSerializerTests {
                 }
             """.trim()
 
-        val serializer = RpcResponseSerializable.serializer(Int.serializer())
+        val serializer = RpcResponse.serializer(Int.serializer())
 
         val result = json.decodeFromString(serializer, string)
         Assert.assertEquals(result.id, "ADFB8971-4473-4B16-A8BC-63EFD2F1FC8E")
@@ -64,7 +64,7 @@ class SocketSerializerTests {
              }
         """.trimIndent()
 
-        val serializer = RpcResponseSerializable.serializer(
+        val serializer = RpcResponse.serializer(
             AccountInfo.serializer(BorshAsBase64JsonArraySerializer(AccountInfoData.serializer()))
         )
 
@@ -103,7 +103,7 @@ class SocketSerializerTests {
             }
         """.trimIndent()
 
-        val serializer = RpcResponseSerializable.serializer(
+        val serializer = RpcResponse.serializer(
             ProgramAccountSerialized.serializer(
                 AccountInfo.serializer(
                     BorshAsBase58JsonArraySerializer(String.serializer().nullable))
@@ -157,7 +157,7 @@ class SocketSerializerTests {
         """.trimIndent()
 
         val serializer =
-            RpcResponseSerializable.serializer(
+            RpcResponse.serializer(
                 AccountInfo.serializer(
                     TokenAccountNotificationData.serializer()
                 )
@@ -186,7 +186,7 @@ class SocketSerializerTests {
             }
             """.trimIndent()
 
-        val serializer = RpcResponseSerializable.serializer(SignatureNotification.serializer())
+        val serializer = RpcResponse.serializer(SignatureNotification.serializer())
 
         val result = json.decodeFromString(serializer, string)
 

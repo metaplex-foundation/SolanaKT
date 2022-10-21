@@ -3,7 +3,7 @@ package com.solana.api
 import com.solana.core.PublicKey
 import com.solana.models.RpcSendTransactionConfig
 import com.solana.networking.MultipleAccountsSerializer
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.makeRequestResult
 import com.solana.vendor.ResultError
 import kotlinx.coroutines.CoroutineScope
@@ -17,7 +17,7 @@ class MultipleAccountsRequest(
     commitment: String = "max",
     length: Int? = null,
     offset: Int? = length?.let { 0 }
-) : RpcRequestSerializable() {
+) : RpcRequest() {
     override val method = "getMultipleAccounts"
     override val params = buildJsonArray {
         addJsonArray {

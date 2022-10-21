@@ -1,7 +1,7 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.makeRequestResult
 import com.solana.networking.serialization.serializers.solana.PublicKeyAsStringSerializer
 import kotlinx.coroutines.CoroutineScope
@@ -10,7 +10,7 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
 
-class GetSlotLeadersRequest(startSlot: Long, limit: Long) : RpcRequestSerializable() {
+class GetSlotLeadersRequest(startSlot: Long, limit: Long) : RpcRequest() {
     override val method: String = "getSlotLeaders"
     override val params = buildJsonArray {
         add(startSlot)
