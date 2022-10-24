@@ -15,15 +15,18 @@ typealias DefaultRpcResponse = RpcResponse<JsonElement>
 @Serializable
 data class RpcError(val code: Int, val message: String)
 
+interface SolanaResponse<R> {
+    val result: R?
+    val error: RpcError?
+    val id: String?
+}
+
 @Serializable
 data class RpcResponse<R>(
-    val result: R? = null,
-    val error: RpcError? = null,
-    val id: String? = null,
-
-    // Sockets
-    val params: Params<R>? = null
-) {
+    override val result: R? = null,
+    override val error: RpcError? = null,
+    override val id: String? = null
+): SolanaResponse<R> {
     val jsonrpc = "2.0"
 }
 

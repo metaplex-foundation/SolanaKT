@@ -21,10 +21,10 @@ sealed class SolanaSocketError : Exception() {
 
 interface SolanaSocketEventsDelegate {
     fun connected()
-    fun accountNotification(notification: RpcResponse<AccountInfo<AccountInfoData?>>)
-    fun programNotification(notification: RpcResponse<ProgramAccountSerialized<AccountInfo<AccountInfoData?>>>)
-    fun signatureNotification(notification: RpcResponse<SignatureNotification>)
-    fun logsNotification(notification: RpcResponse<LogsNotification>)
+    fun accountNotification(notification: SocketResponse<AccountInfo<AccountInfoData?>>)
+    fun programNotification(notification: SocketResponse<ProgramAccountSerialized<AccountInfo<AccountInfoData?>>>)
+    fun signatureNotification(notification: SocketResponse<SignatureNotification>)
+    fun logsNotification(notification: SocketResponse<LogsNotification>)
     fun unsubscribed(id: String)
     fun subscribed(socketId: Int, id: String)
     fun disconnecting(code: Int, reason: String)
@@ -189,7 +189,7 @@ class SolanaSocket(
             methodString?.let {
                 when (it) {
                     SocketMethod.accountNotification.string -> {
-                        val serializer = RpcResponse.serializer(
+                        val serializer = SocketResponse.serializer(
                             AccountInfo.serializer(BorshAsBase64JsonArraySerializer(AccountInfoData.serializer()))
                         )
                         json.decodeFromString(serializer, text).let { response ->
@@ -197,7 +197,7 @@ class SolanaSocket(
                         }
                     }
                     SocketMethod.signatureNotification.string -> {
-                        val serializer = RpcResponse.serializer(
+                        val serializer = SocketResponse.serializer(
                             (SignatureNotification.serializer())
                         )
                         json.decodeFromString(serializer, text).let { response ->
@@ -205,7 +205,7 @@ class SolanaSocket(
                         }
                     }
                     SocketMethod.logsNotification.string -> {
-                        val serializer = RpcResponse.serializer(
+                        val serializer = SocketResponse.serializer(
                             (LogsNotification.serializer())
                         )
                         json.decodeFromString(serializer, text).let { response ->
@@ -213,7 +213,7 @@ class SolanaSocket(
                         }
                     }
                     SocketMethod.programNotification.string -> {
-                        val serializer = RpcResponse.serializer(
+                        val serializer = SocketResponse.serializer(
                             ProgramAccountSerialized.serializer(
                                 AccountInfo.serializer(
                                     BorshAsBase64JsonArraySerializer(AccountInfoData.serializer().nullable)

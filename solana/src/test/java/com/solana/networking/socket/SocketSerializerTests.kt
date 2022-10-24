@@ -30,7 +30,7 @@ class SocketSerializerTests {
                 }
             """.trim()
 
-        val serializer = RpcResponse.serializer(Int.serializer())
+        val serializer = SocketResponse.serializer(Int.serializer())
 
         val result = json.decodeFromString(serializer, string)
         Assert.assertEquals(result.id, "ADFB8971-4473-4B16-A8BC-63EFD2F1FC8E")
@@ -64,7 +64,7 @@ class SocketSerializerTests {
              }
         """.trimIndent()
 
-        val serializer = RpcResponse.serializer(
+        val serializer = SocketResponse.serializer(
             AccountInfo.serializer(BorshAsBase64JsonArraySerializer(AccountInfoData.serializer()))
         )
 
@@ -103,7 +103,7 @@ class SocketSerializerTests {
             }
         """.trimIndent()
 
-        val serializer = RpcResponse.serializer(
+        val serializer = SocketResponse.serializer(
             ProgramAccountSerialized.serializer(
                 AccountInfo.serializer(
                     BorshAsBase58JsonArraySerializer(String.serializer().nullable))
@@ -157,7 +157,7 @@ class SocketSerializerTests {
         """.trimIndent()
 
         val serializer =
-            RpcResponse.serializer(
+            SocketResponse.serializer(
                 AccountInfo.serializer(
                     TokenAccountNotificationData.serializer()
                 )
@@ -186,7 +186,7 @@ class SocketSerializerTests {
             }
             """.trimIndent()
 
-        val serializer = RpcResponse.serializer(SignatureNotification.serializer())
+        val serializer = SocketResponse.serializer(SignatureNotification.serializer())
 
         val result = json.decodeFromString(serializer, string)
 
