@@ -74,9 +74,9 @@ class Methods {
 
     @Test
     fun TestGetBlockTime() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
+        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.mainnetBetaSolana))
         val height = solana.api.getBlockHeight().blockingGet()
-        val result = solana.api.getBlockTime(height).blockingGet()
+        val result = solana.api.getBlockTime(height-1).blockingGet()
         Assert.assertNotNull(result)
     }
 
