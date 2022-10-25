@@ -1,9 +1,8 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
 
 class RpcSendTransactionConfig(
-    @Json(name = "encoding") val encoding: String = Encoding.base64.getEncoding(),
+    val encoding: String = Encoding.base64.getEncoding(),
 ){
     enum class Encoding(private val enc: String) {
         base64("base64"),

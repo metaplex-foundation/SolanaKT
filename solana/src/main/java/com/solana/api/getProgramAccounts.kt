@@ -4,7 +4,7 @@ import com.solana.core.PublicKey
 import com.solana.models.*
 import com.solana.networking.AccountInfoWithPublicKey
 import com.solana.networking.ProgramAccountsSerializer
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -19,7 +19,7 @@ class ProgramAccountRequest(
     filters: List<Any>? = null,
     dataSlice: DataSlice? = null,
     commitment: String = "processed"
-) : RpcRequestSerializable() {
+) : RpcRequest() {
     override val method = "getProgramAccounts"
     override val params = buildJsonArray {
         add(account)
@@ -77,7 +77,7 @@ class ProgramAccountRequest(
 
 @Serializable
 data class ProgramAccountSerialized<T>(
-    val account: AccountInfo<T>,
+    val account: T,
     val pubkey: String
 )
 
@@ -86,7 +86,7 @@ fun <T> Api.getProgramAccounts(
     account: PublicKey,
     offset: Long,
     bytes: String,
-    onComplete: (Result<List<ProgramAccountSerialized<T>>>) -> Unit
+    onComplete: (Result<List<ProgramAccountSerialized<AccountInfo<T>>>>) -> Unit
 ) {
     val filters: MutableList<Any> = ArrayList()
     filters.add(Filter(Memcmp(offset, bytes)))
@@ -97,7 +97,7 @@ fun <T> Api.getProgramAccounts(
 fun <T> Api.getProgramAccounts(
     serializer: KSerializer<T>,
     account: PublicKey,
-    onComplete: (Result<List<ProgramAccountSerialized<T>>>) -> Unit
+    onComplete: (Result<List<ProgramAccountSerialized<AccountInfo<T>>>>) -> Unit
 ) {
     return getProgramAccounts(
         serializer,
@@ -111,7 +111,7 @@ fun <T> Api.getProgramAccounts(
     serializer: KSerializer<T>,
     account: PublicKey,
     programAccountConfig: ProgramAccountConfig?,
-    onComplete: (Result<List<ProgramAccountSerialized<T>>>) -> Unit
+    onComplete: (Result<List<ProgramAccountSerialized<AccountInfo<T>>>>) -> Unit
 ) {
     CoroutineScope(dispatcher).launch {
         val result = getProgramAccounts(
@@ -130,7 +130,7 @@ fun <T> Api.getProgramAccounts(
     account: PublicKey,
     memcmpList: List<Memcmp>,
     dataSize: Int,
-    onComplete: (Result<List<ProgramAccountSerialized<T>>>) -> Unit
+    onComplete: (Result<List<ProgramAccountSerialized<AccountInfo<T>>>>) -> Unit
 ) {
     val filters: MutableList<Any> = ArrayList()
     memcmpList.forEach {
@@ -160,7 +160,7 @@ fun <T> Api.getProgramAccounts(
     serializer: KSerializer<T>,
     account: PublicKey,
     memcmpList: List<Memcmp>,
-    onComplete: (Result<List<ProgramAccountSerialized<T>>>) -> Unit
+    onComplete: (Result<List<ProgramAccountSerialized<AccountInfo<T>>>>) -> Unit
 ) {
     val filters: MutableList<Any> = ArrayList()
     memcmpList.forEach {

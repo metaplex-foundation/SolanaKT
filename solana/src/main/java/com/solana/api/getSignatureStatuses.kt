@@ -1,8 +1,7 @@
 package com.solana.api
 
-import com.solana.core.PublicKey
 import com.solana.models.SignatureStatusRequestConfiguration
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.SolanaResponseSerializer
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
@@ -11,7 +10,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.*
 
-class GetSignatureStatusesRequest(signatures: List<String>, configs: SignatureStatusRequestConfiguration? = SignatureStatusRequestConfiguration()) : RpcRequestSerializable() {
+class GetSignatureStatusesRequest(signatures: List<String>, configs: SignatureStatusRequestConfiguration? = SignatureStatusRequestConfiguration()) : RpcRequest() {
     override val method: String = "getSignatureStatuses"
     override val params = buildJsonArray {
         addJsonArray {

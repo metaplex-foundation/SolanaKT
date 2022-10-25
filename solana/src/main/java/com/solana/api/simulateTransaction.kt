@@ -11,7 +11,7 @@ import kotlinx.serialization.json.*
 class SimulateTransactionRequest(
     transaction: String,
     simulateTransactionConfig: SimulateTransactionConfig,
-) : RpcRequestSerializable() {
+) : RpcRequest() {
     override val method: String = "simulateTransaction"
     override val params = buildJsonArray {
         add(transaction)

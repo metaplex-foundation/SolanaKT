@@ -4,30 +4,12 @@ import com.solana.programs.TokenProgram
 import com.solana.vendor.ByteUtils
 import com.solana.vendor.TweetNaclFast
 import com.solana.vendor.borshj.*
-import com.squareup.moshi.FromJson
 import org.bitcoinj.core.Base58
 import org.bitcoinj.core.Sha256Hash
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
 
-class PublicKeyRule(
-    override val clazz: Class<PublicKey> = PublicKey::class.java
-): BorshRule<PublicKey> {
-
-    fun <Self>writeZeros(output: BorshOutput<Self>): Self{
-        return output.writeFixedArray(ByteArray(size = 32))
-    }
-
-    override fun read(input: BorshInput): PublicKey {
-        return PublicKey(input.readFixedArray(32))
-    }
-
-    override fun <Self>write(obj: Any, output: BorshOutput<Self>): Self {
-        val  publicKey = obj as PublicKey
-        return output.writeFixedArray(publicKey.toByteArray())
-    }
-}
 
 data class PublicKey(val pubkey: ByteArray) : BorshCodable {
     init{
@@ -135,29 +117,5 @@ data class PublicKey(val pubkey: ByteArray) : BorshCodable {
         fun valueOf(publicKey: String): PublicKey {
             return PublicKey(publicKey)
         }
-    }
-}
-
-class AccountPublicKeyRule(
-    override val clazz: Class<AccountPublicKey> = AccountPublicKey::class.java
-) : BorshRule<AccountPublicKey> {
-    override fun read(input: BorshInput): AccountPublicKey {
-        val publicKey = PublicKeyRule().read(input)
-        return AccountPublicKey(publicKey)
-    }
-
-    override fun <Self> write(obj: Any, output: BorshOutput<Self>): Self {
-        TODO("Not yet implemented")
-    }
-}
-
-data class AccountPublicKey (
-    val publicKey: PublicKey
-): BorshCodable
-
-class PublicKeyJsonAdapter {
-    @FromJson
-    fun fromJson(rawData: Any): PublicKey {
-        return PublicKey(rawData as String)
     }
 }

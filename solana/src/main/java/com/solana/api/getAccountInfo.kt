@@ -2,14 +2,11 @@ package com.solana.api
 
 import com.solana.core.PublicKey
 import com.solana.models.RpcSendTransactionConfig
-import com.solana.models.buffer.Buffer
-import com.solana.models.buffer.BufferInfo
 import com.solana.networking.*
 import com.solana.networking.serialization.serializers.base64.BorshAsBase64JsonArraySerializer
 import com.solana.networking.serialization.serializers.solana.AnchorAccountSerializer
 import com.solana.networking.serialization.serializers.solana.SolanaResponseSerializer
 import com.solana.vendor.ResultError
-import com.solana.vendor.borshj.BorshCodable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
@@ -22,7 +19,7 @@ class AccountRequest(
     commitment: String = Commitment.MAX.toString(),
     length: Int? = null,
     offset: Int? = length?.let { 0 }
-) : RpcRequestSerializable() {
+) : RpcRequest() {
 
     constructor(account: String, transactionOptions: TransactionOptions) : this(account,
         transactionOptions.encoding, commitment = transactionOptions.commitment.toString())
@@ -46,9 +43,6 @@ class AccountRequest(
 @Serializable
 data class AccountInfo<D>(val data: D?, val executable: Boolean,
                           val lamports: Long, val owner: String?, val rentEpoch: Long)
-
-fun <D, T: BorshCodable> AccountInfo<D>.toBufferInfo() =
-    BufferInfo(data?.let { Buffer(data as T) }, executable, lamports, owner, rentEpoch)
 
 fun <A> SolanaAccountSerializer(serializer: KSerializer<A>) =
     AccountInfoSerializer(

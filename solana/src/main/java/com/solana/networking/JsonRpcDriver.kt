@@ -30,14 +30,14 @@ interface JsonRpcDriver {
      * Performs the [request] and returns the resulting [RpcResponse]
      */
     suspend fun <R> makeRequest(
-        request: RpcRequestSerializable,
+        request: RpcRequest,
         resultSerializer: KSerializer<R>
-    ): RpcResponseSerializable<R>
+    ): RpcResponse<R>
 
 }
 
 suspend inline fun <reified R> JsonRpcDriver.makeRequestResult(
-    request: RpcRequestSerializable,
+    request: RpcRequest,
     serializer: KSerializer<R>
 ): Result<R?> =
     this.makeRequest(request, serializer).let { response ->
@@ -54,5 +54,5 @@ suspend inline fun <reified R> JsonRpcDriver.makeRequestResult(
     }
 
 
-suspend fun JsonRpcDriver.makeRequest(request: RpcRequestSerializable): DefaultRpcResponse =
+suspend fun JsonRpcDriver.makeRequest(request: RpcRequest): DefaultRpcResponse =
     makeRequest(request, JsonElement.serializer())

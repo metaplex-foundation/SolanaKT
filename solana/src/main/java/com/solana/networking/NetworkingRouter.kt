@@ -19,9 +19,9 @@ class HttpNetworkingRouter(
     }
 
     override suspend fun <R> makeRequest(
-        request: RpcRequestSerializable,
+        request: RpcRequest,
         resultSerializer: KSerializer<R>
-    ): RpcResponseSerializable<R> =
+    ): RpcResponse<R> =
         suspendCancellableCoroutine { continuation ->
             val url = endpoint.url
             with(url.openConnection() as HttpURLConnection) {
@@ -35,7 +35,7 @@ class HttpNetworkingRouter(
 
                 // send request body
                 outputStream.write(
-                    json.encodeToString(RpcRequestSerializable.serializer(), request).toByteArray()
+                    json.encodeToString(RpcRequest.serializer(), request).toByteArray()
                 )
                 outputStream.close()
 
@@ -50,7 +50,7 @@ class HttpNetworkingRouter(
                 continuation.resumeWith(
                     Result.success(
                         json.decodeFromString(
-                            RpcResponseSerializable.serializer(resultSerializer),
+                            RpcResponse.serializer(resultSerializer),
                             responseString
                         )
                     )

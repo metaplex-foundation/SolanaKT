@@ -1,6 +1,6 @@
 package com.solana.api
 
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -8,7 +8,7 @@ import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
 
-class GetBlockTimeRequest(block: Long) : RpcRequestSerializable() {
+class GetBlockTimeRequest(block: Long) : RpcRequest() {
     override val method: String = "getBlockTime"
     override val params = buildJsonArray {
         add(block)

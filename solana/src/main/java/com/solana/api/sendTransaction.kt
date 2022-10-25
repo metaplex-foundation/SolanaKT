@@ -4,7 +4,7 @@ import com.solana.core.Account
 import com.solana.core.Transaction
 import com.solana.models.RpcSendTransactionConfig
 import com.solana.networking.Commitment
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.TransactionOptions
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
@@ -19,7 +19,7 @@ import org.bouncycastle.util.encoders.Base64
 class SendTransactionRequest(serializedMessage: String,
                              skipPreflight: Boolean = false,
                              preflightCommitment: Commitment = Commitment.FINALIZED,
-                             encoding: RpcSendTransactionConfig.Encoding = RpcSendTransactionConfig.Encoding.base64) : RpcRequestSerializable() {
+                             encoding: RpcSendTransactionConfig.Encoding = RpcSendTransactionConfig.Encoding.base64) : RpcRequest() {
 
     constructor(serializedMessage: String, transactionOptions: TransactionOptions) : this(
         serializedMessage,

@@ -1,7 +1,7 @@
 package com.solana.api
 
 import com.solana.models.RpcSendTransactionConfig
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -14,7 +14,7 @@ class GetConfirmedBlockRequest(
     transactionDetails: String = "full",
     rewards: Boolean = true,
     commitment: String = "finalized"
-) : RpcRequestSerializable() {
+) : RpcRequest() {
     override val method: String = "getConfirmedBlock"
     override val params = buildJsonArray {
         add(slot)

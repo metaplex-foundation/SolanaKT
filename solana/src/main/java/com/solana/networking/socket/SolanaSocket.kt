@@ -1,36 +1,30 @@
 package com.solana.networking.socket
 
-import com.solana.core.PublicKeyJsonAdapter
-import com.solana.core.PublicKeyRule
-import com.solana.models.ProgramAccount
+import com.solana.api.AccountInfo
+import com.solana.api.ProgramAccountSerialized
 import com.solana.models.buffer.*
-import com.solana.models.buffer.moshi.AccountInfoJsonAdapter
-import com.solana.models.buffer.moshi.MintJsonAdapter
-import com.solana.models.buffer.moshi.TokenSwapInfoJsonAdapter
-import com.solana.networking.RPCEndpoint
-import com.solana.networking.models.RpcRequest
-import com.solana.networking.models.RpcResponse
+import com.solana.networking.*
+import com.solana.networking.serialization.serializers.base64.BorshAsBase64JsonArraySerializer
 import com.solana.networking.socket.models.*
-import com.solana.vendor.borshj.Borsh
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.nullable
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.*
 import okhttp3.*
 import okio.ByteString
 
-sealed class SolanaSocketError: Exception() {
-    object disconnected: SolanaSocketError()
-    object couldNotSerialize: SolanaSocketError()
-    object couldNotWrite: SolanaSocketError()
+sealed class SolanaSocketError : Exception() {
+    object disconnected : SolanaSocketError()
+    object couldNotSerialize : SolanaSocketError()
+    object couldNotWrite : SolanaSocketError()
 }
 
 interface SolanaSocketEventsDelegate {
     fun connected()
-    fun accountNotification(notification: RpcResponse<BufferInfo<AccountInfoData>>)
-    fun programNotification(notification: RpcResponse<ProgramAccount<AccountInfoData>>)
-    fun signatureNotification(notification: RpcResponse<SignatureNotification>)
-    fun logsNotification(notification: RpcResponse<LogsNotification>)
+    fun accountNotification(notification: SocketResponse<AccountInfo<AccountInfoData?>>)
+    fun programNotification(notification: SocketResponse<ProgramAccountSerialized<AccountInfo<AccountInfoData?>>>)
+    fun signatureNotification(notification: SocketResponse<SignatureNotification>)
+    fun logsNotification(notification: SocketResponse<LogsNotification>)
     fun unsubscribed(id: String)
     fun subscribed(socketId: Int, id: String)
     fun disconnecting(code: Int, reason: String)
@@ -42,23 +36,14 @@ class SolanaSocket(
     private val endpoint: RPCEndpoint,
     private val client: OkHttpClient = OkHttpClient(),
     val enableDebugLogs: Boolean = false
-): WebSocketListener() {
+) : WebSocketListener() {
     private val TAG = "SOLANA_SOCKET"
     private var socket: WebSocket? = null
     private var delegate: SolanaSocketEventsDelegate? = null
 
-    private fun borsh(): Borsh {
-        val borsh = Borsh()
-        borsh.setRules(listOf(PublicKeyRule(), AccountInfoRule(), MintRule(), TokenSwapInfoRule()))
-        return borsh
-    }
-    private val moshi: Moshi by lazy {
-        Moshi.Builder()
-            .add(PublicKeyJsonAdapter())
-            .add(MintJsonAdapter(borsh()))
-            .add(TokenSwapInfoJsonAdapter(borsh()))
-            .add(AccountInfoJsonAdapter(borsh()))
-            .addLast(KotlinJsonAdapterFactory()).build()
+    private val json = Json {
+        encodeDefaults = true
+        ignoreUnknownKeys = true
     }
 
     fun start(delegate: SolanaSocketEventsDelegate) {
@@ -68,200 +53,236 @@ class SolanaSocket(
         client.dispatcher.executorService.shutdown()
     }
 
-    fun stop(){
+    fun stop() {
         socket?.cancel()
     }
 
     fun accountSubscribe(publicKey: String): Result<String> {
-        val params: MutableList<Any> = ArrayList()
-        params.add(publicKey)
-        params.add(mapOf("encoding" to "base64", "commitment" to "recent"))
-        val rpcRequest = RpcRequest(SocketMethod.accountSubscribe.string, params)
+        val params = buildJsonArray {
+            add(publicKey)
+            add(buildJsonObject {
+                put("encoding", Encoding.base64.getEncoding())
+                put("commitment", Commitment.RECENT.value)
+            })
+        }
+        val rpcRequest =
+            RpcRequest(method = SocketMethod.accountSubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
     fun accountUnSubscribe(socketId: Int): Result<String> {
-        val params: MutableList<Any> = ArrayList()
-        params.add(socketId)
-        val rpcRequest = RpcRequest(SocketMethod.accountUnsubscribe.string, params)
+        val params = buildJsonArray {
+            add(socketId)
+        }
+        val rpcRequest =
+            RpcRequest(method = SocketMethod.accountUnsubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
     fun logsSubscribe(mentions: List<String>): Result<String> {
-        val params: MutableList<Any> = ArrayList()
-        params.add(mapOf("mentions" to mentions))
-        params.add(mapOf("encoding" to "base64", "commitment" to "recent"))
-        val rpcRequest = RpcRequest(SocketMethod.logsSubscribe.string, params)
+        val params = buildJsonArray {
+            add(buildJsonObject {
+                put("mentions", buildJsonArray {
+                    mentions.forEach {
+                        add((it))
+                    }
+                })
+            })
+            add(buildJsonObject {
+                put("encoding", Encoding.base64.getEncoding())
+                put("commitment", Commitment.RECENT.value)
+            })
+        }
+        val rpcRequest = RpcRequest(method = SocketMethod.logsSubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
     fun logsSubscribeAll(): Result<String> {
-        val params: MutableList<Any> = ArrayList()
-        params.add("all")
-        params.add(mapOf("encoding" to "base64", "commitment" to "recent"))
-        val rpcRequest = RpcRequest(SocketMethod.logsSubscribe.string, params)
+        val params = buildJsonArray {
+            add("all")
+            add(buildJsonObject {
+                put("encoding", Encoding.base64.getEncoding())
+                put("commitment", Commitment.RECENT.value)
+            })
+        }
+        val rpcRequest = RpcRequest(method = SocketMethod.logsSubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
     fun logsUnsubscribe(socketId: Int): Result<String> {
-        val params: MutableList<Any> = ArrayList()
-        params.add(socketId)
-        val rpcRequest = RpcRequest(SocketMethod.logsUnsubscribe.string, params)
+        val params = buildJsonArray {
+            add(socketId)
+        }
+        val rpcRequest =
+            RpcRequest(method = SocketMethod.logsUnsubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
     fun programSubscribe(publicKey: String): Result<String> {
-        val params: MutableList<Any> = ArrayList()
-        params.add(publicKey)
-        params.add(mapOf("encoding" to "base64", "commitment" to "recent"))
-        val rpcRequest = RpcRequest(SocketMethod.programSubscribe.string, params)
+        val params = buildJsonArray {
+            add(publicKey)
+            add(buildJsonObject {
+                put("encoding", Encoding.base64.getEncoding())
+                put("commitment", Commitment.RECENT.value)
+            })
+        }
+        val rpcRequest =
+            RpcRequest(method = SocketMethod.programSubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
     fun programUnsubscribe(socketId: Int): Result<String> {
-        val params: MutableList<Any> = ArrayList()
-        params.add(socketId)
-        val rpcRequest = RpcRequest(SocketMethod.programUnsubscribe.string, params)
+        val params = buildJsonArray {
+            add(socketId)
+        }
+        val rpcRequest =
+            RpcRequest(method = SocketMethod.programUnsubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
     fun signatureSubscribe(signature: String): Result<String> {
-        val params: MutableList<Any> = ArrayList()
-        params.add(signature)
-        params.add(mapOf("encoding" to "base64", "commitment" to "recent"))
-        val rpcRequest = RpcRequest(SocketMethod.signatureSubscribe.string, params)
+        val params = buildJsonArray {
+            add(signature)
+            add(buildJsonObject {
+                put("encoding", Encoding.base64.getEncoding())
+                put("commitment", Commitment.RECENT.value)
+            })
+        }
+        val rpcRequest =
+            RpcRequest(method = SocketMethod.signatureSubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
     fun signatureUnsubscribe(socketId: Int): Result<String> {
-        val params: MutableList<Any> = ArrayList()
-        params.add(socketId)
-        val rpcRequest = RpcRequest(SocketMethod.signatureUnsubscribe.string, params)
+        val params = buildJsonArray {
+            add(socketId)
+        }
+        val rpcRequest =
+            RpcRequest(method = SocketMethod.signatureUnsubscribe.string, params)
         return writeToSocket(rpcRequest)
     }
 
     fun writeToSocket(request: RpcRequest): Result<String> {
-        val rpcRequestJsonAdapter = moshi.adapter(RpcRequest::class.java)
-        val json = rpcRequestJsonAdapter.toJson(request)
-        if(socket?.send(json) != true){ return Result.failure(SolanaSocketError.couldNotWrite) }
+        val json = json.encodeToString(RpcRequest.serializer(), request)
+        if (socket?.send(json) != true) {
+            return Result.failure(SolanaSocketError.couldNotWrite)
+        }
         return Result.success(request.id)
     }
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
-        if(enableDebugLogs) { println(TAG + " connected")}
+        if (enableDebugLogs) {
+            println(TAG + " connected")
+        }
         delegate?.connected()
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
 
-        if(enableDebugLogs) { println(TAG + " text: $text")}
-        val responseJsonAdapter = moshi.adapter(Map::class.java)
+        if (enableDebugLogs) {
+            println(TAG + " text: $text")
+        }
+
         try {
-            val dictJson = responseJsonAdapter.fromJson(text)
-            val methodString = dictJson?.get("method")
+            val dictJson = json.decodeFromString(RPCResponseMethond.serializer(), text)
+            val methodString = dictJson.method
             methodString?.let {
-                when(it){
+                when (it) {
                     SocketMethod.accountNotification.string -> {
-                        val subscriptionAdapter: JsonAdapter<RpcResponse<BufferInfo<AccountInfoData>>> = moshi.adapter(
-                            Types.newParameterizedType(
-                                RpcResponse::class.java,
-                                Types.newParameterizedType(
-                                    BufferInfo::class.java,
-                                    AccountInfoData::class.java
-                                )
-                            )
+                        val serializer = SocketResponse.serializer(
+                            AccountInfo.serializer(BorshAsBase64JsonArraySerializer(AccountInfoData.serializer()))
                         )
-                        subscriptionAdapter.fromJson(text)?.let {
-                            delegate?.accountNotification(it)
+                        json.decodeFromString(serializer, text).let { response ->
+                            delegate?.accountNotification(response)
                         }
                     }
                     SocketMethod.signatureNotification.string -> {
-                        val subscriptionAdapter: JsonAdapter<RpcResponse<SignatureNotification>> = moshi.adapter(
-                            Types.newParameterizedType(
-                                RpcResponse::class.java,
-                                SignatureNotification::class.java
-                            )
+                        val serializer = SocketResponse.serializer(
+                            (SignatureNotification.serializer())
                         )
-                        subscriptionAdapter.fromJson(text)?.let {
-                            delegate?.signatureNotification(it)
+                        json.decodeFromString(serializer, text).let { response ->
+                            delegate?.signatureNotification(response)
                         }
                     }
                     SocketMethod.logsNotification.string -> {
-                        val subscriptionAdapter: JsonAdapter<RpcResponse<LogsNotification>> = moshi.adapter(
-                            Types.newParameterizedType(
-                                RpcResponse::class.java,
-                                LogsNotification::class.java
-                            )
+                        val serializer = SocketResponse.serializer(
+                            (LogsNotification.serializer())
                         )
-                        subscriptionAdapter.fromJson(text)?.let {
-                            delegate?.logsNotification(it)
+                        json.decodeFromString(serializer, text).let { response ->
+                            delegate?.logsNotification(response)
                         }
                     }
                     SocketMethod.programNotification.string -> {
-                        val subscriptionAdapter: JsonAdapter<RpcResponse<ProgramAccount<AccountInfoData>>> = moshi.adapter(
-                            Types.newParameterizedType(
-                                RpcResponse::class.java,
-                                Types.newParameterizedType(
-                                    ProgramAccount::class.java,
-                                    AccountInfoData::class.java
+                        val serializer = SocketResponse.serializer(
+                            ProgramAccountSerialized.serializer(
+                                AccountInfo.serializer(
+                                    BorshAsBase64JsonArraySerializer(AccountInfoData.serializer().nullable)
                                 )
                             )
                         )
-                        subscriptionAdapter.fromJson(text)?.let {
-                            delegate?.programNotification(it)
-                        }
 
+                        json.decodeFromString(serializer, text).let { response ->
+                            delegate?.programNotification(response)
+                        }
                     }
-                    else -> { }
+                    else -> {}
                 }
             } ?: run {
-                if(dictJson?.get("result") is Double) {
-                    val subscriptionAdapter: JsonAdapter<RpcResponse<Int>> = moshi.adapter(
-                        Types.newParameterizedType(
-                            RpcResponse::class.java,
-                            Int::class.javaObjectType
-                        )
-                    )
-                    subscriptionAdapter.fromJson(text)?.let {
-                        delegate?.subscribed(it.result!!, it.id!!)
+                if (dictJson.result?.intOrNull is Int) {
+                    val serializer = RpcResponse.serializer(Int.serializer())
+
+                    json.decodeFromString(serializer, text).let { response ->
+                        response.result?.let { result ->
+                            response.id?.let { id ->
+                                delegate?.subscribed(
+                                    result,
+                                    id
+                                )
+                            }
+                        }
                     }
                 }
 
-                if(responseJsonAdapter.fromJson(text)?.get("result") is Boolean){
-                    val unSubscriptionAdapter: JsonAdapter<RpcResponse<Boolean>> = moshi.adapter(
-                        Types.newParameterizedType(
-                            RpcResponse::class.java,
-                            Boolean::class.javaObjectType
-                        )
-                    )
-                    unSubscriptionAdapter.fromJson(text)?.let {
-                        delegate?.unsubscribed(it.id!!)
+                if (dictJson.result?.booleanOrNull is Boolean) {
+                    val serializer = RpcResponse.serializer(Boolean.serializer())
+                    json.decodeFromString(serializer, text).let { response ->
+                        response.id?.let { delegate?.unsubscribed(it) }
                     }
                 }
             }
-
-        } catch (error: java.lang.Exception){
+        } catch (error: java.lang.Exception) {
             delegate?.error(error)
         }
     }
 
     override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-        if(enableDebugLogs) { println(TAG + " bytes")}
+        if (enableDebugLogs) {
+            println(TAG + " bytes")
+        }
 
     }
 
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-        if(enableDebugLogs) { println(TAG + " closing")}
+        if (enableDebugLogs) {
+            println(TAG + " closing")
+        }
         delegate?.disconnecting(code, reason)
     }
 
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-        if(enableDebugLogs) { println(TAG + " closed")}
+        if (enableDebugLogs) {
+            println(TAG + " closed")
+        }
         delegate?.disconnected(code, reason)
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-        if(enableDebugLogs) { println(TAG + " failure")}
+        if (enableDebugLogs) {
+            println(TAG + " failure")
+        }
         delegate?.error(Exception(t))
     }
 }
+
+@Serializable
+data class RPCResponseMethond(val method: String? = null, val result: JsonPrimitive? = null)

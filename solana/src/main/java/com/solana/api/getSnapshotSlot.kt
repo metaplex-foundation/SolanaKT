@@ -1,12 +1,12 @@
 package com.solana.api
 
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.serializer
 
-class GetSnapshotSlotRequest: RpcRequestSerializable() {
+class GetSnapshotSlotRequest: RpcRequest() {
     override val method: String = "getSnapshotSlot"
 }
 

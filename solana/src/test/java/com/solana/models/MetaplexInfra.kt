@@ -1,18 +1,20 @@
 package com.solana.models
 
 import com.solana.core.PublicKey
-import com.solana.vendor.borshj.BorshCodable
-import com.solana.vendor.borshj.FieldOrder
+import com.solana.networking.serialization.serializers.solana.PublicKeyAs32ByteSerializer
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class MetaplexMeta(
-    @FieldOrder(0) val key: Byte,
-    @FieldOrder(1) val update_authority: PublicKey,
-    @FieldOrder(2) val mint: PublicKey,
-    @FieldOrder(3) val data: MetaplexData
-): BorshCodable
+    val key: Byte,
+    @Serializable(with = PublicKeyAs32ByteSerializer::class) val update_authority: PublicKey,
+    @Serializable(with = PublicKeyAs32ByteSerializer::class) val mint: PublicKey,
+    val data: MetaplexData
+)
 
+@Serializable
 data class MetaplexData(
-    @FieldOrder(0) val name: String,
-    @FieldOrder(1) val symbol: String,
-    @FieldOrder(2) val uri: String
-): BorshCodable
+    val name: String,
+    val symbol: String,
+    val uri: String
+)

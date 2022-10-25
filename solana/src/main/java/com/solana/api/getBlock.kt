@@ -2,7 +2,6 @@ package com.solana.api
 
 import com.solana.models.*
 import com.solana.networking.*
-import com.squareup.moshi.Json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -16,7 +15,7 @@ class GetBlockRequest(
     commitment: String = "max",
     length: Int? = null,
     offset: Int? = length?.let { 0 }
-) : RpcRequestSerializable() {
+) : RpcRequest() {
     override val method: String = "getBlock"
     override val params = buildJsonArray {
         add(slot)

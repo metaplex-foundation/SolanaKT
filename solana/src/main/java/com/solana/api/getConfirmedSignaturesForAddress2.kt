@@ -1,7 +1,7 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -14,7 +14,7 @@ class GetConfirmedSignaturesForAddress2Request(
     limit: Int? = null,
     before: String? = null,
     until: String? = null,
-) : RpcRequestSerializable() {
+) : RpcRequest() {
     override val method: String = "getConfirmedSignaturesForAddress2"
     override val params = buildJsonArray {
         add(account.toString())
