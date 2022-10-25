@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.solana'
-version '1.2'
+version '2.0'
 
 android {
     compileSdkVersion 30
@@ -16,7 +16,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 30
         versionCode 1
-        versionName "1.2"
+        versionName version
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
