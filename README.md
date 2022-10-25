@@ -241,3 +241,12 @@ solana.action.sendSOL(account, toPublicKey, 1) { result ->
 ## ⛓️ RxSolana
 
 We also include support for RxKotlin in the RxSolana package. 
+
+One example using RxKotlin
+```koltin
+val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
+solana.api.getVersion().doOnSuccess { 
+    // SolanaVersion is available here
+}
+
+```
