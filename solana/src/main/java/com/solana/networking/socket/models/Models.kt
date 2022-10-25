@@ -1,8 +1,7 @@
 package com.solana.networking.socket.models
 
 import com.solana.networking.Params
-import com.solana.networking.RpcError
-import com.solana.networking.JsonRpcResponse
+import com.solana.networking.RpcResponse
 import kotlinx.serialization.Serializable
 
 enum class SocketMethod(val string: String) {
@@ -15,13 +14,8 @@ enum class SocketMethod(val string: String) {
 
 @Serializable
 data class SocketResponse<R>(
-    override val result: R? = null,
-    override val error: RpcError? = null,
-    override val id: String? = null,
-    val params: Params<R>? = null,
-) : JsonRpcResponse<R> {
-    val jsonrpc = "2.0"
-}
+    val params: Params<R>? = null
+) : RpcResponse<R>()
 
 @Serializable
 data class TokenAccountNotificationData (
