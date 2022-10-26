@@ -101,6 +101,7 @@ fun Api.getStakeActivation(publicKey: PublicKey): Single<StakeActivation> {
         Disposables.empty()
     }
 }
+
 fun Api.getStakeActivation(publicKey: PublicKey, epoch: Long): Single<StakeActivation> {
     return Single.create { emitter ->
         this.getStakeActivation(publicKey, epoch) { result ->
@@ -207,6 +208,7 @@ fun Api.getVersion(): Single<SolanaVersion> {
         Disposables.empty()
     }
 }
+
 fun Api.getFeeCalculatorForBlockhash(blockhash: String): Single<FeeCalculatorInfo> {
     return Single.create { emitter ->
         this.getFeeCalculatorForBlockhash(blockhash) { result ->
@@ -430,7 +432,7 @@ fun Api.getSignatureStatuses(signatures: List<String>, configs: SignatureStatusR
 
 fun Api.getConfirmedBlocks(start: Int, end: Int): Single<List<Double>> {
     return Single.create { emitter ->
-        this.getConfirmedBlocks(start,end) { result ->
+        this.getConfirmedBlocks(start, end) { result ->
             result.onSuccess {
                 emitter.onSuccess(it)
             }.onFailure {

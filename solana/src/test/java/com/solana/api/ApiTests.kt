@@ -61,7 +61,8 @@ class ApiTests {
 
     @Test
     fun TestGetConfirmedBlock() = runTest {
-        val slot = solana.api.getSnapshotSlot().getOrThrow()
+//        val slot = solana.api.getSnapshotSlot().getOrThrow()
+        val slot = 169877548L // Using fixed slot to make sure it doesn't contains unsupported transaction versions.
         val result = solana.api.getConfirmedBlock(slot).getOrThrow()
         Assert.assertNotNull(result)
     }
