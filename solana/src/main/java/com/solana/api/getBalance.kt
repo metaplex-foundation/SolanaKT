@@ -1,7 +1,7 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.SolanaResponseSerializer
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.*
 
-class GetBalanceRequest(accountAddress: String) : RpcRequestSerializable() {
+class GetBalanceRequest(accountAddress: String) : RpcRequest() {
     override val method: String = "getBalance"
     override val params = buildJsonArray {
         add(accountAddress)

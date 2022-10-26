@@ -1,7 +1,7 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.makeRequestResult
 import com.solana.networking.serialization.serializers.solana.PublicKeyAsStringSerializer
 import com.solana.networking.serialization.serializers.solana.SolanaResponseSerializer
@@ -12,7 +12,7 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
 
-class GetTokenLargestAccountsRequest(tokenMint: PublicKey) : RpcRequestSerializable() {
+class GetTokenLargestAccountsRequest(tokenMint: PublicKey) : RpcRequest() {
     override val method: String = "getTokenLargestAccounts"
     override val params = buildJsonArray {
         add(tokenMint.toString())

@@ -2,7 +2,7 @@ package com.solana.api
 
 import com.solana.models.RpcSendTransactionConfig
 import com.solana.networking.Commitment
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.TransactionOptions
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
@@ -19,7 +19,7 @@ class SendTransactionRequest(
     skipPreflight: Boolean = false,
     preflightCommitment: Commitment = Commitment.FINALIZED,
     encoding: RpcSendTransactionConfig.Encoding = RpcSendTransactionConfig.Encoding.base64
-) : RpcRequestSerializable() {
+) : RpcRequest() {
 
     constructor(serializedMessage: String, transactionOptions: TransactionOptions) : this(
         serializedMessage,

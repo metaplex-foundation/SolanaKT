@@ -1,6 +1,6 @@
 package com.solana.api
 
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.makeRequestResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -9,7 +9,7 @@ import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
 
-class GetConfirmedBlocksRequest(start: Long, end: Long? = null) : RpcRequestSerializable() {
+class GetConfirmedBlocksRequest(start: Long, end: Long? = null) : RpcRequest() {
     override val method: String = "getConfirmedBlocks"
     override val params = buildJsonArray {
         add(start)

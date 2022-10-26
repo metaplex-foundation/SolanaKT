@@ -1,18 +1,17 @@
 package com.solana.models
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class Token(
-    @Json(name = "tags") val _tags: List<String>,
+    val _tags: List<String> = listOf(),
     val chainId: Int,
     val address: String,
     val symbol: String,
     val name: String,
     val decimals: Int,
-    val logoURI: String?,
-    val extensions: TokenExtensions?,
+    val logoURI: String? = null,
+    val extensions: TokenExtensions? = null,
     val isNative: Boolean = false,
 ) {
     var tokenTags: List<TokenTag> = listOf()
@@ -33,7 +32,7 @@ data class Token(
     }
 }
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class TokensList(
     val name: String,
     val logoURI: String,
@@ -43,14 +42,14 @@ data class TokensList(
     var tokens: List<Token>,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class TokenTag(
     val name: String,
     val description: String
 )
 
-
+@Serializable
 data class TokenExtensions(
-    val website: String?,
-    val bridgeContract: String?
+    val website: String? = null,
+    val bridgeContract: String? = null
 )

@@ -9,7 +9,8 @@ enum class Commitment(val value: String) {
     PROCESSED("processed"),
     CONFIRMED("confirmed"),
     FINALIZED("finalized"),
-    MAX("max");
+    MAX("max"),
+    RECENT("recent");
 
     override fun toString(): String {
         return value
@@ -21,5 +22,5 @@ data class TransactionOptions(
     val encoding: Encoding = Encoding.base64,
     val skipPreflight: Boolean = false,
     val preflightCommitment: Commitment = commitment,
-    val timeout: Duration = Duration.ofSeconds(30)
+    val timeout: Int = 30
 )

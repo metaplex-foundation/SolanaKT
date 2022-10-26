@@ -32,12 +32,12 @@ fun Action.getMultipleMintDatas(
     programId: PublicKey = TokenProgram.PROGRAM_ID,
     onComplete: ((Result<Map<PublicKey, Mint>>) -> Unit)
 ){
-    this.api.getMultipleAccounts(mintAddresses, Mint::class.java) { result ->
+    this.api.getMultipleAccounts(Mint.serializer(), mintAddresses) { result ->
         result.onSuccess { account ->
             if(account.find { it?.owner == programId.toBase58()} == null) {
                 return@getMultipleAccounts onComplete(Result.failure(ResultError("Invalid mint owner")))
             }
-            val values = account.mapNotNull { it?.data?.value }
+            val values = account.mapNotNull { it?.data }
             if(values.size != mintAddresses.size) {
                 return@getMultipleAccounts onComplete(Result.failure(ResultError("Some of mint data are missing")))
             }

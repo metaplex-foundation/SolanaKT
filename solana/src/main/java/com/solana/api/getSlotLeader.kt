@@ -1,13 +1,13 @@
 package com.solana.api
 
 import com.solana.core.PublicKey
-import com.solana.networking.RpcRequestSerializable
+import com.solana.networking.RpcRequest
 import com.solana.networking.makeRequestResult
 import com.solana.networking.serialization.serializers.solana.PublicKeyAsStringSerializer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class GetSlotLeaderRequest : RpcRequestSerializable() {
+class GetSlotLeaderRequest : RpcRequest() {
     override val method: String = "getSlotLeader"
 }
 

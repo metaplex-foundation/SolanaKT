@@ -592,7 +592,7 @@ fun Api.simulateTransaction(transaction: String,
     }
 }
 
-fun <T>Api.getProgramAccounts(serializer: KSerializer<T>, address: PublicKey): Single<List<ProgramAccountSerialized<T>>> {
+fun <T>Api.getProgramAccounts(serializer: KSerializer<T>, address: PublicKey): Single<List<ProgramAccountSerialized<AccountInfo<T>>>> {
     return Single.create { emitter ->
         this.getProgramAccounts(serializer, address) { result ->
             result.onSuccess {

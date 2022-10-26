@@ -2,41 +2,39 @@ package com.solana.api
 
 import com.solana.networking.*
 import kotlinx.serialization.KSerializer
-import java.lang.Error
-import java.lang.reflect.Type
 
 
 class MockRpcDriver(override val endpoint: RPCEndpoint = RPCEndpoint.devnetSolana) :
     NetworkingRouter {
 
-    val willReturn = mutableMapOf<RpcRequestSerializable, Any>()
-    val willError = mutableMapOf<RpcRequestSerializable, RpcError>()
+    val willReturn = mutableMapOf<RpcRequest, Any>()
+    val willError = mutableMapOf<RpcRequest, RpcError>()
 
-    inline fun <reified R : Any> willReturn(forRequest: RpcRequestSerializable, willReturn: R) {
+    inline fun <reified R : Any> willReturn(forRequest: RpcRequest, willReturn: R) {
         this.willReturn[forRequest] = willReturn
     }
 
-    fun willError(forRequest: RpcRequestSerializable, willError: RpcError) {
+    fun willError(forRequest: RpcRequest, willError: RpcError) {
         this.willError[forRequest] = willError
     }
 
     override suspend fun <R> makeRequest(
-        request: RpcRequestSerializable,
+        request: RpcRequest,
         resultSerializer: KSerializer<R>
-    ): RpcResponseSerializable<R> {
+    ): RpcResponse<R> {
         findErrorForRequest(request)?.let { error ->
-            return RpcResponseSerializable(error = RpcError(error.code, error.message))
+            return RpcResponse(error = RpcError(error.code, error.message))
         }
-        return RpcResponseSerializable(findReturnForRequest(request) as R)
+        return RpcResponse(findReturnForRequest(request) as R)
     }
 
-    private fun findErrorForRequest(request: RpcRequestSerializable): RpcError? = willError[
+    private fun findErrorForRequest(request: RpcRequest): RpcError? = willError[
             willError.keys.find {
                 it.method == request.method && it.params == request.params
             }
     ]
 
-    private fun findReturnForRequest(request: RpcRequestSerializable): Any? = willReturn[
+    private fun findReturnForRequest(request: RpcRequest): Any? = willReturn[
             willReturn.keys.find {
                 it.method == request.method && it.params == request.params
             }
