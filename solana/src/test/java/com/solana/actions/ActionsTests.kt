@@ -30,8 +30,6 @@ class ActionsTests {
             "hint", "begin", "crowd", "dolphin", "drive", "render", "finger", "above", "sponsor", "prize", "runway", "invest", "dizzy", "pony", "bitter", "trial", "ignore", "crop", "please", "industry", "hockey", "wire", "use", "side"
         ), "")
 
-        solana.api.requestAirdrop(sender.publicKey, 1000000).getOrThrow()
-
         val result = solana.action.sendSOL(
             sender,
             PublicKey("3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG"),
