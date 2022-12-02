@@ -18,15 +18,15 @@ class SolanaBip44 {
      * @param derivableType bip44 derivableType
      * @return PrivateKey
      */
-    fun getPrivateKeyFromSeed(seed: ByteArray, derivableType: DerivableType?): ByteArray {
+    fun getPrivateKeyFromSeed(seed: ByteArray, derivableType: DerivableType?, change: Int = CHANGE): ByteArray {
         return when (derivableType) {
             DerivableType.BIP44 -> getPrivateKeyFromBip44Seed(seed)
-            DerivableType.BIP44CHANGE -> getPrivateKeyFromBip44SeedWithChange(seed)
+            DerivableType.BIP44CHANGE -> getPrivateKeyFromBip44SeedWithChange(seed, change)
             else -> throw RuntimeException("DerivableType not supported")
         }
     }
 
-    private fun getPrivateKeyFromBip44SeedWithChange(seed: ByteArray): ByteArray {
+    private fun getPrivateKeyFromBip44SeedWithChange(seed: ByteArray, change: Int): ByteArray {
         val masterAddress = hdKeyGenerator.getAddressFromSeed(seed, solanaCoin)
         val purposeAddress =
             hdKeyGenerator.getAddress(masterAddress, PURPOSE, solanaCoin.alwaysHardened) // 44H
@@ -36,9 +36,9 @@ class SolanaBip44 {
             hdKeyGenerator.getAddress(coinTypeAddress, ACCOUNT, solanaCoin.alwaysHardened) //0H
         val changeAddress = hdKeyGenerator.getAddress(
             accountAddress,
-            CHANGE.toLong(),
+            change.toLong(),
             solanaCoin.alwaysHardened
-        ) //0H
+        )
         return changeAddress.privateKey.privateKey
     }
 
