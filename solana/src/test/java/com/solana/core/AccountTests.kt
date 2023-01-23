@@ -1,7 +1,11 @@
 package com.solana.core
 
+import com.solana.vendor.TweetNaclFast
+import com.solana.vendor.bip32.wallet.DerivableType
+import com.solana.vendor.bip32.wallet.SolanaBip44
 import junit.framework.Assert.assertEquals
 import org.bitcoinj.core.Base58
+import org.bitcoinj.crypto.MnemonicCode
 import org.junit.Assert
 import org.junit.Test
 import java.util.*
@@ -71,4 +75,21 @@ class AccountTests {
         assertEquals("2cXAj2TagK3t6rb2CGRwyhF6sTFJgLyzyDGSWBcGd8Go", acc.publicKey.toString())
     }
 
+    @Test
+    fun from12WordsMnemonicChange() {
+        val acc = HotAccount.fromMnemonic(
+            listOf("pill", "tomorrow", "foster", "begin", "walnut", "borrow", "virtual", "kick", "shift", "mutual", "shoe", "scatter"), "" , DerivationPath.BIP44_M_44H_501H_0H_OH
+        )
+        Assert.assertEquals("5F86TNSTre3CYwZd1wELsGQGhqG2HkN3d8zxhbyBSnzm", acc.publicKey.toString())
+
+        val solanaBip44 = SolanaBip44()
+        val seed = MnemonicCode.toSeed(
+            listOf("pill", "tomorrow", "foster", "begin", "walnut", "borrow", "virtual", "kick", "shift", "mutual", "shoe", "scatter"), "")
+        val privateKey = solanaBip44.getPrivateKeyFromSeed(seed, DerivableType.BIP44CHANGE, 0)
+        Assert.assertEquals("5F86TNSTre3CYwZd1wELsGQGhqG2HkN3d8zxhbyBSnzm", PublicKey(TweetNaclFast.Signature.keyPair_fromSeed(privateKey).publicKey).toBase58())
+
+
+        val privateKey01 = solanaBip44.getPrivateKeyFromBip44SeedWithChange(seed, account = 1L, change = 0)
+        Assert.assertEquals("AWjbG5SH5VEay5ksZbGHHgJhYRhM1rsN5Z538cfFvs4a", PublicKey(TweetNaclFast.Signature.keyPair_fromSeed(privateKey01).publicKey).toBase58())
+    }
 }
