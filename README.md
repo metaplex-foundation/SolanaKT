@@ -41,7 +41,7 @@ dependencies {
 
 ### Using GitHub Packages 
 
-First get a Github Token from your [account settings](https://github.com/settings/tokens).
+First get a GitHub Token from your [account settings](https://github.com/settings/tokens).
 
 Inside settings.gradle add a maven repository:
 
