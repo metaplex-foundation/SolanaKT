@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.solana'
-version '2.0'
+version '2.0.1'
 
 android {
     compileSdkVersion 30
