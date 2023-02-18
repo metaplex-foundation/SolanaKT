@@ -25,3 +25,6 @@ jobs:
       with:
         # Here, `./gradlew test` will be run
         script: test
+      env:
+        DEVNET_VALIDATOR_URL: ${{ secrets.DEVNET_VALIDATOR_URL }}
+        DEVNET_VALIDATOR_WSS: ${{ secrets.DEVNET_VALIDATOR_WSS }}
