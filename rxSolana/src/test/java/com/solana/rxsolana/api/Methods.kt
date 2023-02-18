@@ -6,21 +6,31 @@ import com.solana.core.PublicKey
 import com.solana.models.SignatureStatusRequestConfiguration
 import com.solana.models.buffer.AccountInfoData
 import com.solana.networking.HttpNetworkingRouter
+import com.solana.networking.Network
 import com.solana.networking.RPCEndpoint
 import org.junit.Assert
 import org.junit.Test
+import java.net.URL
 import kotlin.collections.listOf
 
+const val DEVNET_VALIDATOR_URL = "DEVNET_VALIDATOR_URL"
+const val DEVNET_VALIDATOR_WSS = "DEVNET_VALIDATOR_WSS"
 class Methods {
+
+    val solana: Solana get() = Solana(HttpNetworkingRouter(RPCEndpoint.custom(
+        URL(System.getProperty(DEVNET_VALIDATOR_URL, "https://api.devnet.solana.com")),
+        URL(System.getProperty(DEVNET_VALIDATOR_WSS, "https://api.devnet.solana.com")),
+        Network.devnet
+    )
+    ))
+
     @Test
     fun TestGetRecentBlockhash() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getRecentBlockhash().blockingGet()
         Assert.assertNotNull(result)
     }
     @Test
     fun TestGetBalance() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getBalance(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV")).blockingGet()
         Assert.assertTrue(result > 0)
     }
@@ -39,35 +49,30 @@ class Methods {
 
     @Test
     fun TestGetVoteAccounts() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getVoteAccounts().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetStakeActivation() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getStakeActivation(PublicKey("HDDhNo3H2t3XbLmRswHdTu5L8SvSMypz9UVFu68Wgmaf")).blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetStakeActivationEpoch() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getStakeActivation(PublicKey("HDDhNo3H2t3XbLmRswHdTu5L8SvSMypz9UVFu68Wgmaf"), 143).blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestRequestAirdrop() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.requestAirdrop(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV"), 1010).blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetMinimumBalanceForRentExemption() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getMinimumBalanceForRentExemption(32000).blockingGet()
         Assert.assertNotNull(result)
     }
@@ -82,35 +87,30 @@ class Methods {
 
     @Test
     fun TestGetAccountInfo() {
-        val solanaDevNet = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
-        val result = solanaDevNet.api.getAccountInfo(SolanaAccountSerializer(AccountInfoData.serializer()), PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV")).blockingGet()
+        val result = solana.api.getAccountInfo(SolanaAccountSerializer(AccountInfoData.serializer()), PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV")).blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetBlockHeight() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getBlockHeight().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetVersion() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getVersion().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestMinimumLedgerSlot() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.minimumLedgerSlot().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetFeeCalculatorForBlockhash() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val blockhash = solana.api.getRecentBlockhash().blockingGet()
         val result = solana.api.getFeeCalculatorForBlockhash(blockhash).blockingGet()
         Assert.assertNotNull(result)
@@ -118,78 +118,66 @@ class Methods {
 
     @Test
     fun TestGetBlockCommitment() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getBlockCommitment(82493733).blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetFeeRateGovernor() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getFeeRateGovernor().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetFees() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getFees().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetTransactionCount() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getTransactionCount().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetMaxRetransmitSlot() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getMaxRetransmitSlot().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetSupply() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.mainnetBetaSolana))
         val result = solana.api.getSupply().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetFirstAvailableBlock() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getFirstAvailableBlock().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetGenesisHash() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getGenesisHash().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetEpochInfo() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getEpochInfo().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetEpochSchedule() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getEpochSchedule().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetConfirmedBlock() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
-//        val slot = solana.api.getSnapshotSlot().blockingGet()
         val slot = 169877548L // Using fixed slot to make sure it doesn't contains unsupported transaction versions.
         val result = solana.api.getConfirmedBlock(slot.toInt()).blockingGet()
         Assert.assertNotNull(result)
@@ -197,28 +185,24 @@ class Methods {
 
     @Test
     fun TestGetSnapshotSlot() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getSnapshotSlot().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetMaxShredInsertSlot() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getMaxShredInsertSlot().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetSlot() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getSlot().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetConfirmedBlocks() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val height = solana.api.getBlockHeight().blockingGet().toInt()
         val result = solana.api.getConfirmedBlocks(height, height - 10).blockingGet()
         Assert.assertNotNull(result)
@@ -233,56 +217,48 @@ class Methods {
 
     @Test
     fun TestGetSlotLeader() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getSlotLeader().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetClusterNodes() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getClusterNodes().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetTokenAccountBalance() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getTokenAccountBalance(PublicKey("FzhfekYF625gqAemjNZxjgTZGwfJpavMZpXCLFdypRFD")).blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetConfirmedSignaturesForAddress2() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getConfirmedSignaturesForAddress2(PublicKey("5Zzguz4NsSRFxGkHfM4FmsFpGZiCDtY72zH2jzMcqkJx"), 10, null, null).blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetSignatureStatuses() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getSignatureStatuses(listOf("3citcRRbx1vTjXazYLXZ4cwVHNkx6baFrSNp5msR2mgTRuuod4qhqTi921emn2CjU93sSM5dGGhCcHeVtvQyPfCV"), SignatureStatusRequestConfiguration(true)).blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetTokenSupply() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getTokenSupply(PublicKey("2tWC4JAdL4AxEFJySziYJfsAnW2MHKRo98vbAPiRDSk8")).blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetTokenLargestAccounts() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getTokenLargestAccounts(PublicKey("2tWC4JAdL4AxEFJySziYJfsAnW2MHKRo98vbAPiRDSk8")).blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetSlotLeaders() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val slot = solana.api.getSlot().blockingGet()
         val result = solana.api.getSlotLeaders(slot, 10).blockingGet()
         Assert.assertNotNull(result)
@@ -290,14 +266,12 @@ class Methods {
 
     @Test
     fun TestGetIdentity() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getIdentity().blockingGet()
         Assert.assertNotNull(result)
     }
 
     @Test
     fun TestGetInflationReward() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val result = solana.api.getInflationReward(listOf(PublicKey("5U3bH5b6XtG99aVWLqwVzYPVpQiFHytBD68Rz2eFPZd7"))).blockingGet()
         Assert.assertNotNull(result)
     }
@@ -315,7 +289,6 @@ class Methods {
 
     @Test
     fun TestGetBlock() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
         val slot = solana.api.getSlot().blockingGet()
         val result = solana.api.getBlock(slot.toInt()).blockingGet()
         Assert.assertNotNull(result)
