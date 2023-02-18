@@ -43,7 +43,6 @@ class Action {
 
     @Test
     fun TestGetTokenWallets() {
-        val solana = Solana(HttpNetworkingRouter(RPCEndpoint.mainnetBetaSolana))
         val result = solana.action.getTokenWallets(
             PublicKey("3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG"),
         ).blockingGet()
