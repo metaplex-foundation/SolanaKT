@@ -24,8 +24,8 @@ const val DEVNET_VALIDATOR_WSS = "DEVNET_VALIDATOR_WSS"
 class ApiTests {
 
     val solana: Solana get() = Solana(HttpNetworkingRouter(RPCEndpoint.custom(
-            URL(System.getProperty(DEVNET_VALIDATOR_URL, "https://api.devnet.solana.com")),
-            URL(System.getProperty(DEVNET_VALIDATOR_WSS, "https://api.devnet.solana.com")),
+            URL(System.getProperty(DEVNET_VALIDATOR_URL)),
+            URL(System.getProperty(DEVNET_VALIDATOR_WSS)),
             Network.devnet
         )
     ))
