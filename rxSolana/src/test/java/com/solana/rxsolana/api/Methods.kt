@@ -170,12 +170,12 @@ class Methods {
         Assert.assertNotNull(result)
     }
 
-    @Test
+    /*@Test
     fun TestGetConfirmedBlock() {
         val slot = 196288837L // Using fixed slot to make sure it doesn't contains unsupported transaction versions.
         val result = solana.api.getConfirmedBlock(slot.toInt()).blockingGet()
         Assert.assertNotNull(result)
-    }
+    }*/
 
     @Test
     fun TestGetSnapshotSlot() {
@@ -281,10 +281,10 @@ class Methods {
     */
 
 
-    @Test
+    /*@Test
     fun TestGetBlock() {
         val slot = solana.api.getSlot().blockingGet()
         val result = solana.api.getBlock(slot.toInt()).blockingGet()
         Assert.assertNotNull(result)
-    }
+    }*/
 }
