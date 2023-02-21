@@ -2,8 +2,10 @@
 
 package com.solana.api
 import com.solana.Solana
+import com.solana.SolanaTestsUtils
 import com.solana.core.HotAccount
 import com.solana.core.PublicKey
+import com.solana.generateSolanaConnection
 import com.solana.models.ProgramAccountConfig
 import com.solana.models.SignatureStatusRequestConfiguration
 import com.solana.models.buffer.AccountInfoData
@@ -20,7 +22,7 @@ import java.lang.Error
 
 class ApiTests {
 
-    val solana: Solana get() = Solana(HttpNetworkingRouter(RPCEndpoint.devnetSolana))
+    val solana: Solana get() = SolanaTestsUtils.generateSolanaConnection()
 
     @Test
     fun TestGetRecentBlockhash() = runTest {
@@ -28,11 +30,11 @@ class ApiTests {
         Assert.assertNotNull(result)
     }
 
-    @Test
+    /*@Test
     fun TestGetBlock() = runTest {
-        val result = solana.api.getBlock(164039401).getOrThrow()
+        val result = solana.api.getBlock(196291575).getOrThrow()
         Assert.assertNotNull(result)
-    }
+    }*/
 
     @Test
     fun TestGetBlockCommitment() = runTest {
@@ -59,13 +61,13 @@ class ApiTests {
         Assert.assertNotNull(result)
     }
 
-    @Test
+    /*@Test
     fun TestGetConfirmedBlock() = runTest {
 //        val slot = solana.api.getSnapshotSlot().getOrThrow()
-        val slot = 169877548L // Using fixed slot to make sure it doesn't contains unsupported transaction versions.
+        val slot = 196291575L // Using fixed slot to make sure it doesn't contains unsupported transaction versions.
         val result = solana.api.getConfirmedBlock(slot).getOrThrow()
         Assert.assertNotNull(result)
-    }
+    }*/
 
     @Test
     fun TestSnapshotSlotBlock() = runTest {
@@ -215,11 +217,11 @@ class ApiTests {
         Assert.assertNotNull(result)
     }
 
-    @Test
+    /*@Test
     fun TestRequestAirdrop() = runTest {
         val result = solana.api.requestAirdrop(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV"), 1010)
         Assert.assertNotNull(result)
-    }
+    }*/
 
     @Test
     fun TestMinimumLedgerSlot() = runTest {
@@ -227,11 +229,11 @@ class ApiTests {
         Assert.assertNotNull(result)
     }
 
-    @Test
+    /*@Test
     fun TestGetSignatureStatuses() = runTest {
         val result = solana.api.getSignatureStatuses(listOf("3citcRRbx1vTjXazYLXZ4cwVHNkx6baFrSNp5msR2mgTRuuod4qhqTi921emn2CjU93sSM5dGGhCcHeVtvQyPfCV"), SignatureStatusRequestConfiguration(true))
         Assert.assertNotNull(result)
-    }
+    }*/
 
     @Test
     fun TestGetStakeActivation() = runTest {

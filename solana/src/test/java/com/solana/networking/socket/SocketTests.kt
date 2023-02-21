@@ -1,12 +1,16 @@
 package com.solana.networking.socket
 
+import com.solana.SolanaTestsUtils
 import com.solana.api.AccountInfo
 import com.solana.api.ProgramAccountSerialized
+import com.solana.generateSolanaSocket
 import com.solana.models.buffer.*
+import com.solana.networking.Network
 import com.solana.networking.RPCEndpoint
 import com.solana.networking.socket.models.*
 import org.junit.Assert
 import org.junit.Test
+import java.net.URL
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -64,7 +68,7 @@ class MockSolanaLiveEventsDelegate : SolanaSocketEventsDelegate {
 }
 
 class SocketTests {
-    val socket = SolanaSocket(RPCEndpoint.devnetSolana, enableDebugLogs = true)
+    val socket get() = SolanaTestsUtils.generateSolanaSocket()
 
     @Test
     fun testSocketConnected() {

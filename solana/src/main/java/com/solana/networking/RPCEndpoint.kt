@@ -15,7 +15,6 @@ sealed class Network(val name: String) {
 
 
 sealed class RPCEndpoint(open val url: URL, open val urlWebSocket: URL, open val network: Network) {
-    object mainnetBetaSerum: RPCEndpoint(URL("https://solana-api.projectserum.com"), URL("https://solana-api.projectserum.com"), Network.mainnetBeta)
     object mainnetBetaSolana: RPCEndpoint(URL("https://api.mainnet-beta.solana.com"), URL("https://api.mainnet-beta.solana.com"), Network.mainnetBeta)
     object devnetSolana: RPCEndpoint(URL("https://api.devnet.solana.com"), URL("https://api.devnet.solana.com"), Network.devnet)
     object testnetSolana: RPCEndpoint(URL("https://testnet.solana.com"), URL("https://testnet.solana.com"),Network.testnet)
