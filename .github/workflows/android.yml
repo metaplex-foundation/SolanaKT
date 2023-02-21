@@ -19,7 +19,7 @@ jobs:
 
     steps:
     - name: Run Tests
-        run: ./gradlew test -Ptesting.rpc.defaultUrl=$DEVNET_VALIDATOR_URL
+      run: ./gradlew test -Ptesting.rpc.defaultUrl=$DEVNET_VALIDATOR_URL
       env:
         DEVNET_VALIDATOR_URL: ${{ secrets.DEVNET_VALIDATOR_URL }}
         DEVNET_VALIDATOR_WSS: ${{ secrets.DEVNET_VALIDATOR_WSS }}
