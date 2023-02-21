@@ -32,7 +32,7 @@ class ApiTests {
 
     @Test
     fun TestGetBlock() = runTest {
-        val result = solana.api.getBlock(196289290).getOrThrow()
+        val result = solana.api.getBlock(196291575).getOrThrow()
         Assert.assertNotNull(result)
     }
 
@@ -64,7 +64,7 @@ class ApiTests {
     @Test
     fun TestGetConfirmedBlock() = runTest {
 //        val slot = solana.api.getSnapshotSlot().getOrThrow()
-        val slot = 196289670L // Using fixed slot to make sure it doesn't contains unsupported transaction versions.
+        val slot = 196291575L // Using fixed slot to make sure it doesn't contains unsupported transaction versions.
         val result = solana.api.getConfirmedBlock(slot).getOrThrow()
         Assert.assertNotNull(result)
     }
