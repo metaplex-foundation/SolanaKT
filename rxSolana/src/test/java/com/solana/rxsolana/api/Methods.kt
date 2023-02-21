@@ -2,6 +2,7 @@ package com.solana.rxsolana.api
 
 import com.solana.Solana
 import com.solana.api.SolanaAccountSerializer
+import com.solana.core.HotAccount
 import com.solana.core.PublicKey
 import com.solana.models.SignatureStatusRequestConfiguration
 import com.solana.models.buffer.AccountInfoData
@@ -15,7 +16,7 @@ import kotlin.collections.listOf
 
 class Methods {
 
-    /*val solana: Solana get() = SolanatestsUtils.generateSolanaConnection()
+    val solana: Solana get() = SolanatestsUtils.generateSolanaConnection()
 
     @Test
     fun TestGetRecentBlockhash() {
@@ -58,11 +59,11 @@ class Methods {
         Assert.assertNotNull(result)
     }
 
-    @Test
+   /*@Test
     fun TestRequestAirdrop() {
-        val result = solana.api.requestAirdrop(PublicKey("AaXs7cLGcSVAsEt8QxstVrqhLhYN2iGhFNRemwYnHitV"), 1010).blockingGet()
+        val result = solana.api.requestAirdrop(HotAccount().publicKey, 1000000000).blockingGet()
         Assert.assertNotNull(result)
-    }
+    }*/
 
     @Test
     fun TestGetMinimumBalanceForRentExemption() {
@@ -171,7 +172,7 @@ class Methods {
 
     @Test
     fun TestGetConfirmedBlock() {
-        val slot = 169877548L // Using fixed slot to make sure it doesn't contains unsupported transaction versions.
+        val slot = 196288837L // Using fixed slot to make sure it doesn't contains unsupported transaction versions.
         val result = solana.api.getConfirmedBlock(slot.toInt()).blockingGet()
         Assert.assertNotNull(result)
     }
@@ -232,11 +233,11 @@ class Methods {
         Assert.assertNotNull(result)
     }
 
-    @Test
+    /*@Test
     fun TestGetSignatureStatuses() {
         val result = solana.api.getSignatureStatuses(listOf("3citcRRbx1vTjXazYLXZ4cwVHNkx6baFrSNp5msR2mgTRuuod4qhqTi921emn2CjU93sSM5dGGhCcHeVtvQyPfCV"), SignatureStatusRequestConfiguration(true)).blockingGet()
         Assert.assertNotNull(result)
-    }
+    }*/
 
     @Test
     fun TestGetTokenSupply() {
@@ -285,5 +286,5 @@ class Methods {
         val slot = solana.api.getSlot().blockingGet()
         val result = solana.api.getBlock(slot.toInt()).blockingGet()
         Assert.assertNotNull(result)
-    }*/
+    }
 }

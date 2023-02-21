@@ -2,8 +2,10 @@ package com.solana.networking
 
 import kotlinx.coroutines.*
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.net.HttpURLConnection
+import kotlin.coroutines.resumeWithException
 
 interface NetworkingRouter : JsonRpcDriver {
     val endpoint: RPCEndpoint
@@ -47,14 +49,19 @@ class HttpNetworkingRouter(
                 println("Response Code : $responseCode")
                 println("input stream : $responseString")
 
-                continuation.resumeWith(
-                    Result.success(
-                        json.decodeFromString(
-                            RpcResponse.serializer(resultSerializer),
-                            responseString
+                try {
+                    val decoded = json.decodeFromString(
+                        RpcResponse.serializer(resultSerializer),
+                        responseString
+                    )
+                    continuation.resumeWith(
+                        Result.success(
+                            decoded
                         )
                     )
-                )
+                } catch (e: SerializationException){
+                    continuation.resumeWithException(e)
+                }
             }
         }
 
