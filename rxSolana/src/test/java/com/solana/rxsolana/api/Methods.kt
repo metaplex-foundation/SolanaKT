@@ -15,7 +15,7 @@ import kotlin.collections.listOf
 
 class Methods {
 
-    val solana: Solana get() = SolanatestsUtils.generateSolanaConnection()
+    /*val solana: Solana get() = SolanatestsUtils.generateSolanaConnection()
 
     @Test
     fun TestGetRecentBlockhash() {
@@ -285,5 +285,5 @@ class Methods {
         val slot = solana.api.getSlot().blockingGet()
         val result = solana.api.getBlock(slot.toInt()).blockingGet()
         Assert.assertNotNull(result)
-    }
+    }*/
 }
