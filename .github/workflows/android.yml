@@ -18,13 +18,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Run Gradle command
-      uses: Raul6469/android-gradle-action@2.0.0
-      with:
-        # Here, `./gradlew test` will be run
-        script: test
+    - name: Run Tests
+        run: ./gradlew test -Ptesting.rpc.defaultUrl=$DEVNET_VALIDATOR_URL
       env:
         DEVNET_VALIDATOR_URL: ${{ secrets.DEVNET_VALIDATOR_URL }}
         DEVNET_VALIDATOR_WSS: ${{ secrets.DEVNET_VALIDATOR_WSS }}

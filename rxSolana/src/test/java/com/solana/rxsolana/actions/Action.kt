@@ -6,25 +6,18 @@ import com.solana.core.HotAccount
 import com.solana.core.DerivationPath
 import com.solana.core.PublicKey
 import com.solana.core.Transaction
-import com.solana.networking.HttpNetworkingRouter
-import com.solana.networking.Network
-import com.solana.networking.RPCEndpoint
 import com.solana.programs.MemoProgram
 import com.solana.programs.SystemProgram
+import com.solana.rxsolana.SolanatestsUtils
 import com.solana.rxsolana.api.*
+import com.solana.rxsolana.generateSolanaConnection
 import org.junit.Assert
 import org.junit.Test
-import java.net.URL
 import java.util.*
 
 
 class Action {
-    val solana: Solana get() = Solana(HttpNetworkingRouter(RPCEndpoint.custom(
-        URL(System.getProperty(DEVNET_VALIDATOR_URL)),
-        URL(System.getProperty(DEVNET_VALIDATOR_WSS)),
-        Network.devnet
-    )
-    ))
+    val solana: Solana get() = SolanatestsUtils.generateSolanaConnection()
 
     @Test
     fun TestSendSOL() {

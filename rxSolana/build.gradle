@@ -9,17 +9,28 @@ group 'com.solana'
 version '2.0.1'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
     buildToolsVersion '30.0.2'
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 30
+        targetSdkVersion 33
         versionCode 1
         versionName version
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+
+        // read RPC URL properties fro testing
+        def defaultRpcUrl = project.properties["testing.rpc.defaultUrl"]
+        def rpcUrl = project.properties["rpcUrl"] ?: defaultRpcUrl
+
+        def useLocalValidator = project.properties["localValidator"].toBoolean()
+        def localRpcUrl = project.properties["testing.rpc.localUrl"]
+        if (useLocalValidator && localRpcUrl != null) rpcUrl = localRpcUrl
+
+        // set RPC URL (used in testing)
+        buildConfigField 'String', 'RPC_URL', "\"${rpcUrl.toString().replace('"', '')}\""
     }
 
     buildTypes {

@@ -1,9 +1,9 @@
 package com.solana.networking.socket
 
+import com.solana.SolanaTestsUtils
 import com.solana.api.AccountInfo
-import com.solana.api.DEVNET_VALIDATOR_URL
-import com.solana.api.DEVNET_VALIDATOR_WSS
 import com.solana.api.ProgramAccountSerialized
+import com.solana.generateSolanaSocket
 import com.solana.models.buffer.*
 import com.solana.networking.Network
 import com.solana.networking.RPCEndpoint
@@ -68,14 +68,7 @@ class MockSolanaLiveEventsDelegate : SolanaSocketEventsDelegate {
 }
 
 class SocketTests {
-    val socket = SolanaSocket(
-        RPCEndpoint.custom(
-            URL(System.getProperty(DEVNET_VALIDATOR_URL, "https://api.devnet.solana.com")),
-            URL(System.getProperty(DEVNET_VALIDATOR_WSS, "https://api.devnet.solana.com")),
-            Network.devnet
-        ),
-        enableDebugLogs = true
-    )
+    val socket get() = SolanaTestsUtils.generateSolanaSocket()
 
     @Test
     fun testSocketConnected() {

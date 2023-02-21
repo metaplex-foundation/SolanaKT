@@ -6,23 +6,16 @@ import com.solana.core.PublicKey
 import com.solana.models.SignatureStatusRequestConfiguration
 import com.solana.models.buffer.AccountInfoData
 import com.solana.networking.HttpNetworkingRouter
-import com.solana.networking.Network
 import com.solana.networking.RPCEndpoint
+import com.solana.rxsolana.SolanatestsUtils
+import com.solana.rxsolana.generateSolanaConnection
 import org.junit.Assert
 import org.junit.Test
-import java.net.URL
 import kotlin.collections.listOf
 
-const val DEVNET_VALIDATOR_URL = "DEVNET_VALIDATOR_URL"
-const val DEVNET_VALIDATOR_WSS = "DEVNET_VALIDATOR_WSS"
 class Methods {
 
-    val solana: Solana get() = Solana(HttpNetworkingRouter(RPCEndpoint.custom(
-        URL(System.getProperty(DEVNET_VALIDATOR_URL)),
-        URL(System.getProperty(DEVNET_VALIDATOR_WSS)),
-        Network.devnet
-    )
-    ))
+    val solana: Solana get() = SolanatestsUtils.generateSolanaConnection()
 
     @Test
     fun TestGetRecentBlockhash() {

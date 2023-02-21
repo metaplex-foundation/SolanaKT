@@ -2,8 +2,10 @@
 
 package com.solana.api
 import com.solana.Solana
+import com.solana.SolanaTestsUtils
 import com.solana.core.HotAccount
 import com.solana.core.PublicKey
+import com.solana.generateSolanaConnection
 import com.solana.models.ProgramAccountConfig
 import com.solana.models.SignatureStatusRequestConfiguration
 import com.solana.models.buffer.AccountInfoData
@@ -17,18 +19,10 @@ import kotlinx.serialization.serializer
 import org.junit.Assert
 import org.junit.Test
 import java.lang.Error
-import java.net.URL
 
-const val DEVNET_VALIDATOR_URL = "DEVNET_VALIDATOR_URL"
-const val DEVNET_VALIDATOR_WSS = "DEVNET_VALIDATOR_WSS"
 class ApiTests {
 
-    val solana: Solana get() = Solana(HttpNetworkingRouter(RPCEndpoint.custom(
-            URL(System.getProperty(DEVNET_VALIDATOR_URL)),
-            URL(System.getProperty(DEVNET_VALIDATOR_WSS)),
-            Network.devnet
-        )
-    ))
+    val solana: Solana get() = SolanaTestsUtils.generateSolanaConnection()
 
     @Test
     fun TestGetRecentBlockhash() = runTest {
