@@ -22,7 +22,7 @@ jobs:
     - name: Run Tests
       uses: Raul6469/android-gradle-action@2.0.0
       with:
-        script: test -Ptesting.rpc.defaultUrl="$DEVNET_VALIDATOR_URL"
+        script: test -Ptesting.rpc.defaultUrl="${DEVNET_VALIDATOR_URL}"
       env:
         DEVNET_VALIDATOR_URL: ${{ secrets.DEVNET_VALIDATOR_URL }}
         DEVNET_VALIDATOR_WSS: ${{ secrets.DEVNET_VALIDATOR_WSS }}
