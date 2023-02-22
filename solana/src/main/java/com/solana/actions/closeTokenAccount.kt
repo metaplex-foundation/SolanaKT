@@ -2,16 +2,26 @@ package com.solana.actions
 
 import com.solana.api.sendTransaction
 import com.solana.core.Account
-import com.solana.core.HotAccount
 import com.solana.core.PublicKey
 import com.solana.core.Transaction
 import com.solana.programs.TokenProgram
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 fun Action.closeTokenAccount(
     account: Account,
     tokenPubkey: PublicKey,
     onComplete: ((Result<Pair<String, PublicKey>>) -> Unit)
 ){
+    CoroutineScope(dispatcher).launch {
+        onComplete(closeTokenAccount(account, tokenPubkey))
+    }
+}
+
+suspend fun Action.closeTokenAccount(
+    account: Account,
+    tokenPubkey: PublicKey,
+): Result<Pair<String, PublicKey>> {
     val transaction = Transaction()
     val instruction = TokenProgram.closeAccount(
         account = tokenPubkey,
@@ -20,11 +30,8 @@ fun Action.closeTokenAccount(
     )
 
     transaction.add(instruction)
-    api.sendTransaction(transaction, listOf(account)){ result ->
-        result.onSuccess { transactionId ->
-            onComplete(Result.success(Pair(transactionId, tokenPubkey)))
-        }.onFailure { error ->
-            onComplete(Result.failure(error))
-        }
+    val transactionId = api.sendTransaction(transaction, listOf(account)).getOrElse {
+        return Result.failure(it)
     }
+    return Result.success(Pair(transactionId, tokenPubkey))
 }

@@ -1,9 +1,7 @@
 package com.solana.actions
 
-import com.solana.api.getAccountInfo
 import com.solana.api.sendTransaction
 import com.solana.core.Account
-import com.solana.core.HotAccount
 import com.solana.core.Transaction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

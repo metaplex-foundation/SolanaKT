@@ -1,9 +1,12 @@
 package com.solana.actions
 
+import com.solana.api.sendTransaction
 import com.solana.core.Account
 import com.solana.core.PublicKey
 import com.solana.core.Transaction
 import com.solana.programs.SystemProgram
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 fun Action.sendSOL(
     account: Account,
@@ -11,14 +14,21 @@ fun Action.sendSOL(
     amount: Long,
     onComplete: ((Result<String>) -> Unit)
 ) {
+    CoroutineScope(dispatcher).launch {
+        onComplete(sendSOL(account, destination, amount))
+    }
+}
+
+suspend fun Action.sendSOL(
+    account: Account,
+    destination: PublicKey,
+    amount: Long
+): Result<String> {
     val instructions = SystemProgram.transfer(account.publicKey, destination, amount)
     val transaction = Transaction()
     transaction.add(instructions)
-    this.serializeAndSendWithFee(transaction, listOf(account), null) { result ->
-        result.onSuccess {
-            onComplete(Result.success(it))
-        }.onFailure {
-            onComplete(Result.failure(it))
-        }
+    val transactionId = api.sendTransaction(transaction, listOf(account)).getOrElse {
+        return Result.failure(it)
     }
+    return Result.success(transactionId)
 }
