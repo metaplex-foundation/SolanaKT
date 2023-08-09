@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import java.lang.Exception
 import java.net.HttpURLConnection
 import kotlin.coroutines.resumeWithException
 
@@ -41,26 +42,24 @@ class HttpNetworkingRouter(
                 )
                 outputStream.close()
 
-                // read response
-                val responseString = inputStream.bufferedReader().use { it.readText() }
+                when (responseCode) {
+                    HttpURLConnection.HTTP_OK -> {
+                        try {
+                            val responseString = inputStream.bufferedReader().use { it.readText() }
 
-                // TODO: should check response code and/or errorStream for errors
-                println("URL : $url")
-                println("Response Code : $responseCode")
-                println("input stream : $responseString")
-
-                try {
-                    val decoded = json.decodeFromString(
-                        RpcResponse.serializer(resultSerializer),
-                        responseString
-                    )
-                    continuation.resumeWith(
-                        Result.success(
-                            decoded
-                        )
-                    )
-                } catch (e: SerializationException){
-                    continuation.resumeWithException(e)
+                            val decoded = json.decodeFromString(
+                                RpcResponse.serializer(resultSerializer), responseString)
+                            continuation.resumeWith(
+                                Result.success(decoded)
+                            )
+                        } catch (e: SerializationException){
+                            continuation.resumeWithException(e)
+                        }
+                    }
+                    else -> {
+                        val errorString = errorStream.bufferedReader().use { it.readText() }
+                        continuation.resumeWithException(Exception(errorString))
+                    }
                 }
             }
         }
