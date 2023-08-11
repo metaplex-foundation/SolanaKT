@@ -58,6 +58,8 @@ class ProgramAccountRequest(
                         put("bytes", filter.memcmp.bytes)
                     }
                 }
+
+                else -> { throw NotImplementedError("Not implemented") }
             }
         }
     }
@@ -70,6 +72,7 @@ class ProgramAccountRequest(
                 is Number -> put(k, v)
                 is String -> put(k, v)
                 is Boolean -> put(k, v)
+                else -> { throw NotImplementedError("Not implemented") }
             }
         }
     }
