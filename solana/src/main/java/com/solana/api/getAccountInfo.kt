@@ -42,7 +42,7 @@ class AccountRequest(
 
 @Serializable
 data class AccountInfo<D>(val data: D?, val executable: Boolean,
-                          val lamports: Long, val owner: String?, val rentEpoch: Long)
+                          val lamports: Long, val owner: String?, val rentEpoch: ULong)
 
 fun <A> SolanaAccountSerializer(serializer: KSerializer<A>) =
     AccountInfoSerializer(
